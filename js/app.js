@@ -1,10 +1,9 @@
 Vue.component('navbar-items', {
-    template: `<ul><li v-for="item in items"><navbar-button v-bind:item="item"></navbar-button></li><user-badge v-bind:user="user"></user-badge></ul>`,
+    template: `<ul><navbar-logo></navbar-logo><li v-for="item in items"><navbar-button v-bind:item="item"></navbar-button></li><user-badge v-bind:user="user"></user-badge></ul>`,
     props: ['user'],
     data: () => {
         return {
             items: [
-                "Logo",
                 "Dashboard",
                 "Blog",
                 "Community"
@@ -28,13 +27,21 @@ Vue.component('navbar-button', {
 });
 
 Vue.component('user-badge', {
-    template: `<li v-if="user.username"><button><img v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button></li><li v-else-if="!user.username"><button v-on:click="login">Login</button></li>`,
+    template: `<li v-if="user.username"><button><img v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button><user-dropdown></user-dropdown></li><li v-else-if="!user.username"><button v-on:click="login">Login</button></li>`,
     props: ['user'],
     methods: {
         login: () => {
             window.location = "api/v1/user/auth?scope=identify+guilds";
         }
     }
+});
+
+Vue.component('user-dropdown', {
+    template: `<ul class="dropdown"><li>Profile</li><li>My Servers</li><li>Notifications</li><li>Log Out</li></ul>`
+})
+
+Vue.component('navbar-logo', {
+    template: `<li><button>Logo</button></li>`
 });
 
 var app = new Vue({

@@ -22,10 +22,9 @@ main {
 .navbar ul {
     color: #99aab5;
     list-style: none;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
+    padding: 0;
     display: inline-flex;
-    width: -webkit-fill-available;
+    width: 100vw;
 }
 
 .navbar ul li {
@@ -33,9 +32,14 @@ main {
     margin-right: 0.4em;
 }
 
+.navbar ul li:first-child {
+    padding-left: 1.5em;
+}
+
 .navbar ul li:last-child {
     margin-left: auto;
     margin-right: 0;
+    padding-right: 1.5em;
 }
 
 .navbar ul li:last-child img {
@@ -43,6 +47,14 @@ main {
     float: left;
     padding-right: 0.3em;
     border-radius: 50%;
+}
+
+.navbar ul.dropdown {
+    display: block;
+}
+
+.navbar ul.dropdown li {
+    padding: 0;
 }
 
 .navbar ul li button {

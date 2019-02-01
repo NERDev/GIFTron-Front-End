@@ -38,8 +38,12 @@ main {
 
 .navbar ul li:last-child {
     margin-left: auto;
-    margin-right: 0;
-    padding-right: 1.5em;
+    margin-right: 1.5em;
+    position: relative;
+}
+
+.navbar ul li:last-child button {
+    z-index: 2;
 }
 
 .navbar ul li:last-child img {
@@ -50,11 +54,35 @@ main {
 }
 
 .navbar ul.dropdown {
-    display: block;
+    display: unset;
+    position: absolute;
+    width: auto;
+    padding-top: 3.5em;
+    background-color: #1D1E1F;
+    right: 0;
+    left: 0;
+    text-align: center;
 }
 
 .navbar ul.dropdown li {
     padding: 0;
+    margin: 0;
+}
+
+.navbar ul.dropdown li:last-child {
+    margin-bottom: 0.6em;
+    color: red
+}
+
+.navbar ul.dropdown li hr {
+    margin: auto;
+    margin-top: 0.6em;
+    margin-bottom: 0.6em;
+    width: 30%;
+}
+
+.navbar ul.dropdown li:last-child hr {
+    display: none;
 }
 
 .navbar ul li button {

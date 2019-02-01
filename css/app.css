@@ -69,9 +69,24 @@ main {
     margin: 0;
 }
 
+.navbar ul.dropdown li button {
+    width: 100%;
+    transition: 0.15s all ease-in-out;
+}
+
+.navbar ul.dropdown li button:hover {
+    background-color: #99aab5;
+    color: #1D1E1F;
+}
+
 .navbar ul.dropdown li:last-child {
     margin-bottom: 0.6em;
     color: red
+}
+
+.navbar ul.dropdown li:last-child button:hover {
+    background-color: red;
+    color: #1D1E1F;
 }
 
 .navbar ul.dropdown li hr {

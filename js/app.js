@@ -27,7 +27,7 @@ Vue.component('navbar-button', {
 });
 
 Vue.component('user-badge', {
-    template: `<li v-if="user.username"><button onfocus="document.querySelector('.dropdown').style.display = 'unset';" onblur="document.querySelector('.dropdown').style.display = 'none';"><img v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button><user-dropdown></user-dropdown></li><li v-else-if="!user.username"><button v-on:click="login">Login</button></li>`,
+    template: `<li v-if="user.username"><button onfocus="dropdownFocus(this)" onblur="dropdownUnfocus(this)"><img v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button><user-dropdown></user-dropdown></li><li v-else-if="!user.username"><button v-on:click="login">Login</button></li>`,
     props: ['user'],
     methods: {
         login: () => {
@@ -69,6 +69,21 @@ var app = new Vue({
     }
 });
 
+function dropdownFocus(element) {
+    var dropdown = document.querySelector('.dropdown');
+    if (document.activeElement == element) {
+        dropdown.style.display = 'unset';
+    }
+}
+
+function dropdownUnfocus(element) {
+    var dropdown = document.querySelector('.dropdown');
+    console.log(document.activeElement);
+    if (document.activeElement != dropdown)
+    {
+        dropdown.style.display = 'none';
+    }
+}
 
 var xhttp = new XMLHttpRequest();
 xhttp.onreadystatechange = function () {

@@ -27,7 +27,7 @@ Vue.component('navbar-button', {
 });
 
 Vue.component('user-badge', {
-    template: `<li v-if="user.username"><button v-bind:onfocus="dropdownShow" v-bind:onblur="dropdownHide"><img v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button><user-dropdown></user-dropdown></li><li v-else-if="!user.username"><button v-on:click="login">Login</button></li>`,
+    template: `<li v-if="user.username"><button onfocus="document.querySelector('.dropdown').style.display = 'unset';" onblur="document.querySelector('.dropdown').style.display = 'none';"><img v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button><user-dropdown></user-dropdown></li><li v-else-if="!user.username"><button v-on:click="login">Login</button></li>`,
     props: ['user'],
     methods: {
         login: () => {
@@ -37,12 +37,6 @@ Vue.component('user-badge', {
             var dropdown = document.querySelector('.dropdown'),
                 state = dropdown.style.display;
             dropdown.style.display = state ? '' : 'none';
-        },
-        dropdownShow: () => {
-            alert("showing!");
-        },
-        dropdownHide: () => {
-            alert("hiding!");
         }
     }
 });

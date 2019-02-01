@@ -54,7 +54,7 @@ main {
 }
 
 .navbar ul.dropdown {
-    display: unset;
+    display: none;
     position: absolute;
     width: auto;
     padding-top: 3.5em;

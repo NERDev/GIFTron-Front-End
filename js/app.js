@@ -45,18 +45,18 @@ Vue.component('user-badge', {
                 dropdown = document.querySelector('.dropdown');
             if (e == 'enter') {
                 if (dropdown.style.display != 'list-item') {
-                    button.classList.add('hover', 'shadow');
+                    button.parentElement.classList.add('hover', 'shadow');
                     console.log('enter');
                 }
             }
             if (e == 'leave') {
                 if (dropdown.style.display != 'list-item') {
-                    button.classList.remove('hover', 'shadow');
+                    button.parentElement.classList.remove('hover', 'shadow');
                     console.log('leave');
                 }
             }
             if (e == 'click') {
-                button.classList.remove('shadow');
+                button.parentElement.classList.remove('shadow');
                 dropdown.classList.add('shadow');
                 dropdown.style.display = 'list-item';
             }
@@ -106,7 +106,7 @@ function closeMenus(element) {
     {
         var userButton = document.querySelector('#userButton'),
             dropdown = document.querySelector('.dropdown');
-        userButton.classList.remove('hover', 'shadow');
+        userButton.parentElement.classList.remove('hover', 'shadow');
         dropdown.classList.remove('shadow');
         dropdown.style.display = 'none';
     }

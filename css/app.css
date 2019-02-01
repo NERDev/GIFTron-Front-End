@@ -47,14 +47,18 @@ main {
     margin-left: auto;
     margin-right: 1.5em;
     position: relative;
+    transition: 0.15s all ease-in-out;
 }
 
 .navbar ul li:last-child button {
     z-index: 2;
-    transition: 0.15s all ease-in-out;
 }
 
-.navbar ul li:last-child button.hover {
+.navbar ul li:last-child button:active {
+    background-color: #1D1E1F;
+}
+
+.navbar ul li:last-child.hover {
     transform: translate(0px, -2px);
 }
 

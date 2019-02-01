@@ -1,6 +1,6 @@
 Vue.component('navbar-items', {
-    template: `<ul><navbar-logo></navbar-logo><li v-for="item in items"><navbar-button v-bind:item="item"></navbar-button></li><user-badge v-bind:user="user"></user-badge></ul>`,
-    props: ['user'],
+    template: `<ul><navbar-logo></navbar-logo><li v-for="item in items"><navbar-button v-bind:item="item"></navbar-button></li><user-badge v-bind:user="user" v-bind:loading="loading"></user-badge></ul>`,
+    props: ['user', 'loading'],
     data: () => {
         return {
             items: [
@@ -27,22 +27,45 @@ Vue.component('navbar-button', {
 });
 
 Vue.component('user-badge', {
-    template: `<li v-if="user.username"><button onfocus="dropdownFocus(this)" onblur="dropdownUnfocus(this)"><img v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button><user-dropdown></user-dropdown></li><li v-else-if="!user.username"><button v-on:click="login">Login</button></li>`,
-    props: ['user'],
+    template: `<li v-if="loading"><div class="lds-ellipsis"><div v-for="index in 4"></div></div></li><li v-else-if="user.username"><button v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')" class="menuButton" id="userButton"><img v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button><user-dropdown></user-dropdown></li><li v-else-if="!user.username"><button v-on:click="login">Login</button></li>`,
+    props: ['user', 'loading'],
     methods: {
         login: () => {
             window.location = "api/v1/user/auth?scope=identify+guilds";
         },
         toggle: () => {
+            /*
             var dropdown = document.querySelector('.dropdown'),
                 state = dropdown.style.display;
             dropdown.style.display = state ? '' : 'none';
+            */
+        },
+        mouse: (e) => {
+            var button = document.getElementById('userButton'),
+                dropdown = document.querySelector('.dropdown');
+            if (e == 'enter') {
+                if (dropdown.style.display != 'list-item') {
+                    button.classList.add('hover', 'shadow');
+                    console.log('enter');
+                }
+            }
+            if (e == 'leave') {
+                if (dropdown.style.display != 'list-item') {
+                    button.classList.remove('hover', 'shadow');
+                    console.log('leave');
+                }
+            }
+            if (e == 'click') {
+                button.classList.remove('shadow');
+                dropdown.classList.add('shadow');
+                dropdown.style.display = 'list-item';
+            }
         }
     }
 });
 
 Vue.component('user-dropdown', {
-    template: `<ul class="dropdown"><li v-for="item in items"><button>{{ item }}</button><hr></li></ul>`,
+    template: `<ul class="dropdown menu"><li v-for="item in items"><hr><button>{{ item }}</button></li></ul>`,
     data: () => {
         return {
             items: [
@@ -64,32 +87,37 @@ var app = new Vue({
     data() {
         return {
             user: {},
-            title: "GIFTron"
+            title: "GIFTron",
+            loading: true
         };
+    },
+    mounted: () => {
+        window.addEventListener('click', (e) => {
+            if (!e.target.classList['menu']) {
+                console.log('closing menus');
+                closeMenus(e.target);
+            }
+        });
     }
 });
 
-function dropdownFocus(element) {
-    var dropdown = document.querySelector('.dropdown');
-    if (document.activeElement == element) {
-        dropdown.style.display = 'unset';
-    }
-}
-
-function dropdownUnfocus(element) {
-    var dropdown = document.querySelector('.dropdown');
-    console.log(document.activeElement);
-    if (document.activeElement != dropdown)
+function closeMenus(element) {
+    if (!element.closest('.menu') && !element.closest('.menuButton'))
     {
+        var userButton = document.querySelector('#userButton'),
+            dropdown = document.querySelector('.dropdown');
+        userButton.classList.remove('hover', 'shadow');
+        dropdown.classList.remove('shadow');
         dropdown.style.display = 'none';
     }
 }
 
 var xhttp = new XMLHttpRequest();
 xhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-        // Action to be performed when the document is read;
-        app.user = JSON.parse(this.response);
+    if (this.readyState == 4) {
+        if (this.status == 200) {
+            app.user = JSON.parse(this.response);
+        }
         app.loading = false;
     }
 };

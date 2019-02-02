@@ -7,6 +7,7 @@ main {
     width: 100vw;
     background-color: #2C2F33;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-y: auto;
 }
 
 .shadow {
@@ -18,6 +19,8 @@ main {
 .navbar {
     padding-top: 0.2em;
     background-color: inherit;
+    position: fixed;
+    z-index: 1;
 }
 
 .navbar hr {

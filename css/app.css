@@ -54,7 +54,7 @@ main {
     z-index: 2;
 }
 
-.navbar ul li:last-child button:active {
+.navbar ul li:last-child button.menuButton:active {
     background-color: #1D1E1F;
 }
 

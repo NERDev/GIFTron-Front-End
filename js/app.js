@@ -70,13 +70,19 @@ Vue.component('user-badge', {
 Vue.component('user-dropdown', {
     template: `<ul class="dropdown menu"><li v-for="item in items"><hr><button>{{ item }}</button></li></ul>`,
     data: () => {
+        var items = [
+            "My Servers",
+            "Notifications",
+            "Log Out"
+        ];
+        
+        if (app.user.staff)
+        {
+            items.splice(0, 0, "Staff");
+        };
+
         return {
-            items: [
-                "Profile",
-                "My Servers",
-                "Notifications",
-                "Log Out"
-            ]
+            items
         }
     }
 })

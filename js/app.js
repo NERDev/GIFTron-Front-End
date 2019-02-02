@@ -20,7 +20,7 @@ Vue.component('navbar-button', {
             if (element.item == 'Login') {
                 window.location = "api/v1/user/auth?scope=identify+guilds";
             } else {
-                console.log("You are going to be redirected to /#" + element.item);
+                //console.log("You are going to be redirected to /#" + element.item);
             }
         }
     }
@@ -46,19 +46,22 @@ Vue.component('user-badge', {
             if (e == 'enter') {
                 if (dropdown.style.display != 'list-item') {
                     button.parentElement.classList.add('hover', 'shadow');
-                    console.log('enter');
+                    //console.log('enter');
                 }
             }
             if (e == 'leave') {
                 if (dropdown.style.display != 'list-item') {
                     button.parentElement.classList.remove('hover', 'shadow');
-                    console.log('leave');
+                    //console.log('leave');
                 }
             }
             if (e == 'click') {
                 button.parentElement.classList.remove('shadow');
                 dropdown.classList.add('shadow');
                 dropdown.style.display = 'list-item';
+                setTimeout(() => {
+                    dropdown.style.maxHeight = '100vh';                    
+                }, 1);
             }
         }
     }
@@ -94,7 +97,7 @@ var app = new Vue({
     mounted: () => {
         window.addEventListener('click', (e) => {
             if (!e.target.classList['menu']) {
-                console.log('closing menus');
+                //console.log('closing menus');
                 closeMenus(e.target);
             }
         });
@@ -109,6 +112,7 @@ function closeMenus(element) {
         userButton.parentElement.classList.remove('hover', 'shadow');
         dropdown.classList.remove('shadow');
         dropdown.style.display = 'none';
+        dropdown.style.maxHeight = '';
     }
 }
 

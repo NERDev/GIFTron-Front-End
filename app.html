@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+    <script src="?js/gemini.js"></script>
+    <link href="?css/gemini-scrollbar.css" rel="stylesheet">
     <link rel="stylesheet" href="?css/app.css">
     <link rel="stylesheet" href="?css/loading.css">
     <title>Document</title>
@@ -17,7 +19,11 @@
             <navbar-items v-bind:user="user"></navbar-items>
             <hr>
         </div>
-
+        <div id="content">
+            <div style="height: 3500px">
+                <h1 style="position: relative; top: 500px;">kek</h1>
+            </div>
+        </div>
         <!--
         <user-avatar v-if="user.avatar" v-bind:user="user"></user-avatar>
         <h1 v-if="user.username">Welcome {{ user.username }}</h1>

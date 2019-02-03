@@ -99,6 +99,7 @@ Vue.component('user-dropdown', {
     template: `<ul class="dropdown menu"><li if="user.staff"><button>Staff</button></li><li v-for="item in items"><hr><button>{{ item }}</button></li></ul>`,
     props: ['user'],
     data () {
+        //need to handle this part on mounted
         var items = [
             "My Servers",
             "Notifications",
@@ -122,5 +123,10 @@ var app = new Vue({
             user: {},
             title: "GIFTron"
         };
+    },
+    mounted: function() {
+        var myScrollbar = new GeminiScrollbar({
+            element: document.querySelector('#content')
+        }).create();
     }
 });

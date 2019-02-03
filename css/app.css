@@ -46,6 +46,12 @@ main {
     padding-left: 1.5em;
 }
 
+.navbar ul li:first-child button img {
+    height: 2em;
+    position: relative;
+    bottom: 5px;
+}
+
 .navbar ul li:last-child {
     margin-left: auto;
     margin-right: 1.5em;

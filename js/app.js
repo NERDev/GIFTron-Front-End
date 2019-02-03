@@ -31,11 +31,13 @@ Vue.component('user-loader', {
 })
 
 Vue.component('user-badge', {
-    template: `<li><user-loader v-if="loading"></user-loader><button v-if="user.username" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')" class="menuButton" id="userButton"><img v-if="user.avatar" v-bind:src="'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png'" />{{ user.username }}</button><user-dropdown v-bind:user="user"></user-dropdown><button v-if="!user.username && !loading" v-on:click="login">Login</button></li>`,
+    template: `<li><user-loader v-if="loading"></user-loader><button v-if="user.username" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')" class="menuButton" id="userButton"><img v-bind:src="avatar" />{{ user.username }}</button><user-dropdown v-bind:user="user"></user-dropdown><button v-if="!user.username && !loading" v-on:click="login">Login</button></li>`,
     props: ['user'],
     data () {
+        var avatar;
         return {
-            loading: true
+            loading: true,
+            avatar
         }
     },
     methods: {
@@ -75,11 +77,17 @@ Vue.component('user-badge', {
                 vm.loading = false;
                 if (this.status == 200) {
                     app.user = JSON.parse(this.response);
+                    if (app.user.avatar) {
+                        vm.avatar = 'https://cdn.discordapp.com/avatars/' + app.user.id + '/' + app.user.avatar + '.png'
+                    } else {
+                        vm.avatar = 'https://cdn.discordapp.com/embed/avatars/' + app.user.discriminator % 5 + '.png'
+                    };
                 }
             }
         };
         xhttp.open("GET", "api/v1/user", true);
         xhttp.send();
+        
         window.addEventListener('click', (e) => {
             if (!e.target.closest('.menu') && !e.target.closest('.menuButton')) {
                 var userButton = document.querySelector('#userButton'),

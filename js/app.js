@@ -113,7 +113,7 @@ Vue.component('user-dropdown', {
 })
 
 Vue.component('navbar-logo', {
-    template: `<li><button><img src="?img/nerdev.svg"></button></li>`
+    template: `<li><button><img src="?img/nerdev-soft.svg"></button></li>`
 });
 
 var app = new Vue({

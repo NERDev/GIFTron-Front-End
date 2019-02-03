@@ -46,8 +46,9 @@ main {
     padding-left: 1.5em;
 }
 
-.navbar ul li:first-child button img {
+.navbar ul li:first-child button svg {
     height: 2em;
+    width: auto;
     position: relative;
     bottom: 5px;
 }

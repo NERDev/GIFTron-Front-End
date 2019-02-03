@@ -68,20 +68,18 @@ Vue.component('user-badge', {
         }
     },
     mounted: function() {
-        var vm = this;
-        window.onload = function() {
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    vm.loading = false;
-                    if (this.status == 200) {
-                        app.user = JSON.parse(this.response);
-                    }
+        var vm = this,
+            xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                vm.loading = false;
+                if (this.status == 200) {
+                    app.user = JSON.parse(this.response);
                 }
-            };
-            xhttp.open("GET", "api/v1/user", true);
-            xhttp.send();
+            }
         };
+        xhttp.open("GET", "api/v1/user", true);
+        xhttp.send();
         window.addEventListener('click', (e) => {
             if (!e.target.closest('.menu') && !e.target.closest('.menuButton')) {
                 var userButton = document.querySelector('#userButton'),

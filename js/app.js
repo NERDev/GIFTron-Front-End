@@ -20,7 +20,7 @@ Vue.component('navbar-button', {
             console.log('Clicked ' + e);
             switch (e) {
                 case 'dashboard':
-                    //code
+                    window.location.hash = '#dashboard';
                     break;
                 case 'blog':
                     //code
@@ -132,14 +132,10 @@ Vue.component('user-dropdown', {
         click: function (e) {
             console.log('Clicked ' + e);
             switch (e) {
-                case 'staff':                
-                    //code
-                    break;
-                case 'servers':                
-                    //code
-                    break;
-                case 'notifications':                
-                    //code
+                case 'staff':
+                case 'servers':
+                case 'notifications':
+                    window.location.hash = '#' + e;
                     break;
                 case 'logout':
                     this.$root.user = {};
@@ -174,7 +170,8 @@ var app = new Vue({
     data() {
         return {
             user: {},
-            title: "GIFTron"
+            title: "GIFTron",
+            hash: window.location.hash
         };
     },
     methods: {
@@ -183,8 +180,13 @@ var app = new Vue({
         }
     },
     mounted: function () {
-        var myScrollbar = new GeminiScrollbar({
+        var vm = this,
+            myScrollbar = new GeminiScrollbar({
             element: document.querySelector('#content')
         }).create();
+
+        window.onhashchange = function (e) {
+            vm.hash = window.location.hash;
+        };
     }
 });

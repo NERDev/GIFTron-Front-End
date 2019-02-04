@@ -86,11 +86,11 @@ Vue.component('user-badge', {
             if (this.readyState == 4) {
                 vm.loading = false;
                 if (this.status == 200) {
-                    app.user = JSON.parse(this.response);
-                    if (app.user.avatar) {
-                        vm.avatar = 'https://cdn.discordapp.com/avatars/' + app.user.id + '/' + app.user.avatar + '.png'
+                    vm.$root.user = JSON.parse(this.response);
+                    if (vm.$root.user.avatar) {
+                        vm.avatar = 'https://cdn.discordapp.com/avatars/' + vm.$root.user.id + '/' + vm.$root.user.avatar + '.png'
                     } else {
-                        vm.avatar = 'https://cdn.discordapp.com/embed/avatars/' + app.user.discriminator % 5 + '.png'
+                        vm.avatar = 'https://cdn.discordapp.com/embed/avatars/' + vm.$root.user.discriminator % 5 + '.png'
                     };
                 }
             }
@@ -135,7 +135,7 @@ Vue.component('user-dropdown', {
 
                     break;
                 case 'logout':
-                    app.user = {};
+                    this.$root.user = {};
                     this.$root.delete_cookie('session');
                     this.$parent.close();
                     break;

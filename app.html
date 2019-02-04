@@ -37,8 +37,20 @@
             <hr>
         </div>
         <div id="content">
-            <div style="height: 3500px">
-                <h1 style="position: relative; top: 500px;">kek</h1>
+            <div v-bind:page="page" v-show="!page">
+                <h1 style="position: relative; top: 100px; color: #99aab5;">Home</h1>
+            </div>
+            <div v-bind:page="page" v-show="page == '#dashboard'">
+                <h1 style="position: relative; top: 100px; color: #99aab5;">Dashboard</h1>
+            </div>
+            <div v-bind:page="page" v-show="page == '#staff'">
+                <h1 style="position: relative; top: 100px; color: #99aab5;">Staff</h1>
+            </div>
+            <div v-bind:page="page" v-show="page == '#notifications'">
+                <h1 style="position: relative; top: 100px; color: #99aab5;">Notifications</h1>
+            </div>
+            <div v-bind:page="page" v-show="page == '#servers'">
+                <h1 style="position: relative; top: 100px; color: #99aab5;">Servers</h1>
             </div>
         </div>
     </main>

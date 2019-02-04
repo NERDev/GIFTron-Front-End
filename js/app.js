@@ -4,6 +4,7 @@ Vue.component('navbar-items', {
     data: function () {
         return {
             items: [
+                { name: "Home", function: "home" },
                 { name: "Dashboard", function: "dashboard" },
                 { name: "Blog", function: "blog" },
                 { name: "Community", function: "community" }
@@ -21,6 +22,9 @@ Vue.component('navbar-button', {
             switch (e) {
                 case 'dashboard':
                     window.location.hash = '#dashboard';
+                    break;
+                case 'home':
+                    window.location.hash = '';
                     break;
                 case 'blog':
                     //code
@@ -171,7 +175,7 @@ var app = new Vue({
         return {
             user: {},
             title: "GIFTron",
-            hash: window.location.hash
+            page: window.location.hash
         };
     },
     methods: {
@@ -186,7 +190,13 @@ var app = new Vue({
         }).create();
 
         window.onhashchange = function (e) {
-            vm.hash = window.location.hash;
+            if (!window.location.hash) {
+                history.replaceState({}, document.title, ".");
+            }
+            vm.page = window.location.hash;
+            setTimeout(() => {
+                myScrollbar.update();
+            }, 100);
         };
     }
 });

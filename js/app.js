@@ -1,7 +1,7 @@
 Vue.component('navbar-items', {
     template: `<ul><navbar-logo></navbar-logo><li v-for="item in items"><navbar-button v-bind:item="item"></navbar-button></li><user-badge v-bind:user="user"></user-badge></ul>`,
     props: ['user'],
-    data: function() {
+    data: function () {
         return {
             items: [
                 "Dashboard",
@@ -33,7 +33,7 @@ Vue.component('user-loader', {
 Vue.component('user-badge', {
     template: `<li><user-loader v-if="loading"></user-loader><button v-if="user.username" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')" class="menuButton" id="userButton"><img v-bind:src="avatar" />{{ user.username }}</button><user-dropdown v-bind:user="user"></user-dropdown><button v-if="!user.username && !loading" v-on:click="login">Login</button></li>`,
     props: ['user'],
-    data () {
+    data() {
         var avatar;
         return {
             loading: true,
@@ -41,10 +41,10 @@ Vue.component('user-badge', {
         }
     },
     methods: {
-        login: function() {
+        login: function () {
             window.location = "api/v1/user/auth?scope=identify+guilds";
         },
-        mouse: function(e) {
+        mouse: function (e) {
             var button = document.getElementById('userButton'),
                 dropdown = document.querySelector('.dropdown');
             if (e == 'enter') {
@@ -63,13 +63,23 @@ Vue.component('user-badge', {
                 button.parentElement.classList.remove('shadow');
                 dropdown.classList.add('shadow');
                 dropdown.style.display = 'list-item';
-                setTimeout(function() {
-                    dropdown.style.maxHeight = '100vh';                    
+                setTimeout(function () {
+                    dropdown.style.maxHeight = '100vh';
                 }, 1);
+            }
+        },
+        close: function () {
+            var userButton = document.querySelector('#userButton'),
+                dropdown = document.querySelector('.dropdown');
+            if (userButton && dropdown) {
+                userButton.parentElement.classList.remove('hover', 'shadow');
+                dropdown.classList.remove('shadow');
+                dropdown.style.display = 'none';
+                dropdown.style.maxHeight = '';
             }
         }
     },
-    mounted: function() {
+    mounted: function () {
         var vm = this,
             xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
@@ -87,35 +97,49 @@ Vue.component('user-badge', {
         };
         xhttp.open("GET", "api/v1/user", true);
         xhttp.send();
-        
+
         window.addEventListener('click', (e) => {
             if (!e.target.closest('.menu') && !e.target.closest('.menuButton')) {
-                var userButton = document.querySelector('#userButton'),
-                    dropdown = document.querySelector('.dropdown');
-                if (userButton && dropdown) {
-                    userButton.parentElement.classList.remove('hover', 'shadow');
-                    dropdown.classList.remove('shadow');
-                    dropdown.style.display = 'none';
-                    dropdown.style.maxHeight = '';
-                }
+                vm.close();
             }
         });
     }
 });
 
 Vue.component('user-dropdown', {
-    template: `<ul class="dropdown menu"><li if="user.staff"><button>Staff</button></li><li v-for="item in items"><hr><button>{{ item }}</button></li></ul>`,
+    template: `<ul class="dropdown menu"><li if="user.staff"><button v-on:click="click('staff')">Staff</button></li><li v-for="item in items"><hr><button v-on:click="click(item.function)">{{ item.name }}</button></li></ul>`,
     props: ['user'],
-    data () {
+    data() {
         //need to handle this part on mounted
         var items = [
-            "My Servers",
-            "Notifications",
-            "Log Out"
+            { name: "My Servers", function: "servers" },
+            { name: "Notifications", function: "notifications" },
+            { name: "Log Out", function: "logout" }
         ];
 
         return {
             items
+        }
+    },
+    methods: {
+        click: function (e) {
+            console.log('Clicked ' + e);
+            switch (e) {
+                case 'staff':
+
+                    break;
+                case 'servers':
+
+                    break;
+                case 'notifications':
+
+                    break;
+                case 'logout':
+                    app.user = {};
+                    this.$root.delete_cookie('session');
+                    this.$parent.close();
+                    break;
+            }
         }
     }
 })
@@ -146,7 +170,12 @@ var app = new Vue({
             title: "GIFTron"
         };
     },
-    mounted: function() {
+    methods: {
+        delete_cookie: function (name) {
+            document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+        }
+    },
+    mounted: function () {
         var myScrollbar = new GeminiScrollbar({
             element: document.querySelector('#content')
         }).create();

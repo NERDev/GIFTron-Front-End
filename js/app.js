@@ -4,23 +4,30 @@ Vue.component('navbar-items', {
     data: function () {
         return {
             items: [
-                "Dashboard",
-                "Blog",
-                "Community"
+                { name: "Dashboard", function: "dashboard" },
+                { name: "Blog", function: "blog" },
+                { name: "Community", function: "community" }
             ]
         };
     }
 });
 
 Vue.component('navbar-button', {
-    template: `<button v-on:click="navclick({item})">{{ item }}</button>`,
+    template: `<button v-on:click="click(item.function)">{{ item.name }}</button>`,
     props: ['item'],
     methods: {
-        navclick: (element) => {
-            if (element.item == 'Login') {
-                window.location = "api/v1/user/auth?scope=identify+guilds";
-            } else {
-                //console.log("You are going to be redirected to /#" + element.item);
+        click: function (e) {
+            console.log('Clicked ' + e);
+            switch (e) {
+                case 'dashboard':
+                    //code
+                    break;
+                case 'blog':
+                    //code
+                    break;
+                case 'community':
+                    //code
+                    break;
             }
         }
     }
@@ -125,14 +132,14 @@ Vue.component('user-dropdown', {
         click: function (e) {
             console.log('Clicked ' + e);
             switch (e) {
-                case 'staff':
-
+                case 'staff':                
+                    //code
                     break;
-                case 'servers':
-
+                case 'servers':                
+                    //code
                     break;
-                case 'notifications':
-
+                case 'notifications':                
+                    //code
                     break;
                 case 'logout':
                     this.$root.user = {};

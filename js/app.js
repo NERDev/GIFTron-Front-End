@@ -170,11 +170,94 @@ Vue.component('navbar-logo', {
     </svg></button></li>`
 });
 
+Vue.component('giftron-dashboard', {
+    template: `<div><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value"></server-card></div>`,
+    data: function () {
+        return {
+            guildlist: {},
+            index: 0
+        }
+    },
+    mounted: function () {
+        var vm = this;
+
+        //console.log('mounted');
+        if (!vm.$root.guildlist) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    vm.loading = false;
+                    if (this.status == 200) {
+                        vm.$root.guildlist = JSON.parse(this.response);
+                        vm.guildlist = vm.$root.guildlist;
+                        //console.log(vm.$root.guildlist);
+                    }
+                }
+            };
+            xhttp.open("GET", "api/v1/user/guilds", true);
+            xhttp.send();
+        } else {
+            vm.guildlist = vm.$root.guildlist;
+        }
+    }
+});
+
+Vue.component('server-card', {
+    template: `<h3 style="margin-top:50px;color:white;" v-if="info">{{ id }}</h3>`,
+    props: ['id', 'manage'],
+    data: function () {
+        return {
+            info: null
+        }
+    },
+    mounted: function () {
+        var vm = this;
+
+        function guildExists(url) {
+            var req = new XMLHttpRequest();
+            req.open('HEAD', url, false);
+            req.send();
+            return req.status !== 204;
+        }
+
+
+        if (!vm.$root.guilds[vm.id]) {
+            var url = "api/v1/guild?guild_id=" + vm.id;
+            var interval = setInterval(() => {
+                //console.log(vm.$parent.index, Object.keys(vm.$parent.guildlist).indexOf(vm.id));
+                if (vm.$parent.index == Object.keys(vm.$parent.guildlist).indexOf(vm.id)) {
+                    //console.log('my turn', vm.id);
+                    clearInterval(interval);
+
+                    if (guildExists(url)) {
+                        var xhttp = new XMLHttpRequest();
+                        xhttp.onreadystatechange = function () {
+                            if (this.readyState == 4) {
+                                if (this.status == 200) {
+                                    vm.$root.guilds[vm.id] = JSON.parse(this.response);
+                                    vm.info = vm.$root.guilds[vm.id];
+                                    //console.log(vm.info);
+                                }
+                            }
+                        };
+                        xhttp.open("GET", url, true);
+                        xhttp.send();
+                    }
+                    vm.$parent.index++;
+                }
+            }, 0);
+        } else {
+            vm.info = vm.$root.guilds[vm.id];
+        }
+    }
+});
+
 var app = new Vue({
     el: 'main',
     data() {
         return {
             user: {},
+            guilds: {},
             title: "GIFTron",
             page: window.location.hash
         };
@@ -185,19 +268,13 @@ var app = new Vue({
         }
     },
     mounted: function () {
-        var vm = this,
-            myScrollbar = new GeminiScrollbar({
-            element: document.querySelector('#content')
-        }).create();
+        var vm = this;
 
         window.onhashchange = function (e) {
             if (!window.location.hash) {
                 history.replaceState({}, document.title, ".");
             }
             vm.page = window.location.hash;
-            setTimeout(() => {
-                myScrollbar.update();
-            }, 100);
         };
     }
 });

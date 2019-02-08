@@ -213,37 +213,27 @@ Vue.component('server-card', {
     mounted: function () {
         var vm = this;
 
-        function guildExists(url) {
-            var req = new XMLHttpRequest();
-            req.open('HEAD', url, false);
-            req.send();
-            return req.status !== 204;
-        }
-
 
         if (!vm.$root.guilds[vm.id]) {
-            var url = "api/v1/guild?guild_id=" + vm.id;
             var interval = setInterval(() => {
                 //console.log(vm.$parent.index, Object.keys(vm.$parent.guildlist).indexOf(vm.id));
                 if (vm.$parent.index == Object.keys(vm.$parent.guildlist).indexOf(vm.id)) {
                     //console.log('my turn', vm.id);
                     clearInterval(interval);
 
-                    if (guildExists(url)) {
-                        var xhttp = new XMLHttpRequest();
-                        xhttp.onreadystatechange = function () {
-                            if (this.readyState == 4) {
-                                if (this.status == 200) {
-                                    vm.$root.guilds[vm.id] = JSON.parse(this.response);
-                                    vm.info = vm.$root.guilds[vm.id];
-                                    //console.log(vm.info);
-                                }
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            vm.$parent.index++;
+                            if (this.status == 200) {
+                                vm.$root.guilds[vm.id] = JSON.parse(this.response);
+                                vm.info = vm.$root.guilds[vm.id];
+                                //console.log(vm.info);
                             }
-                        };
-                        xhttp.open("GET", url, true);
-                        xhttp.send();
-                    }
-                    vm.$parent.index++;
+                        }
+                    };
+                    xhttp.open("GET", "api/v1/guild?guild_id=" + vm.id, true);
+                    xhttp.send();
                 }
             }, 0);
         } else {

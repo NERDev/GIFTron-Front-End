@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
-    <script src="?js/gemini.js"></script>
-    <link href="?css/gemini-scrollbar.css" rel="stylesheet">
+    <!--<script src="?js/gemini.js"></script>
+    <link href="?css/gemini-scrollbar.css" rel="stylesheet">-->
     <link rel="stylesheet" href="?css/app.css">
     <link rel="stylesheet" href="?css/loading.css">
     <link rel="apple-touch-icon" sizes="57x57" href="?favicon/apple-icon-57x57.png">
@@ -37,21 +37,11 @@
             <hr>
         </div>
         <div id="content">
-            <div v-bind:page="page" v-show="!page">
-                <h1 style="position: relative; top: 100px; color: #99aab5;">Home</h1>
-            </div>
-            <div v-bind:page="page" v-show="page == '#dashboard'">
-                <h1 style="position: relative; top: 100px; color: #99aab5;">Dashboard</h1>
-            </div>
-            <div v-bind:page="page" v-show="page == '#staff'">
-                <h1 style="position: relative; top: 100px; color: #99aab5;">Staff</h1>
-            </div>
-            <div v-bind:page="page" v-show="page == '#notifications'">
-                <h1 style="position: relative; top: 100px; color: #99aab5;">Notifications</h1>
-            </div>
-            <div v-bind:page="page" v-show="page == '#servers'">
-                <h1 style="position: relative; top: 100px; color: #99aab5;">Servers</h1>
-            </div>
+            <h1 v-bind:page="page" v-if="!page" style="position: relative; top: 100px; color: #99aab5;">Home</h1>
+            <giftron-dashboard v-bind:page="page" v-if="page == '#dashboard'"></giftron-dashboard>
+            <h1 v-bind:page="page" v-if="page == '#staff'" style="position: relative; top: 100px; color: #99aab5;">Staff</h1>
+            <h1 v-bind:page="page" v-if="page == '#notifications'" style="position: relative; top: 100px; color: #99aab5;">Notifications</h1>
+            <h1 v-bind:page="page" v-if="page == '#servers'" style="position: relative; top: 100px; color: #99aab5;">Servers</h1>
         </div>
     </main>
     <script src="?js/app.js"></script>

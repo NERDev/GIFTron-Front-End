@@ -183,6 +183,7 @@ Vue.component('giftron-dashboard', {
 
         //console.log('mounted');
         if (!vm.$root.guildlist) {
+            console.log('loader 1 started');
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4) {
@@ -190,6 +191,7 @@ Vue.component('giftron-dashboard', {
                     if (this.status == 200) {
                         vm.$root.guildlist = JSON.parse(this.response);
                         vm.guildlist = vm.$root.guildlist;
+                        console.log('loader 2 started');
                         //console.log(vm.$root.guildlist);
                     }
                 }
@@ -229,6 +231,11 @@ Vue.component('server-card', {
                                 vm.$root.guilds[vm.id] = JSON.parse(this.response);
                                 vm.info = vm.$root.guilds[vm.id];
                                 //console.log(vm.info);
+                            }
+                            //console.log(vm.id);
+                            console.log(Math.floor((vm.$parent.index / Object.keys(vm.$parent.guildlist).length) * 100) + '%');
+                            if (vm.$parent.index == (Object.keys(vm.$parent.guildlist).length)) {
+                                console.log('done!');
                             }
                         }
                     };

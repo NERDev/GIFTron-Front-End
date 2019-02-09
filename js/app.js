@@ -199,32 +199,44 @@ Vue.component('giftron-dashboard', {
             guildlist: {},
             index: 0,
             status: 0,
-            active: true
+            active: true,
+            initialized: false
+        }
+    },
+    methods: {
+        initialize: function () {
+            var vm = this;
+
+            //console.log('mounted');
+            if (!vm.$root.guildlist && !vm.initialized) {
+                console.log('loader 1 started');
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+                            vm.$root.guildlist = JSON.parse(this.response);
+                            vm.guildlist = vm.$root.guildlist;
+                            console.log('loader 2 started');
+                            vm.loading = true;
+                            //console.log(vm.$root.guildlist);
+                        }
+                    }
+                };
+                xhttp.open("GET", "api/v1/user/guilds", true);
+                xhttp.send();
+            } else {
+                vm.guildlist = vm.$root.guildlist;
+            }
         }
     },
     mounted: function () {
-        var vm = this;
-
-        //console.log('mounted');
-        if (!vm.$root.guildlist) {
-            console.log('loader 1 started');
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    if (this.status == 200) {
-                        vm.$root.guildlist = JSON.parse(this.response);
-                        vm.guildlist = vm.$root.guildlist;
-                        console.log('loader 2 started');
-                        vm.loading = true;
-                        //console.log(vm.$root.guildlist);
-                    }
+        var vm = this,
+            initialize = setInterval(() => {
+                if (vm.$root.page == '#dashboard') {
+                    this.initialize();
+                    clearTimeout(initialize);
                 }
-            };
-            xhttp.open("GET", "api/v1/user/guilds", true);
-            xhttp.send();
-        } else {
-            vm.guildlist = vm.$root.guildlist;
-        }
+            }, 0);
     }
 });
 
@@ -262,6 +274,7 @@ Vue.component('server-card', {
                                 console.log('done!');
                                 setTimeout(() => {
                                     vm.$parent.loading = false;
+                                    vm.$parent.initialized = false;
                                 }, 500);
                             }
                         }
@@ -300,7 +313,7 @@ var app = new Vue({
                 console.log('404 not found');
             }
         }
-        pageHandle();        
+        pageHandle();
         window.onhashchange = function (e) {
             if (!window.location.hash) {
                 history.replaceState({}, document.title, ".");

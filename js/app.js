@@ -37,6 +37,28 @@ Vue.component('navbar-button', {
     }
 });
 
+Vue.component('navbar-loader', {
+    template: `<div class="loader" v-show="loading" v-bind:style="{width: status + '%'}"></div>`,
+    data() {
+        return {
+            status: 0,
+            loading: false
+        }
+    },
+    mounted: function () {
+        setInterval(() => {
+            if (this.$root.$refs[this.$root.page]) {
+                this.status = this.$root.$refs[this.$root.page].status;
+                this.loading = this.$root.$refs[this.$root.page].loading;
+            } else {
+                this.status = 0;
+                this.loading = false;
+            }
+        }, 0);
+        //this.status = this.$refs[this.$root.page].status
+    }
+});
+
 Vue.component('user-loader', {
     template: `<div class="lds-ellipsis"><div v-for="index in 4"></div></div>`
 })
@@ -175,7 +197,9 @@ Vue.component('giftron-dashboard', {
     data: function () {
         return {
             guildlist: {},
-            index: 0
+            index: 0,
+            status: 0,
+            active: true
         }
     },
     mounted: function () {
@@ -187,11 +211,11 @@ Vue.component('giftron-dashboard', {
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4) {
-                    vm.loading = false;
                     if (this.status == 200) {
                         vm.$root.guildlist = JSON.parse(this.response);
                         vm.guildlist = vm.$root.guildlist;
                         console.log('loader 2 started');
+                        vm.loading = true;
                         //console.log(vm.$root.guildlist);
                     }
                 }
@@ -214,8 +238,6 @@ Vue.component('server-card', {
     },
     mounted: function () {
         var vm = this;
-
-
         if (!vm.$root.guilds[vm.id]) {
             var interval = setInterval(() => {
                 //console.log(vm.$parent.index, Object.keys(vm.$parent.guildlist).indexOf(vm.id));
@@ -233,9 +255,14 @@ Vue.component('server-card', {
                                 //console.log(vm.info);
                             }
                             //console.log(vm.id);
-                            console.log(Math.floor((vm.$parent.index / Object.keys(vm.$parent.guildlist).length) * 100) + '%');
+                            vm.$parent.status = Math.floor((vm.$parent.index / Object.keys(vm.$parent.guildlist).length) * 100);
+                            console.log(vm.$parent.status);
+                            //this.status = vm.$parent.index / Object.keys(vm.$parent.guildlist).length;
                             if (vm.$parent.index == (Object.keys(vm.$parent.guildlist).length)) {
                                 console.log('done!');
+                                setTimeout(() => {
+                                    vm.$parent.loading = false;
+                                }, 500);
                             }
                         }
                     };
@@ -266,12 +293,20 @@ var app = new Vue({
     },
     mounted: function () {
         var vm = this;
-
+        function pageHandle() {
+            if (vm.$refs[vm.page]) {
+                vm.$refs[vm.page].active = true;
+            } else {
+                console.log('404 not found');
+            }
+        }
+        pageHandle();        
         window.onhashchange = function (e) {
             if (!window.location.hash) {
                 history.replaceState({}, document.title, ".");
             }
             vm.page = window.location.hash;
+            pageHandle();
         };
     }
 });

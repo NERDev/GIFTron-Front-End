@@ -64,7 +64,7 @@ Vue.component('user-loader', {
 })
 
 Vue.component('user-badge', {
-    template: `<li><user-loader v-if="loading"></user-loader><button v-if="user.username" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')" class="menuButton" id="userButton"><img v-bind:src="avatar" />{{ user.username }}</button><user-dropdown v-bind:user="user"></user-dropdown><button v-if="!user.username && !loading" v-on:click="login">Login</button></li>`,
+    template: `<li><user-loader v-if="loading"></user-loader><button v-if="user.username" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')" class="menuButton userButton" id="userButton"><img v-bind:src="avatar" />{{ user.username }}</button><user-dropdown v-bind:user="user"></user-dropdown><button v-if="!user.username && !loading" v-on:click="login">Login</button></li>`,
     props: ['user'],
     data() {
         var avatar;
@@ -82,13 +82,21 @@ Vue.component('user-badge', {
                 dropdown = document.querySelector('.dropdown');
             if (e == 'enter') {
                 if (dropdown.style.display != 'list-item') {
-                    button.parentElement.classList.add('hover', 'shadow');
+                    button.parentElement.classList.add('shadow');
+                    anime({
+                        targets: '.userButton',
+                        translateY: -2
+                    });
                     //console.log('enter');
                 }
             }
             if (e == 'leave') {
                 if (dropdown.style.display != 'list-item') {
-                    button.parentElement.classList.remove('hover', 'shadow');
+                    button.parentElement.classList.remove('shadow');
+                    anime({
+                        targets: '.userButton',
+                        translateY: 0
+                    });
                     //console.log('leave');
                 }
             }
@@ -105,7 +113,11 @@ Vue.component('user-badge', {
             var userButton = document.querySelector('#userButton'),
                 dropdown = document.querySelector('.dropdown');
             if (userButton && dropdown) {
-                userButton.parentElement.classList.remove('hover', 'shadow');
+                userButton.parentElement.classList.remove('shadow');
+                anime({
+                    targets: '.userButton',
+                    translateY: 0
+                });
                 dropdown.classList.remove('shadow');
                 dropdown.style.display = 'none';
                 dropdown.style.maxHeight = '';
@@ -193,7 +205,7 @@ Vue.component('navbar-logo', {
 });
 
 Vue.component('giftron-dashboard', {
-    template: `<div><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value"></server-card></div>`,
+    template: `<div id="dashboard"><h1>Select a Server</h1><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value"></server-card></ul></div>`,
     data: function () {
         return {
             guildlist: {},
@@ -241,11 +253,41 @@ Vue.component('giftron-dashboard', {
 });
 
 Vue.component('server-card', {
-    template: `<h3 style="margin-top:50px;color:white;" v-if="info">{{ id }}</h3>`,
+    template: `<li style="transform: scale(0)" v-bind:class="'serverCard ' + 'serverCard-' + id" v-if="info"><button v-bind:id="'serverButton-' + id" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')"><img v-bind:src="icon"><h3>{{ info.name }}</h3></button></li>`,
     props: ['id', 'manage'],
     data: function () {
         return {
             info: null
+        }
+    },
+    methods: {
+        mouse: function (e) {
+            var button = document.getElementById('serverButton-' + this.id);
+            var screenheight = document.body.clientHeight;
+            if (e == 'enter') {
+                button.parentElement.classList.add('hover', 'shadow');
+                anime({
+                    targets: '.serverCard-' + this.id,
+                    translateY: -2
+                });
+            }
+
+            if (e == 'leave') {
+                button.parentElement.classList.remove('hover', 'shadow');
+                anime({
+                    targets: '.serverCard-' + this.id,
+                    translateY: 0
+                });
+            }
+
+            if (e == 'click') {
+                anime({
+                    targets: '.serverCard',
+                    translateY: -screenheight,
+                    delay: anime.stagger(100, {order: 'reverse'}),
+                    duration: 3000
+                });
+            }
         }
     },
     mounted: function () {
@@ -264,15 +306,29 @@ Vue.component('server-card', {
                             if (this.status == 200) {
                                 vm.$root.guilds[vm.id] = JSON.parse(this.response);
                                 vm.info = vm.$root.guilds[vm.id];
+
+                                if (vm.$root.user.avatar) {
+                                    vm.icon = 'https://cdn.discordapp.com/icons/' + vm.id + '/' + vm.info.icon + '.png?size=1024'
+                                } else {
+                                    //vm.avatar = 'https://cdn.discordapp.com/embed/avatars/' + vm.$root.user.discriminator % 5 + '.png'
+                                };
                                 //console.log(vm.info);
                             }
                             //console.log(vm.id);
                             vm.$parent.status = Math.floor((vm.$parent.index / Object.keys(vm.$parent.guildlist).length) * 100);
                             console.log(vm.$parent.status);
+                            console.log('.serverCard-' + vm.id);
+                            setTimeout(function () {
+                                console.log(document.querySelector(('.serverCard-' + vm.id.toString())));
+                                anime({
+                                    targets: ('.serverCard-' + vm.id.toString()),
+                                    scale: 1
+                                });
+                            }, 10);
                             //this.status = vm.$parent.index / Object.keys(vm.$parent.guildlist).length;
                             if (vm.$parent.index == (Object.keys(vm.$parent.guildlist).length)) {
                                 console.log('done!');
-                                setTimeout(() => {
+                                setTimeout(function () {
                                     vm.$parent.loading = false;
                                     vm.$parent.initialized = false;
                                 }, 500);

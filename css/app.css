@@ -164,3 +164,61 @@ main::-webkit-scrollbar { width: 0 !important }
 .navbar ul li button:focus {
     outline: 0;   
 }
+
+#content {
+    height: inherit;
+    width: inherit;
+}
+
+#dashboard {
+    height: inherit;
+    width: inherit;
+}
+
+#dashboard h1 {
+    text-align: center;
+    color: white;
+    padding-top: 4em;
+    padding-bottom: 1em;
+    margin: 0;
+}
+
+.serverList {
+    width: inherit;
+    text-align: center;
+    margin-top: 5.5em;
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+.serverList .serverCard {
+    color: white;
+    display: inline-block;
+    height: 40vw;
+    width: 40vw;
+    max-height: 17rem;
+    max-width: 14rem;
+    margin: 1em;
+    border-width: 2px;
+    border-color: #99aab5;
+    border-radius: 10px;
+    border-style: solid;
+    overflow: hidden;
+    transition: box-shadow 0.15s ease;
+}
+
+.serverList .serverCard button {
+    text-decoration: none;
+    background-color: inherit;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+}
+
+.serverList .serverCard button img {
+    width: 100%;
+}

@@ -195,7 +195,7 @@ main::-webkit-scrollbar { width: 0 !important }
 .serverList .serverCard {
     color: white;
     display: inline-block;
-    height: 40vw;
+    height: 53vw;
     width: 40vw;
     max-height: 17rem;
     max-width: 14rem;

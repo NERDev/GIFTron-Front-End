@@ -244,9 +244,16 @@ Vue.component('giftron-dashboard', {
     },
     mounted: function () {
         var vm = this,
+            query = window.location.hash.split('?', 2)[1],
             initialize = setInterval(() => {
                 if (vm.$root.page == '#dashboard') {
-                    this.initialize();
+                    if (query) {
+                        //handle the request of a direct query
+                        vm.guildlist[query] = false;
+                        console.log(vm.guildlist);
+                    } else {
+                        this.initialize();
+                    }
                     clearTimeout(initialize);
                 }
             }, 0);
@@ -295,7 +302,7 @@ Vue.component('server-card', {
                         translateY: -2
                     });
                 }
-    
+
                 if (e == 'leave') {
                     button.parentElement.classList.remove('hover', 'shadow');
                     anime({
@@ -303,14 +310,17 @@ Vue.component('server-card', {
                         translateY: 0
                     });
                 }
-    
+
                 if (e == 'click') {
+                    window.location.hash = '#dashboard?' + this.id;
+                    /*
                     anime({
                         targets: '.serverCard',
                         translateY: -screenheight,
                         delay: anime.stagger(100, {order: 'reverse'}),
                         duration: 3000
                     });
+                    */
                 }
             }
         }
@@ -380,7 +390,7 @@ var app = new Vue({
             user: {},
             guilds: {},
             title: "GIFTron",
-            page: window.location.hash
+            page: window.location.hash.split('?')[0]
         };
     },
     methods: {
@@ -402,7 +412,7 @@ var app = new Vue({
             if (!window.location.hash) {
                 history.replaceState({}, document.title, ".");
             }
-            vm.page = window.location.hash;
+            vm.page = window.location.hash.split('?')[0];
             pageHandle();
         };
     }

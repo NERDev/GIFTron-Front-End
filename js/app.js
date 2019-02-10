@@ -205,14 +205,15 @@ Vue.component('navbar-logo', {
 });
 
 Vue.component('giftron-dashboard', {
-    template: `<div id="dashboard"><h1>Select a Server</h1><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value"></server-card></ul></div>`,
+    template: `<div id="dashboard"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul></div>`,
     data: function () {
         return {
             guildlist: {},
             index: 0,
             status: 0,
             active: true,
-            initialized: false
+            initialized: false,
+            filter: false
         }
     },
     methods: {
@@ -252,41 +253,65 @@ Vue.component('giftron-dashboard', {
     }
 });
 
+Vue.component('server-toolbar', {
+    template: `<div id="serverToolbar"><h1>Select a Server</h1><checkbox-slider v-bind:id="'serverFilter'"></checkbox-slider></div>`,
+    methods: {
+        serverFilter: function () {
+            this.$parent.filter = document.getElementById('serverFilter').checked;
+        }
+    }
+});
+
+Vue.component('checkbox-slider', {
+    template: `<div class="container"><label class="switch" v-bind:for="id"><input type="checkbox" v-bind:id="id" v-on:click="click" /><div class="slider round"></div></label></div>`,
+    props: ['id'],
+    methods: {
+        click: function () {
+            if (this.$parent[this.id]) {
+                this.$parent[this.id]();
+            }
+        }
+    }
+});
+
 Vue.component('server-card', {
-    template: `<li style="transform: scale(0)" v-bind:class="'serverCard ' + 'serverCard-' + id" v-if="info"><button v-bind:id="'serverButton-' + id" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')"><img v-bind:src="icon"><h3>{{ info.name }}</h3></button></li>`,
-    props: ['id', 'manage'],
+    template: `<li style="transform: scale(0)" v-bind:class="'serverCard ' + 'serverCard-' + id" v-if="info" v-show="manage - filter >= 0"><button v-bind:id="'serverButton-' + id" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')"><img v-bind:src="icon"><h3>{{ info.name }}</h3></button></li>`,
+    props: ['id', 'manage', 'filter'],
     data: function () {
         return {
-            info: null
+            info: null,
+            stillLoading: true
         }
     },
     methods: {
         mouse: function (e) {
             var button = document.getElementById('serverButton-' + this.id);
             var screenheight = document.body.clientHeight;
-            if (e == 'enter') {
-                button.parentElement.classList.add('hover', 'shadow');
-                anime({
-                    targets: '.serverCard-' + this.id,
-                    translateY: -2
-                });
-            }
-
-            if (e == 'leave') {
-                button.parentElement.classList.remove('hover', 'shadow');
-                anime({
-                    targets: '.serverCard-' + this.id,
-                    translateY: 0
-                });
-            }
-
-            if (e == 'click') {
-                anime({
-                    targets: '.serverCard',
-                    translateY: -screenheight,
-                    delay: anime.stagger(100, {order: 'reverse'}),
-                    duration: 3000
-                });
+            if (!this.stillLoading) {
+                if (e == 'enter') {
+                    button.parentElement.classList.add('hover', 'shadow');
+                    anime({
+                        targets: '.serverCard-' + this.id,
+                        translateY: -2
+                    });
+                }
+    
+                if (e == 'leave') {
+                    button.parentElement.classList.remove('hover', 'shadow');
+                    anime({
+                        targets: '.serverCard-' + this.id,
+                        translateY: 0
+                    });
+                }
+    
+                if (e == 'click') {
+                    anime({
+                        targets: '.serverCard',
+                        translateY: -screenheight,
+                        delay: anime.stagger(100, {order: 'reverse'}),
+                        duration: 3000
+                    });
+                }
             }
         }
     },
@@ -324,6 +349,9 @@ Vue.component('server-card', {
                                     targets: ('.serverCard-' + vm.id.toString()),
                                     scale: 1
                                 });
+                                setTimeout(() => {
+                                    vm.stillLoading = false;
+                                }, 500);
                             }, 10);
                             //this.status = vm.$parent.index / Object.keys(vm.$parent.guildlist).length;
                             if (vm.$parent.index == (Object.keys(vm.$parent.guildlist).length)) {

@@ -262,6 +262,7 @@ Vue.component('giftron-dashboard', {
                     anime({
                         targets: '.serverCard',
                         translateY: -(listheight + (screenheight / 2)),
+                        scale: 1,
                         delay: anime.stagger(100, { from: index }),
 
                     });
@@ -272,6 +273,7 @@ Vue.component('giftron-dashboard', {
                         anime({
                             targets: '.serverCard',
                             translateY: -(listheight + (screenheight / 2)),
+                            scale: 1,
                             delay: anime.stagger(100, { from: index })
                         });
                     } else {
@@ -321,6 +323,7 @@ Vue.component('giftron-dashboard', {
                                     anime({
                                         targets: '.serverCard',
                                         translateY: 0,
+                                        scale: 1,
                                         delay: anime.stagger(100)
                                     });
                                 } else {
@@ -328,6 +331,7 @@ Vue.component('giftron-dashboard', {
                                     anime({
                                         targets: '.serverCard',
                                         translateY: 0,
+                                        scale: 1,
                                         delay: anime.stagger(100)
                                     });
                                 }
@@ -428,10 +432,12 @@ Vue.component('server-card', {
             //console.log('.serverCard-' + vm.id);
             setTimeout(function () {
                 //console.log(document.querySelector(('.serverCard-' + vm.id.toString())));
-                anime({
-                    targets: ('.serverCard-' + vm.id.toString()),
-                    scale: 1
-                });
+                if (vm.$parent.loading) {
+                    anime({
+                        targets: ('.serverCard-' + vm.id.toString()),
+                        scale: 1
+                    });
+                }
                 setTimeout(() => {
                     vm.stillLoading = false;
                 }, 500);

@@ -166,7 +166,10 @@ main::-webkit-scrollbar { width: 0 !important }
 }
 
 #content {
-    height: inherit;
+    position: relative;
+    height: 90vh;
+    bottom: -10vh;
+    top: auto;
     width: inherit;
 }
 
@@ -178,7 +181,6 @@ main::-webkit-scrollbar { width: 0 !important }
 #serverToolbar {
     text-align: center;
     color: white;
-    padding-top: 7em;
     padding-bottom: 1em;
     width: inherit;
 }

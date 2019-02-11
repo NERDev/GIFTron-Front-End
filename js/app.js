@@ -221,7 +221,7 @@ Vue.component('giftron-dashboard', {
             var vm = this;
 
             //console.log('mounted');
-            if (!vm.$root.guildlist && !vm.initialized) {
+            if (!vm.initialized) {
                 console.log('loader 1 started');
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function () {
@@ -244,19 +244,100 @@ Vue.component('giftron-dashboard', {
     },
     mounted: function () {
         var vm = this,
-            query = window.location.hash.split('?', 2)[1],
-            initialize = setInterval(() => {
-                if (vm.$root.page == '#dashboard') {
-                    if (query) {
-                        //handle the request of a direct query
-                        vm.guildlist[query] = false;
-                        console.log(vm.guildlist);
+            query,
+            storedQuery = null;
+
+        function getQuery() {
+            query = window.location.hash.split('?', 2)[1];
+        }
+
+        function switchQuery(newQuery) {
+            if (newQuery != storedQuery) {
+                var screenheight = document.body.clientHeight;
+                var listheight = document.querySelector('.serverList').clientHeight;
+                var index = Array.prototype.indexOf.call(document.querySelector('.serverList').childNodes,
+                    document.querySelector('.serverCard-' + newQuery));
+                if (storedQuery === null && vm.initialized) {
+                    console.log('animating to ' + newQuery);
+                    anime({
+                        targets: '.serverCard',
+                        translateY: -(listheight + (screenheight / 2)),
+                        delay: anime.stagger(100, { from: index }),
+
+                    });
+                } else {
+                    if (vm.loading) {
+                        console.log('cancelling loading and animating to ' + newQuery);
+                        vm.loading = false;
+                        anime({
+                            targets: '.serverCard',
+                            translateY: -(listheight + (screenheight / 2)),
+                            delay: anime.stagger(100, { from: index })
+                        });
                     } else {
-                        this.initialize();
+                        console.log('direct to ' + newQuery);
                     }
-                    clearTimeout(initialize);
                 }
-            }, 0);
+                if (!vm.$root.guilds[newQuery]) {
+                    console.log('going and getting the info for this guild');
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                vm.$root.guilds[newQuery] = JSON.parse(this.response);
+                                console.log('got info');
+                            } else {
+                                console.log('no guild');
+                            }
+                        }
+                    };
+                    xhttp.open("GET", "api/v1/guild?guild_id=" + newQuery, true);
+                    xhttp.send();
+                }
+                storedQuery = newQuery;
+            }
+        }
+
+        var initialize = setInterval(() => {
+            getQuery();
+            if (vm.$root.page == '#dashboard') {
+                if (query) {
+                    switchQuery(query);
+                } else {
+                    vm.initialize();
+                    clearTimeout(initialize);
+                    storedQuery = null;
+                    var watch = setInterval(() => {
+                        getQuery();
+                        if (query) {
+                            switchQuery(query);
+                        } else {
+                            if (storedQuery !== null && storedQuery != query) {
+                                storedQuery = null;
+                                if (!vm.initialized && (vm.$parent.index + 1) != (Object.keys(vm.$parent.guildlist).length)) {
+                                    console.log('resuming load');
+                                    vm.loading = true;
+                                    vm.index++
+                                    anime({
+                                        targets: '.serverCard',
+                                        translateY: 0,
+                                        delay: anime.stagger(100)
+                                    });
+                                } else {
+                                    console.log('loading finished before this');
+                                    anime({
+                                        targets: '.serverCard',
+                                        translateY: 0,
+                                        delay: anime.stagger(100)
+                                    });
+                                }
+                            }
+
+                        }
+                    }, 0);
+                }
+            }
+        }, 0);
     }
 });
 
@@ -282,18 +363,18 @@ Vue.component('checkbox-slider', {
 });
 
 Vue.component('server-card', {
-    template: `<li style="transform: scale(0)" v-bind:class="'serverCard ' + 'serverCard-' + id" v-if="info" v-show="manage - filter >= 0"><button v-bind:id="'serverButton-' + id" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')"><img v-bind:src="icon"><h3>{{ info.name }}</h3></button></li>`,
+    template: `<li style="transform: scale(0)" v-bind:class="'serverCard ' + 'serverCard-' + id" v-if="info" v-show="manage - filter >= 0"><button v-bind:id="'serverButton-' + id" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')"><img v-if="icon" v-bind:src="icon"><h3>{{ info.name }}</h3></button></li>`,
     props: ['id', 'manage', 'filter'],
     data: function () {
         return {
             info: null,
-            stillLoading: true
+            stillLoading: true,
+            icon: null
         }
     },
     methods: {
         mouse: function (e) {
             var button = document.getElementById('serverButton-' + this.id);
-            var screenheight = document.body.clientHeight;
             if (!this.stillLoading) {
                 if (e == 'enter') {
                     button.parentElement.classList.add('hover', 'shadow');
@@ -305,10 +386,12 @@ Vue.component('server-card', {
 
                 if (e == 'leave') {
                     button.parentElement.classList.remove('hover', 'shadow');
-                    anime({
-                        targets: '.serverCard-' + this.id,
-                        translateY: 0
-                    });
+                    if (!window.location.hash.includes('?')) {
+                        anime({
+                            targets: '.serverCard-' + this.id,
+                            translateY: 0
+                        });
+                    }
                 }
 
                 if (e == 'click') {
@@ -327,59 +410,73 @@ Vue.component('server-card', {
     },
     mounted: function () {
         var vm = this;
-        if (!vm.$root.guilds[vm.id]) {
-            var interval = setInterval(() => {
-                //console.log(vm.$parent.index, Object.keys(vm.$parent.guildlist).indexOf(vm.id));
-                if (vm.$parent.index == Object.keys(vm.$parent.guildlist).indexOf(vm.id)) {
-                    //console.log('my turn', vm.id);
-                    clearInterval(interval);
+        function handleGotData() {
+            vm.info = vm.$root.guilds[vm.id];
 
+            if (vm.info.icon) {
+                vm.icon = 'https://cdn.discordapp.com/icons/' + vm.id + '/' + vm.info.icon + '.png?size=1024'
+            } else {
+                //vm.avatar = 'https://cdn.discordapp.com/embed/avatars/' + vm.$root.user.discriminator % 5 + '.png'
+            };
+            //console.log(vm.info);
+        }
+
+        function handleFinishedLoading() {
+            //console.log(vm.id);
+            vm.$parent.status = Math.floor(((vm.$parent.index + 1) / Object.keys(vm.$parent.guildlist).length) * 100);
+            console.log(vm.$parent.status);
+            //console.log('.serverCard-' + vm.id);
+            setTimeout(function () {
+                //console.log(document.querySelector(('.serverCard-' + vm.id.toString())));
+                anime({
+                    targets: ('.serverCard-' + vm.id.toString()),
+                    scale: 1
+                });
+                setTimeout(() => {
+                    vm.stillLoading = false;
+                }, 500);
+            }, 10);
+            //this.status = vm.$parent.index / Object.keys(vm.$parent.guildlist).length;
+            //console.log(vm.$parent.index, Object.keys(vm.$parent.guildlist).length);
+            if ((vm.$parent.index + 1) == (Object.keys(vm.$parent.guildlist).length)) {
+                console.log('done!');
+                setTimeout(function () {
+                    vm.$parent.loading = false;
+                    vm.$parent.status = 0;
+                    vm.$parent.initialized = true;
+                }, 500);
+            }
+
+            if (vm.$parent.loading) {
+                vm.$parent.index++;
+            }
+        }
+        var interval = setInterval(() => {
+            //console.log(Object.keys(vm.$parent.guildlist).indexOf(vm.id), Object.keys(vm.$parent.guildlist));
+            if (vm.$parent.index == Object.keys(vm.$parent.guildlist).indexOf(vm.id)) {
+                //console.log('my turn', vm.id);
+                clearInterval(interval);
+
+                if (!vm.$root.guilds[vm.id]) {
                     var xhttp = new XMLHttpRequest();
                     xhttp.onreadystatechange = function () {
                         if (this.readyState == 4) {
-                            vm.$parent.index++;
                             if (this.status == 200) {
                                 vm.$root.guilds[vm.id] = JSON.parse(this.response);
-                                vm.info = vm.$root.guilds[vm.id];
-
-                                if (vm.$root.user.avatar) {
-                                    vm.icon = 'https://cdn.discordapp.com/icons/' + vm.id + '/' + vm.info.icon + '.png?size=1024'
-                                } else {
-                                    //vm.avatar = 'https://cdn.discordapp.com/embed/avatars/' + vm.$root.user.discriminator % 5 + '.png'
-                                };
-                                //console.log(vm.info);
+                                handleGotData();
                             }
-                            //console.log(vm.id);
-                            vm.$parent.status = Math.floor((vm.$parent.index / Object.keys(vm.$parent.guildlist).length) * 100);
-                            console.log(vm.$parent.status);
-                            console.log('.serverCard-' + vm.id);
-                            setTimeout(function () {
-                                console.log(document.querySelector(('.serverCard-' + vm.id.toString())));
-                                anime({
-                                    targets: ('.serverCard-' + vm.id.toString()),
-                                    scale: 1
-                                });
-                                setTimeout(() => {
-                                    vm.stillLoading = false;
-                                }, 500);
-                            }, 10);
-                            //this.status = vm.$parent.index / Object.keys(vm.$parent.guildlist).length;
-                            if (vm.$parent.index == (Object.keys(vm.$parent.guildlist).length)) {
-                                console.log('done!');
-                                setTimeout(function () {
-                                    vm.$parent.loading = false;
-                                    vm.$parent.initialized = false;
-                                }, 500);
-                            }
+                            handleFinishedLoading();
                         }
                     };
                     xhttp.open("GET", "api/v1/guild?guild_id=" + vm.id, true);
                     xhttp.send();
+                } else {
+                    console.log('skipping ' + vm.id);
+                    handleGotData();
+                    handleFinishedLoading();
                 }
-            }, 0);
-        } else {
-            vm.info = vm.$root.guilds[vm.id];
-        }
+            }
+        }, 0);
     }
 });
 

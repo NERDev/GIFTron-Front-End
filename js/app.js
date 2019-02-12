@@ -205,7 +205,7 @@ Vue.component('navbar-logo', {
 });
 
 Vue.component('giftron-dashboard', {
-    template: `<div id="dashboard" v-if="user.id"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul></div>`,
+    template: `<div id="dashboard" v-if="user.id"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel></dashboard-panel></div>`,
     props: ['user'],
     data: function () {
         return {
@@ -296,6 +296,13 @@ Vue.component('giftron-dashboard', {
                         console.log('direct to ' + newQuery);
                     }
                 }
+                console.log('animating in the dashboard for ' + newQuery);
+                setTimeout(() => {
+                    anime({
+                        targets: '#dashboardPanel',
+                        translateY: 0
+                    });
+                }, 500);
                 if (!vm.$root.guilds[newQuery]) {
                     //document.querySelector('#serverToolbar').style.transform = 'translateY(-200px)';
                     console.log('going and getting the info for this guild');
@@ -331,6 +338,13 @@ Vue.component('giftron-dashboard', {
                             targets: '#serverToolbar',
                             translateY: 0
                         });
+                        console.log(document.getElementById('dashboardPanel').style.transform);
+                        if (document.getElementById('dashboardPanel').style.transform == 'translateY(0vh)') {
+                            anime({
+                                targets: '#dashboardPanel',
+                                translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+                            });
+                        }
                     }, 100);
                     storedQuery = null;
                     var watch = setInterval(() => {
@@ -356,6 +370,10 @@ Vue.component('giftron-dashboard', {
                                 anime({
                                     targets: '#serverToolbar',
                                     translateY: 0
+                                });
+                                anime({
+                                    targets: '#dashboardPanel',
+                                    translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
                                 });
                             }
                         }
@@ -505,6 +523,17 @@ Vue.component('server-card', {
             }
         }, 0);
     }
+});
+
+Vue.component('dashboard-panel', {
+    template: `<div id="dashboardPanel" style="transform: translateY(-100vh);"><h1 style="
+    text-align: center;
+    position: absolute;
+    top: 30vh;
+    font-size: 10em;
+    color: white;
+    width: inherit;
+">DASHBOARD</h1></div>`
 });
 
 var app = new Vue({

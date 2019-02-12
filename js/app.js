@@ -205,7 +205,8 @@ Vue.component('navbar-logo', {
 });
 
 Vue.component('giftron-dashboard', {
-    template: `<div id="dashboard"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul></div>`,
+    template: `<div id="dashboard" v-if="user.id"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul></div>`,
+    props: ['user'],
     data: function () {
         return {
             guildlist: {},
@@ -232,6 +233,8 @@ Vue.component('giftron-dashboard', {
                             console.log('loader 2 started');
                             vm.loading = true;
                             //console.log(vm.$root.guildlist);
+                        } else if (this.status == 401) {
+                            window.location = "api/v1/user/auth?scope=identify+guilds";
                         }
                     }
                 };
@@ -316,10 +319,13 @@ Vue.component('giftron-dashboard', {
                 } else {
                     vm.initialize();
                     clearTimeout(initialize);
-                    anime({
-                        targets: '#serverToolbar',
-                        translateY: 0
-                    });
+                    console.log('moving toolbar');
+                    setTimeout(() => {
+                        anime({
+                            targets: '#serverToolbar',
+                            translateY: 0
+                        });
+                    }, 100);
                     storedQuery = null;
                     var watch = setInterval(() => {
                         getQuery();

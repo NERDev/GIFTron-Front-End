@@ -166,9 +166,10 @@ main::-webkit-scrollbar { width: 0 !important }
 }
 
 #content {
-    position: relative;
-    height: 90vh;
-    bottom: -10vh;
+    position: absolute;
+    height: calc(100vh - 5.5em);
+    bottom: 0;
+    left: 0;
     top: auto;
     width: inherit;
 }
@@ -182,6 +183,7 @@ main::-webkit-scrollbar { width: 0 !important }
     text-align: center;
     color: white;
     padding-bottom: 1em;
+    padding-top: 4em;
     width: inherit;
 }
 

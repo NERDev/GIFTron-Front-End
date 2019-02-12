@@ -166,12 +166,12 @@ main::-webkit-scrollbar { width: 0 !important }
 }
 
 #content {
-    position: absolute;
-    height: calc(100vh - 5.5em);
-    bottom: 0;
+    position: relative;
+    bottom: -5.5em;
     left: 0;
     top: auto;
     width: inherit;
+    height: calc(100vh - 5.5em);
 }
 
 #dashboard {

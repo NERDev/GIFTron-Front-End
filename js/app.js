@@ -214,7 +214,8 @@ Vue.component('giftron-dashboard', {
             status: 0,
             active: true,
             initialized: false,
-            filter: false
+            filter: false,
+            pageTitle: 'Dashboard'
         }
     },
     methods: {
@@ -507,7 +508,6 @@ var app = new Vue({
         return {
             user: {},
             guilds: {},
-            title: "GIFTron",
             page: window.location.hash.split('?')[0]
         };
     },
@@ -519,11 +519,18 @@ var app = new Vue({
     mounted: function () {
         var vm = this;
         function pageHandle() {
-            if (vm.$refs[vm.page]) {
-                vm.$refs[vm.page].active = true;
+            if (vm.page) {
+                if (vm.$refs[vm.page]) {
+                    vm.$refs[vm.page].active = true;
+                    vm.title = 'GIFTron - ' + vm.$refs[vm.page].pageTitle;
+                } else {
+                    vm.title = 'GIFTron - 404';
+                    console.log('404 not found');
+                }
             } else {
-                console.log('404 not found');
+                vm.title = 'GIFTron';
             }
+            document.title = vm.title;
         }
         pageHandle();
         window.onhashchange = function (e) {

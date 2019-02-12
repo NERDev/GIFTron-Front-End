@@ -263,8 +263,11 @@ Vue.component('giftron-dashboard', {
                         targets: '.serverCard',
                         translateY: -(listheight + (screenheight / 2)),
                         scale: 1,
-                        delay: anime.stagger(100, { from: index }),
-
+                        delay: anime.stagger(100, { from: index })
+                    });
+                    anime({
+                        targets: '#serverToolbar',
+                        translateY: -200
                     });
                 } else {
                     if (vm.loading) {
@@ -276,11 +279,16 @@ Vue.component('giftron-dashboard', {
                             scale: 1,
                             delay: anime.stagger(100, { from: index })
                         });
+                        anime({
+                            targets: '#serverToolbar',
+                            translateY: -200
+                        });
                     } else {
                         console.log('direct to ' + newQuery);
                     }
                 }
                 if (!vm.$root.guilds[newQuery]) {
+                    //document.querySelector('#serverToolbar').style.transform = 'translateY(-200px)';
                     console.log('going and getting the info for this guild');
                     var xhttp = new XMLHttpRequest();
                     xhttp.onreadystatechange = function () {
@@ -308,6 +316,10 @@ Vue.component('giftron-dashboard', {
                 } else {
                     vm.initialize();
                     clearTimeout(initialize);
+                    anime({
+                        targets: '#serverToolbar',
+                        translateY: 0
+                    });
                     storedQuery = null;
                     var watch = setInterval(() => {
                         getQuery();
@@ -320,23 +332,20 @@ Vue.component('giftron-dashboard', {
                                     console.log('resuming load');
                                     vm.loading = true;
                                     vm.index++
-                                    anime({
-                                        targets: '.serverCard',
-                                        translateY: 0,
-                                        scale: 1,
-                                        delay: anime.stagger(100)
-                                    });
                                 } else {
                                     console.log('loading finished before this');
-                                    anime({
-                                        targets: '.serverCard',
-                                        translateY: 0,
-                                        scale: 1,
-                                        delay: anime.stagger(100)
-                                    });
                                 }
+                                anime({
+                                    targets: '.serverCard',
+                                    translateY: 0,
+                                    scale: 1,
+                                    delay: anime.stagger(100)
+                                });
+                                anime({
+                                    targets: '#serverToolbar',
+                                    translateY: 0
+                                });
                             }
-
                         }
                     }, 0);
                 }
@@ -346,7 +355,7 @@ Vue.component('giftron-dashboard', {
 });
 
 Vue.component('server-toolbar', {
-    template: `<div id="serverToolbar"><h1>Select a Server</h1><checkbox-slider v-bind:id="'serverFilter'" v-bind:on="'Manage'" v-bind:off="'All'"></checkbox-slider></div>`,
+    template: `<div id="serverToolbar" style="transform: translateY(-200px);"><h1>Select a Server</h1><checkbox-slider v-bind:id="'serverFilter'" v-bind:on="'Manage'" v-bind:off="'All'"></checkbox-slider></div>`,
     methods: {
         serverFilter: function () {
             this.$parent.filter = document.getElementById('serverFilter').checked;

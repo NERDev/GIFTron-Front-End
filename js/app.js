@@ -346,7 +346,7 @@ Vue.component('giftron-dashboard', {
 });
 
 Vue.component('server-toolbar', {
-    template: `<div id="serverToolbar"><h1>Select a Server</h1><checkbox-slider v-bind:id="'serverFilter'"></checkbox-slider></div>`,
+    template: `<div id="serverToolbar"><h1>Select a Server</h1><checkbox-slider v-bind:id="'serverFilter'" v-bind:on="'Manage'" v-bind:off="'All'"></checkbox-slider></div>`,
     methods: {
         serverFilter: function () {
             this.$parent.filter = document.getElementById('serverFilter').checked;
@@ -355,8 +355,8 @@ Vue.component('server-toolbar', {
 });
 
 Vue.component('checkbox-slider', {
-    template: `<div class="container"><label class="switch" v-bind:for="id"><input type="checkbox" v-bind:id="id" v-on:click="click" /><div class="slider round"></div></label></div>`,
-    props: ['id'],
+    template: `<div class="container"><p v-if="off" style="left: -25px">{{ off }}</p><label class="switch" v-bind:for="id"><input type="checkbox" v-bind:id="id" v-on:click="click" /><div class="slider round"></div></label><p v-if="on" style="right: -65px;">{{ on }}</p></div>`,
+    props: ['id', 'on', 'off'],
     methods: {
         click: function () {
             if (this.$parent[this.id]) {

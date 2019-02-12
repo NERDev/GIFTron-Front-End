@@ -190,6 +190,8 @@ main::-webkit-scrollbar { width: 0 !important }
 #serverToolbar h1 {
     width: max-content;
     margin: auto;
+    color: #99aab5;
+    font-size: 3em;
 }
 
 #serverToolbar h3 {
@@ -210,6 +212,22 @@ main::-webkit-scrollbar { width: 0 !important }
   .switch input {
     display:none;
   }
+
+  #serverToolbar .container {
+    display: inline-block;
+    position: absolute;
+    right: 9em;
+    top: 5.5em;
+  }
+
+  .container p {
+    color: #99aab5;
+    display: inherit;
+    margin: 0;
+    text-align: unset;
+    position: absolute;
+    top: 5px;
+  }
   
   .slider {
     background-color: #1D1E1F;
@@ -220,6 +238,9 @@ main::-webkit-scrollbar { width: 0 !important }
     right: 0;
     top: 0;
     transition: .4s;
+    -webkit-box-shadow: inset 0px 6px 12px -2px rgba(0,0,0,0.69);
+    -moz-box-shadow: inset 0px 6px 12px -2px rgba(0,0,0,0.69);
+    box-shadow: inset 0px 6px 12px -2px rgba(0,0,0,0.69);
   }
   
   .slider:before {
@@ -231,6 +252,9 @@ main::-webkit-scrollbar { width: 0 !important }
     position: absolute;
     transition: .4s;
     width: 26px;
+    -webkit-box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
+    -moz-box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
+    box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
   }
   
   input:checked + .slider {
@@ -288,6 +312,13 @@ main::-webkit-scrollbar { width: 0 !important }
     width: 100%;
     padding: 0;
 }
+
+.serverList .serverCard button h3 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: #99aab5;
+}
+
 
 .serverList .serverCard button img {
     width: 100%;

@@ -348,33 +348,35 @@ Vue.component('giftron-dashboard', {
                     }, 100);
                     storedQuery = null;
                     var watch = setInterval(() => {
-                        getQuery();
-                        if (query) {
-                            switchQuery(query);
-                        } else {
-                            if (storedQuery !== null && storedQuery != query) {
-                                storedQuery = null;
-                                if (!vm.initialized && (vm.$parent.index + 1) != (Object.keys(vm.$parent.guildlist).length)) {
-                                    console.log('resuming load');
-                                    vm.loading = true;
-                                    vm.index++
-                                } else {
-                                    console.log('loading finished before this');
+                        if (vm.$root.page == '#dashboard') {
+                            getQuery();
+                            if (query) {
+                                switchQuery(query);
+                            } else {
+                                if (storedQuery !== null && storedQuery != query) {
+                                    storedQuery = null;
+                                    if (!vm.initialized && (vm.$parent.index + 1) != (Object.keys(vm.$parent.guildlist).length)) {
+                                        console.log('resuming load');
+                                        vm.loading = true;
+                                        vm.index++
+                                    } else {
+                                        console.log('loading finished before this');
+                                    }
+                                    anime({
+                                        targets: '.serverCard',
+                                        translateY: 0,
+                                        scale: 1,
+                                        delay: anime.stagger(100)
+                                    });
+                                    anime({
+                                        targets: '#serverToolbar',
+                                        translateY: 0
+                                    });
+                                    anime({
+                                        targets: '#dashboardPanel',
+                                        translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+                                    });
                                 }
-                                anime({
-                                    targets: '.serverCard',
-                                    translateY: 0,
-                                    scale: 1,
-                                    delay: anime.stagger(100)
-                                });
-                                anime({
-                                    targets: '#serverToolbar',
-                                    translateY: 0
-                                });
-                                anime({
-                                    targets: '#dashboardPanel',
-                                    translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
-                                });
                             }
                         }
                     }, 0);

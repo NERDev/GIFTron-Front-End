@@ -258,9 +258,14 @@ Vue.component('giftron-dashboard', {
         function switchQuery(newQuery) {
             if (newQuery != storedQuery) {
                 var screenheight = document.body.clientHeight;
-                var listheight = document.querySelector('.serverList').clientHeight;
-                var index = Array.prototype.indexOf.call(document.querySelector('.serverList').childNodes,
-                    document.querySelector('.serverCard-' + newQuery));
+                var serverList = document.querySelector('.serverList');
+                var listheight = 0;
+                var index;
+                if (serverList) {
+                    listheight = document.querySelector('.serverList').clientHeight;
+                    index = Array.prototype.indexOf.call(document.querySelector('.serverList').childNodes,
+                        document.querySelector('.serverCard-' + newQuery));
+                }
                 if (storedQuery === null && vm.initialized) {
                     console.log('animating to ' + newQuery);
                     anime({

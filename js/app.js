@@ -180,6 +180,7 @@ Vue.component('user-dropdown', {
                     this.$root.user = {};
                     this.$root.delete_cookie('session');
                     this.$parent.close();
+                    window.location.hash = '';
                     break;
             }
         }

@@ -570,7 +570,7 @@ Vue.component('dashboard-panel', {
 });
 
 Vue.component('setup-panel', {
-    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);"><h1>Hello!</h1><h2>{{ greeting }}</h2><hr><p>{{ copy }}</p><setup-options v-bind:setup="guild.setup.channels"></setup-options></div>`,
+    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);"><h1>Hello!</h1><h2>{{ greeting }}</h2><hr><p>{{ copy }}</p><setup-options v-bind:setup="guild.setup.channels"></setup-options><hr></div>`,
     props: ['guild'],
     data: function () {
         return {
@@ -598,7 +598,7 @@ Vue.component('setup-panel', {
 });
 
 Vue.component('setup-options', {
-    template: `<div><ul class="setup-options"><li v-for="(name, id) in suggested"><button v-on:click="removed" v-bind:value="id">#{{ name }}</button></li><li><select v-on:click="selected" v-if="Object.keys(available).length !== 0"><option value="" selected disabled>Select Channel</option><option v-for="(name, id) in available" v-bind:value="id">#{{ name }}</option></select></li></ul></div>`,
+    template: `<ul class="setup-options"><li v-for="(name, id) in suggested"><button v-on:click="removed" v-bind:value="id">#{{ name }}</button></li><li><select v-on:click="selected" v-if="Object.keys(available).length !== 0"><option value="" selected disabled>Select Channel</option><option v-for="(name, id) in available" v-bind:value="id">#{{ name }}</option></select></li></ul>`,
     props: ['setup'],
     data: function () {
         var suggested = this.setup.suggested,
@@ -614,14 +614,17 @@ Vue.component('setup-options', {
             var vm = this,
                 newSelect = event.target.value;
             if (newSelect && newSelect != vm.oldSelect) {
-                event.target.selectedIndex = 0;
                 if (!vm.suggested) {
                     vm.suggested = {};
                 }
                 vm.oldSelect = newSelect;
                 Vue.set(vm.suggested, newSelect, vm.available[newSelect]);
                 delete vm.available[newSelect];
-                console.log(newSelect);
+                if (event.target.tagName == 'OPTION') {
+                    event.target.parentElement.selectedIndex = 0;
+                } else {
+                    event.target.selectedIndex = 0;
+                }
             }
         },
         removed: function (event) {

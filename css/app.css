@@ -236,12 +236,19 @@ main::-webkit-scrollbar { width: 0 !important }
 .setup-options {
     list-style: none;
     padding: 0;
+    min-height: 10em;
+    width:50%;
+    margin: auto;
+    margin-top: 3em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .setup-options li {
     color: #99aab5;
     display: inline-block;
-    margin-right: 1em;
+    margin: 1em .5em 1em .5em;
 }
 
 .setup-options li button,select {

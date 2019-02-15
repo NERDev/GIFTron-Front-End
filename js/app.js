@@ -264,6 +264,7 @@ Vue.component('giftron-dashboard', {
                 var index;
                 if (serverList) {
                     listheight = document.querySelector('.serverList').clientHeight;
+                    //need to check .tagName of each childNode
                     index = Array.prototype.indexOf.call(document.querySelector('.serverList').childNodes,
                         document.querySelector('.serverCard-' + newQuery));
                 }

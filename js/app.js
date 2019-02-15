@@ -264,10 +264,16 @@ Vue.component('giftron-dashboard', {
                 var index;
                 if (serverList) {
                     listheight = document.querySelector('.serverList').clientHeight;
-                    //need to check .tagName of each childNode
-                    index = Array.prototype.indexOf.call(document.querySelector('.serverList').childNodes,
-                        document.querySelector('.serverCard-' + newQuery));
+                    var childNodes = [];
+                    document.querySelector('.serverList').childNodes.forEach((n) => {
+                        if (n.nodeType == 1) {
+                            childNodes.push(n);
+                        }
+                    });
+                    console.log(childNodes);
+                    index = Array.prototype.indexOf.call(childNodes, document.querySelector('.serverCard-' + newQuery));
                 }
+                console.log(index);
                 if (storedQuery === null && vm.initialized) {
                     console.log('animating to ' + newQuery);
                     anime({

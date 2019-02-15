@@ -206,7 +206,7 @@ Vue.component('navbar-logo', {
 });
 
 Vue.component('giftron-dashboard', {
-    template: `<div id="dashboard" v-if="user.id"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel></dashboard-panel></div>`,
+    template: `<div id="dashboard" v-if="user.id"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel></dashboard-panel><setup-panel v-if="guildQuery.setup" v-bind:guild="guildQuery"></setup-panel></div>`,
     props: ['user'],
     data: function () {
         return {
@@ -216,7 +216,8 @@ Vue.component('giftron-dashboard', {
             active: true,
             initialized: false,
             filter: false,
-            pageTitle: 'Dashboard'
+            pageTitle: 'Dashboard',
+            guildQuery: {}
         }
     },
     methods: {
@@ -256,12 +257,36 @@ Vue.component('giftron-dashboard', {
             query = window.location.hash.split('?', 2)[1];
         }
 
+        function dashboardOrSetup(newQuery) {
+            if (vm.$root.guilds[newQuery]) {
+                vm.guildQuery = vm.$root.guilds[newQuery];
+                if (vm.$root.guilds[newQuery].setup) {
+                    console.log("this guild needs to be setup!");
+                    console.log(vm.$root.guilds[newQuery].setup);
+                    setTimeout(() => {
+                        anime({
+                            targets: '#setupPanel',
+                            translateY: 0
+                        });
+                    }, 500);
+                } else {
+                    console.log('animating in the dashboard for ' + newQuery);
+                    setTimeout(() => {
+                        anime({
+                            targets: '#dashboardPanel',
+                            translateY: 0
+                        });
+                    }, 500);
+                }
+            }
+        }
+
         function switchQuery(newQuery) {
             if (newQuery != storedQuery) {
-                var screenheight = document.body.clientHeight;
-                var serverList = document.querySelector('.serverList');
-                var listheight = 0;
-                var index;
+                var screenheight = document.body.clientHeight,
+                    serverList = document.querySelector('.serverList'),
+                    listheight = 0,
+                    index;
                 if (serverList) {
                     listheight = document.querySelector('.serverList').clientHeight;
                     var childNodes = [];
@@ -270,10 +295,8 @@ Vue.component('giftron-dashboard', {
                             childNodes.push(n);
                         }
                     });
-                    console.log(childNodes);
                     index = Array.prototype.indexOf.call(childNodes, document.querySelector('.serverCard-' + newQuery));
                 }
-                console.log(index);
                 if (storedQuery === null && vm.initialized) {
                     console.log('animating to ' + newQuery);
                     anime({
@@ -304,13 +327,6 @@ Vue.component('giftron-dashboard', {
                         console.log('direct to ' + newQuery);
                     }
                 }
-                console.log('animating in the dashboard for ' + newQuery);
-                setTimeout(() => {
-                    anime({
-                        targets: '#dashboardPanel',
-                        translateY: 0
-                    });
-                }, 500);
                 if (!vm.$root.guilds[newQuery]) {
                     //document.querySelector('#serverToolbar').style.transform = 'translateY(-200px)';
                     console.log('going and getting the info for this guild');
@@ -320,6 +336,7 @@ Vue.component('giftron-dashboard', {
                             if (this.status == 200) {
                                 vm.$root.guilds[newQuery] = JSON.parse(this.response);
                                 console.log('got info');
+                                dashboardOrSetup(newQuery);
                             } else {
                                 console.log('no guild');
                             }
@@ -327,6 +344,8 @@ Vue.component('giftron-dashboard', {
                     };
                     xhttp.open("GET", "api/v1/guild?guild_id=" + newQuery, true);
                     xhttp.send();
+                } else {
+                    dashboardOrSetup(newQuery);
                 }
                 storedQuery = newQuery;
             }
@@ -338,6 +357,7 @@ Vue.component('giftron-dashboard', {
                 if (query) {
                     switchQuery(query);
                 } else {
+                    vm.guildQuery = {};
                     vm.initialize();
                     clearTimeout(initialize);
                     console.log('moving toolbar');
@@ -346,13 +366,15 @@ Vue.component('giftron-dashboard', {
                             targets: '#serverToolbar',
                             translateY: 0
                         });
-                        console.log(document.getElementById('dashboardPanel').style.transform);
-                        if (document.getElementById('dashboardPanel').style.transform == 'translateY(0vh)') {
-                            anime({
-                                targets: '#dashboardPanel',
-                                translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
-                            });
-                        }
+                        document.querySelectorAll('.panel').forEach((p) => {
+                            console.log(p.id);
+                            if (p.style.transform == 'translateY(0vh)') {
+                                anime({
+                                    targets: '#' + p.id,
+                                    translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+                                });
+                            }
+                        });
                     }, 100);
                     storedQuery = null;
                     var watch = setInterval(() => {
@@ -361,6 +383,7 @@ Vue.component('giftron-dashboard', {
                             if (query) {
                                 switchQuery(query);
                             } else {
+                                vm.guildQuery = {};
                                 if (storedQuery !== null && storedQuery != query) {
                                     storedQuery = null;
                                     if (!vm.initialized && (vm.$parent.index + 1) != (Object.keys(vm.$parent.guildlist).length)) {
@@ -381,7 +404,7 @@ Vue.component('giftron-dashboard', {
                                         translateY: 0
                                     });
                                     anime({
-                                        targets: '#dashboardPanel',
+                                        targets: '.panel',
                                         translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
                                     });
                                 }
@@ -536,7 +559,7 @@ Vue.component('server-card', {
 });
 
 Vue.component('dashboard-panel', {
-    template: `<div id="dashboardPanel" style="transform: translateY(-100vh);"><h1 style="
+    template: `<div class="panel" id="dashboardPanel" style="transform: translateY(-100vh);"><h1 style="
     text-align: center;
     position: absolute;
     top: 30vh;
@@ -544,6 +567,74 @@ Vue.component('dashboard-panel', {
     color: white;
     width: inherit;
 ">DASHBOARD</h1></div>`
+});
+
+Vue.component('setup-panel', {
+    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);"><h1>Hello!</h1><h2>{{ greeting }}</h2><hr><p>{{ copy }}</p><setup-options v-bind:setup="guild.setup.channels"></setup-options></div>`,
+    props: ['guild'],
+    data: function () {
+        return {
+            copy: "",
+            greeting: "",
+            channelCopy0: "We didn't detect any giveaway channels on your server. Would you like to create one now, or use an existing channel? This can be changed in the future!",
+            channelCopy1: "We've detected that you have a Giveaway channel on your server! Would you like us to use it? If not, select a different channel! This can be changed in the future!",
+            channelCopy2: "We've detected multiple Giveaway channels on your server! Would you like us to use them? If not, customize to how you see fit! This can be changed in the future!",
+        }
+    },
+    mounted: function () {
+        var vm = this,
+            channels = this.guild.setup.channels;
+        vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!"
+        if (channels.suggested) {
+            if (Object.keys(channels.suggested).length > 1) {
+                vm.copy = vm.channelCopy2;
+            } else {
+                vm.copy = vm.channelCopy1;
+            }
+        } else {
+            vm.copy = vm.channelCopy0;
+        }
+    }
+});
+
+Vue.component('setup-options', {
+    template: `<div><ul class="setup-options"><li v-for="(name, id) in suggested"><button v-on:click="removed" v-bind:value="id">#{{ name }}</button></li><li><select v-on:click="selected" v-if="Object.keys(available).length !== 0"><option value="" selected disabled>Select Channel</option><option v-for="(name, id) in available" v-bind:value="id">#{{ name }}</option></select></li></ul></div>`,
+    props: ['setup'],
+    data: function () {
+        var suggested = this.setup.suggested,
+            available = this.setup.available;
+        return {
+            suggested,
+            available,
+            oldSelect: null
+        }
+    },
+    methods: {
+        selected: function (event) {
+            var vm = this,
+                newSelect = event.target.value;
+            if (newSelect && newSelect != vm.oldSelect) {
+                event.target.selectedIndex = 0;
+                if (!vm.suggested) {
+                    vm.suggested = {};
+                }
+                vm.oldSelect = newSelect;
+                Vue.set(vm.suggested, newSelect, vm.available[newSelect]);
+                delete vm.available[newSelect];
+                console.log(newSelect);
+            }
+        },
+        removed: function (event) {
+            var vm = this,
+                value = event.target.value;
+            Vue.set(vm.available, value, vm.suggested[value]);
+            delete vm.suggested[value];
+        }
+    },
+    mounted: function () {
+        var vm = this;
+        console.log(vm.setup.suggested);
+    }
 });
 
 var app = new Vue({

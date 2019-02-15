@@ -11,6 +11,23 @@ main {
     -ms-overflow-style: none;
 }
 
+hr {
+    background-color: #99aab5;
+    border-color: #99aab5;
+}
+
+button:focus {
+    outline: 0;   
+}
+
+select:focus {
+    outline: 0;   
+}
+
+::selection {
+    color: white;
+}
+
 main::-webkit-scrollbar { width: 0 !important }
 
 .shadow {
@@ -161,10 +178,6 @@ main::-webkit-scrollbar { width: 0 !important }
     align-items: center;
 }
 
-.navbar ul li button:focus {
-    outline: 0;   
-}
-
 #content {
     position: relative;
     bottom: -5.5em;
@@ -185,6 +198,72 @@ main::-webkit-scrollbar { width: 0 !important }
     position: absolute;
     top: 0;
     background-color: #2C2F33;
+}
+
+#setupPanel {
+    height: inherit;
+    width: inherit;
+    position: absolute;
+    top: 0;
+    background-color: #2C2F33;
+    text-align: center;
+}
+
+#setupPanel h1 {
+    color: #7289DA;
+    font-size: 4em;
+    margin-bottom: 0;
+}
+
+#setupPanel h2 {
+    color: #99aab5;
+    font-size: 2em;
+    margin-top: 0;
+    font-weight: normal;
+}
+
+#setupPanel p {
+    font-size: 1.5em;
+    max-width: 50%;
+    margin: auto;
+    color: #99aab5;
+}
+
+#setupPanel hr {
+    width: 50%;
+}
+
+.setup-options {
+    list-style: none;
+    padding: 0;
+}
+
+.setup-options li {
+    color: #99aab5;
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.setup-options li button,select {
+    text-decoration: none;
+    background-color: inherit;
+    color: inherit;
+    cursor: pointer;
+    width: max-content;
+    padding: 5px 10px 5px 10px;
+    border-color: #99aab5;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: .3em;
+    font-size: 1.3em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.setup-options li select > option {
+    background-color: #2C2F33!important;
+    box-shadow: 0 0 10px 100px #fff inset;
 }
 
 #serverToolbar {

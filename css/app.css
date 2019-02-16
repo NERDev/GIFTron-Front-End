@@ -263,7 +263,6 @@ main::-webkit-scrollbar { width: 0 !important }
     border-width: 1px;
     border-radius: .3em;
     font-size: 1.3em;
-    -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
 }

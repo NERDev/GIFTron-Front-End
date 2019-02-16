@@ -632,6 +632,7 @@ Vue.component('setup-options', {
                 value = event.target.value;
             Vue.set(vm.available, value, vm.suggested[value]);
             delete vm.suggested[value];
+            vm.oldSelect = null;
         }
     },
     mounted: function () {

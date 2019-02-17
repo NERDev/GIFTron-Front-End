@@ -36,6 +36,17 @@ main::-webkit-scrollbar { width: 0 !important }
     box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
 }
 
+button.main {
+    text-decoration: none;
+    background-color: #7289DA;
+    font-size: 1.75em;
+    cursor: pointer;
+    border: none;
+    border-radius: .3em;
+    padding: .5em 2em .5em 2em;
+    color: white;
+}
+
 .navbar {
     padding-top: 0.2em;
     background-color: #2C2F33;
@@ -209,6 +220,12 @@ main::-webkit-scrollbar { width: 0 !important }
     text-align: center;
 }
 
+#setupContainer {
+    width: 50%;
+    height: inherit;
+    margin: auto;
+}
+
 #setupPanel h1 {
     color: #7289DA;
     font-size: 4em;
@@ -224,22 +241,15 @@ main::-webkit-scrollbar { width: 0 !important }
 
 #setupPanel p {
     font-size: 1.5em;
-    max-width: 50%;
     margin: auto;
     color: #99aab5;
-}
-
-#setupPanel hr {
-    width: 50%;
 }
 
 .setup-options {
     list-style: none;
     padding: 0;
     min-height: 10em;
-    width:50%;
     margin: auto;
-    margin-top: 3em;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -270,6 +280,14 @@ main::-webkit-scrollbar { width: 0 !important }
 .setup-options li select > option {
     background-color: #2C2F33!important;
     box-shadow: 0 0 10px 100px #fff inset;
+}
+
+.setup-buttons button:first-child {
+    margin-right: 1em;
+}
+
+.setup-buttons button:last-child {
+    margin-left: 1em;
 }
 
 #serverToolbar {

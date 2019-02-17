@@ -570,43 +570,67 @@ Vue.component('dashboard-panel', {
 });
 
 Vue.component('setup-panel', {
-    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);"><h1>Hello!</h1><h2>{{ greeting }}</h2><hr><p>{{ copy }}</p><setup-options v-bind:setup="guild.setup.channels"></setup-options><hr></div>`,
+    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);"><div id="setupContainer"><h1>{{ top }}</h1><h2>{{ greeting }}</h2><div class="innerLoader" v-show="loading"><div class="lds-roller"><div v-for="index in 7"></div></div></div><div class="inner" v-show="!loading"><hr><p v-show="step == 1">{{ access_roleCopy }}<br><br></p><p>{{ copy }}</p><setup-options v-bind:step="0" v-bind:prefix="'#'" v-bind:setup="guild.setup.channels"></setup-options><setup-options v-bind:step="1" v-bind:prefix="''" v-bind:setup="guild.setup.access_roles"></setup-options><hr></div><setup-buttons v-bind:step="step" v-show="!loading"></setup-buttons></div></div>`,
     props: ['guild'],
     data: function () {
         return {
+            loading: false,
+            setup: {},
+            step: 0,
+            scopes: [
+                'channel',
+                'access_role'
+            ],
             copy: "",
+            top: "Hello!",
             greeting: "",
             channelCopy0: "We didn't detect any giveaway channels on your server. Would you like to create one now, or use an existing channel? This can be changed in the future!",
             channelCopy1: "We've detected that you have a Giveaway channel on your server! Would you like us to use it? If not, select a different channel! This can be changed in the future!",
-            channelCopy2: "We've detected multiple Giveaway channels on your server! Would you like us to use them? If not, customize to how you see fit! This can be changed in the future!",
+            channelCopy2: "We've detected multiple Giveaway channels on your server! Would you like us to use them? If not, add or remove channels as you see fit. This can be changed in the future!",
+            access_roleCopy: "By default, access to this Dashboard will be limited to the Server Owner, and users with the Manage Server permission. By setting up Access Roles, you can give certain users permission to edit this dashboard regardless of their Discord permissions.",
+            access_roleCopy0: "",
+            access_roleCopy1: "We have detected one that you might want to use.",
+            access_roleCopy2: "We have detected some that you might want to use.",
         }
     },
     mounted: function () {
-        var vm = this,
-            channels = this.guild.setup.channels;
+        var vm = this;
         vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!"
-        if (channels.suggested) {
-            if (Object.keys(channels.suggested).length > 1) {
-                vm.copy = vm.channelCopy2;
+    },
+    updated: function () {
+        var vm = this,
+            scope = this.scopes[this.step],
+            items = this.guild.setup[scope + 's'];
+        if (items.suggested) {
+            if (Object.keys(items.suggested).length > 1) {
+                vm.copy = vm[scope + 'Copy2'];
             } else {
-                vm.copy = vm.channelCopy1;
+                vm.copy = vm[scope + 'Copy1'];
             }
         } else {
-            vm.copy = vm.channelCopy0;
+            vm.copy = vm[scope + 'Copy0'];
         }
     }
 });
 
 Vue.component('setup-options', {
-    template: `<ul class="setup-options"><li v-for="(name, id) in suggested"><button v-on:click="removed" v-bind:value="id">#{{ name }}</button></li><li><select v-on:click="selected" v-if="Object.keys(available).length !== 0"><option value="" selected disabled>Select Channel</option><option v-for="(name, id) in available" v-bind:value="id">#{{ name }}</option></select></li></ul>`,
-    props: ['setup'],
+    template: `<ul class="setup-options" v-show="(step == $parent.step)">
+        <li v-for="(name, id) in setup.suggested">
+            <button v-on:click="removed" v-bind:value="id">{{ prefix }}{{ name }}</button>
+        </li>
+        <li>
+            <select v-on:click="selected" v-if="Object.keys(setup.available).length !== 0">
+                <option value="" selected disabled>Select {{ thing }}s</option><option v-for="(name, id) in setup.available" v-bind:value="id">{{ prefix }}{{ name }}</option>
+            </select>
+        </li>
+    </ul>`,
+    props: ['setup', 'prefix', 'step'],
     data: function () {
-        var suggested = this.setup.suggested,
-            available = this.setup.available;
+        var scope = this.$parent.scopes[this.step];
         return {
-            suggested,
-            available,
-            oldSelect: null
+            scope,
+            oldSelect: null,
+            thing: scope.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
         }
     },
     methods: {
@@ -614,12 +638,12 @@ Vue.component('setup-options', {
             var vm = this,
                 newSelect = event.target.value;
             if (newSelect && newSelect != vm.oldSelect) {
-                if (!vm.suggested) {
-                    vm.suggested = {};
+                if (!vm.setup.suggested) {
+                    vm.setup.suggested = {};
                 }
                 vm.oldSelect = newSelect;
-                Vue.set(vm.suggested, newSelect, vm.available[newSelect]);
-                delete vm.available[newSelect];
+                Vue.set(vm.setup.suggested, newSelect, vm.setup.available[newSelect]);
+                delete vm.setup.available[newSelect];
                 if (event.target.tagName == 'OPTION') {
                     event.target.parentElement.selectedIndex = 0;
                 } else {
@@ -630,14 +654,51 @@ Vue.component('setup-options', {
         removed: function (event) {
             var vm = this,
                 value = event.target.value;
-            Vue.set(vm.available, value, vm.suggested[value]);
-            delete vm.suggested[value];
+            Vue.set(vm.setup.available, value, vm.setup.suggested[value]);
+            delete vm.setup.suggested[value];
             vm.oldSelect = null;
         }
     },
     mounted: function () {
         var vm = this;
         console.log(vm.setup.suggested);
+    }
+});
+
+Vue.component('setup-buttons', {
+    template: `<div class="setup-buttons"><button class="main" v-if="step > 0" v-on:click="back">Back</button><button class="main" v-if="step < last" v-on:click="next">Next</button><button class="main" v-if="step == last" v-on:click="apply">Apply</button></div>`,
+    props: ['step'],
+    data: function () {
+        return {
+            last: 1
+        }
+    },
+    methods: {
+        back: function () {
+            var scope = this.$parent.scopes[this.step];
+            this.$parent.step--;
+            if (this.$parent.setup[scope + 's']) {
+                delete this.$parent.setup[scope + 's'];
+            }
+        },
+        next: function () {
+            var scope = this.$parent.scopes[this.step],
+            items = Object.keys(this.$parent.guild.setup[scope + 's'].suggested);
+            this.$parent.step++;
+            Vue.set(this.$parent.setup, scope + 's', items.length ? items : false);
+        },
+        apply: function () {
+            var scope = this.$parent.scopes[this.step],
+                items = Object.keys(this.$parent.guild.setup[scope + 's'].suggested);
+            Vue.set(this.$parent.setup, scope + 's', items.length ? items : false);
+            this.$parent.loading = true;
+            this.$parent.top = "Almost Done!";
+            this.$parent.greeting = "Getting you setup, one moment...";
+            console.log(JSON.stringify(this.$parent.setup));
+            setTimeout(() => {
+                this.$parent.loading = false;
+            }, 100000);
+        }
     }
 });
 

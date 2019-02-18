@@ -260,6 +260,7 @@ Vue.component('giftron-dashboard', {
         function dashboardOrSetup(newQuery) {
             if (vm.$root.guilds[newQuery]) {
                 vm.guildQuery = vm.$root.guilds[newQuery];
+                vm.guildQuery.id = newQuery;
                 if (vm.$root.guilds[newQuery].setup) {
                     console.log("this guild needs to be setup!");
                     console.log(vm.$root.guilds[newQuery].setup);
@@ -570,11 +571,12 @@ Vue.component('dashboard-panel', {
 });
 
 Vue.component('setup-panel', {
-    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);"><div id="setupContainer"><h1>{{ top }}</h1><h2>{{ greeting }}</h2><div class="innerLoader" v-show="loading"><div class="lds-roller"><div v-for="index in 7"></div></div></div><div class="inner" v-show="!loading"><hr><p v-show="step == 1">{{ access_roleCopy }}<br><br></p><p>{{ copy }}</p><setup-options v-bind:step="0" v-bind:prefix="'#'" v-bind:setup="guild.setup.channels"></setup-options><setup-options v-bind:step="1" v-bind:prefix="''" v-bind:setup="guild.setup.access_roles"></setup-options><hr></div><setup-buttons v-bind:step="step" v-show="!loading"></setup-buttons></div></div>`,
+    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);"><div id="setupContainer"><h1>{{ top }}</h1><h2>{{ greeting }}</h2><div v-show="!loading && finished"><svg style="fill: limegreen;" xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div><div class="innerLoader" v-show="loading && !finished"><div class="lds-roller"><div v-for="index in 7"></div></div></div><div class="inner" v-show="!loading && !finished"><hr><p v-show="step == 1">{{ access_roleCopy }}<br><br></p><p>{{ copy }}</p><setup-options v-bind:step="0" v-bind:prefix="'#'" v-bind:setup="guild.setup.channels"></setup-options><setup-options v-bind:step="1" v-bind:prefix="''" v-bind:setup="guild.setup.access_roles"></setup-options><hr></div><setup-buttons v-bind:step="step" v-show="!loading && !finished"></setup-buttons></div></div>`,
     props: ['guild'],
     data: function () {
         return {
             loading: false,
+            finished: false,
             setup: {},
             step: 0,
             scopes: [
@@ -590,7 +592,7 @@ Vue.component('setup-panel', {
             access_roleCopy: "By default, access to this Dashboard will be limited to the Server Owner, and users with the Manage Server permission. By setting up Access Roles, you can give certain users permission to edit this dashboard regardless of their Discord permissions.",
             access_roleCopy0: "",
             access_roleCopy1: "We have detected one that you might want to use.",
-            access_roleCopy2: "We have detected some that you might want to use.",
+            access_roleCopy2: "We have detected some that you might want to use."
         }
     },
     mounted: function () {
@@ -682,22 +684,62 @@ Vue.component('setup-buttons', {
             }
         },
         next: function () {
-            var scope = this.$parent.scopes[this.step],
-            items = Object.keys(this.$parent.guild.setup[scope + 's'].suggested);
+            var scope = this.$parent.scopes[this.step];
+            if (!this.$parent.guild.setup[scope + 's'].suggested) {
+                console.log('Dis bitch empty - Y E E T');
+                var items = {};
+            } else {
+                var items = Object.keys(this.$parent.guild.setup[scope + 's'].suggested);
+            }
             this.$parent.step++;
             Vue.set(this.$parent.setup, scope + 's', items.length ? items : false);
         },
         apply: function () {
-            var scope = this.$parent.scopes[this.step],
-                items = Object.keys(this.$parent.guild.setup[scope + 's'].suggested);
-            Vue.set(this.$parent.setup, scope + 's', items.length ? items : false);
-            this.$parent.loading = true;
-            this.$parent.top = "Almost Done!";
-            this.$parent.greeting = "Getting you setup, one moment...";
-            console.log(JSON.stringify(this.$parent.setup));
-            setTimeout(() => {
-                this.$parent.loading = false;
-            }, 100000);
+            var vm = this,
+                scope = vm.$parent.scopes[vm.step];
+            if (!vm.$parent.guild.setup[scope + 's'].suggested) {
+                console.log('Dis bitch empty - Y E E T');
+                var items = {};
+            } else {
+                var items = Object.keys(vm.$parent.guild.setup[scope + 's'].suggested);
+            }
+            Vue.set(vm.$parent.setup, scope + 's', items.length ? items : false);
+            vm.$parent.loading = true;
+            vm.$parent.top = "Almost Done!";
+            vm.$parent.greeting = "Getting you setup, one moment...";
+            var setup = JSON.stringify(vm.$parent.setup);
+            console.log(setup);
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    vm.$parent.loading = false;
+                    console.log(this.response);
+                    if (this.status == 200) {
+                        vm.$parent.finished = true;
+                        vm.$parent.$parent.guildQuery = JSON.parse(this.response);
+                        console.log(vm.$parent.$parent.guildQuery);
+                        vm.$parent.finished = true;
+                        vm.$parent.top = "Finished!";
+                        vm.$parent.greeting = "All set - She's all yours!";
+
+                        setTimeout(() => {
+                            anime({
+                                targets: '#setupPanel',
+                                translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+                            });
+                            setTimeout(() => {
+                                anime({
+                                    targets: '#dashboardPanel',
+                                    translateY: 0
+                                });
+                            }, 500);
+                        }, 1000);
+                    }
+                }
+            };
+            xhttp.open("POST", "api/v1/guild/?guild_id=" + vm.$parent.guild.id, true);
+            xhttp.send(setup);
         }
     }
 });

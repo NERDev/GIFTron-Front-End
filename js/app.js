@@ -728,7 +728,8 @@ Vue.component('setup-buttons', {
                             });
                             setTimeout(() => {
                                 //dirty af but it gets the job done
-                                vm.$parent.$parent.guildQuery = JSON.parse(xhr.response);
+                                vm.$root.guilds[vm.$parent.guild.id] = JSON.parse(xhr.response);
+                                console.log(vm.$root.guilds[vm.$parent.guild.id]);
                                 anime({
                                     targets: '#dashboardPanel',
                                     translateY: 0

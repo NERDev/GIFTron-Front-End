@@ -335,8 +335,12 @@ Vue.component('giftron-dashboard', {
                         if (this.readyState == 4) {
                             if (this.status == 200) {
                                 vm.$root.guilds[newQuery] = JSON.parse(this.response);
-                                console.log('got info');
-                                dashboardOrSetup(newQuery);
+                                if (!vm.$root.guilds[newQuery]) {
+                                    console.log('got info');
+                                    dashboardOrSetup(newQuery);
+                                } else {
+                                    console.log('this guild is unavailable');
+                                }
                             } else {
                                 console.log('no guild');
                             }
@@ -488,7 +492,6 @@ Vue.component('server-card', {
         var vm = this;
         function handleGotData() {
             vm.info = vm.$root.guilds[vm.id];
-
             if (vm.info.icon) {
                 vm.icon = 'https://cdn.discordapp.com/icons/' + vm.id + '/' + vm.info.icon + '.png?size=1024'
             } else {
@@ -503,8 +506,13 @@ Vue.component('server-card', {
             console.log(vm.$parent.status);
             //console.log('.serverCard-' + vm.id);
             setTimeout(function () {
-                //console.log(document.querySelector(('.serverCard-' + vm.id.toString())));
                 if (vm.$parent.loading) {
+                    if (vm.info && vm.info.unavailable) {
+                        var button = document.getElementById('serverButton-' + vm.id);
+                        button.disabled = true;
+                        button.parentElement.style.opacity = '.5';
+                        button.style.cursor = 'not-allowed';
+                    }
                     anime({
                         targets: ('.serverCard-' + vm.id.toString()),
                         scale: 1

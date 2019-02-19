@@ -714,11 +714,9 @@ Vue.component('setup-buttons', {
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4) {
                     vm.$parent.loading = false;
-                    console.log(this.response);
                     if (this.status == 200) {
+                        var xhr = this;
                         vm.$parent.finished = true;
-                        vm.$parent.$parent.guildQuery = JSON.parse(this.response);
-                        console.log(vm.$parent.$parent.guildQuery);
                         vm.$parent.finished = true;
                         vm.$parent.top = "Finished!";
                         vm.$parent.greeting = "All set - She's all yours!";
@@ -729,6 +727,8 @@ Vue.component('setup-buttons', {
                                 translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
                             });
                             setTimeout(() => {
+                                //dirty af but it gets the job done
+                                vm.$parent.$parent.guildQuery = JSON.parse(xhr.response);
                                 anime({
                                     targets: '#dashboardPanel',
                                     translateY: 0

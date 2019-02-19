@@ -45,8 +45,8 @@ Vue.component('navbar-loader', {
             loading: false
         }
     },
-    mounted: function () {
-        setInterval(() => {
+    methods: {
+        update: function () {
             if (this.$root.$refs[this.$root.page]) {
                 this.status = this.$root.$refs[this.$root.page].status;
                 this.loading = this.$root.$refs[this.$root.page].loading;
@@ -54,8 +54,7 @@ Vue.component('navbar-loader', {
                 this.status = 0;
                 this.loading = false;
             }
-        }, 0);
-        //this.status = this.$refs[this.$root.page].status
+        }
     }
 });
 
@@ -523,12 +522,14 @@ Vue.component('server-card', {
                     vm.$parent.loading = false;
                     vm.$parent.status = 0;
                     vm.$parent.initialized = true;
-                }, 500);
+                    vm.$root.$refs.navbarLoader.update();
+                }, 150);
             }
 
             if (vm.$parent.loading) {
                 vm.$parent.index++;
             }
+            vm.$root.$refs.navbarLoader.update();
         }
         var interval = setInterval(() => {
             //console.log(Object.keys(vm.$parent.guildlist).indexOf(vm.id), Object.keys(vm.$parent.guildlist));
@@ -783,5 +784,8 @@ var app = new Vue({
             vm.page = window.location.hash.split('?')[0];
             pageHandle();
         };
+    },
+    updated: function () {
+        console.log('updating navbar');
     }
 });

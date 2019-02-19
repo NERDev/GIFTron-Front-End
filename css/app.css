@@ -58,7 +58,7 @@ button.main {
     height: 5px;
     background-color: #99aab5;
     width: 0%;
-    transition: 0.5s ease width;
+    transition: 0.15s ease width;
 }
 
 .navbar hr {

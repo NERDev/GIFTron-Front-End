@@ -335,7 +335,7 @@ Vue.component('giftron-dashboard', {
                         if (this.readyState == 4) {
                             if (this.status == 200) {
                                 vm.$root.guilds[newQuery] = JSON.parse(this.response);
-                                if (!vm.$root.guilds[newQuery]) {
+                                if (!vm.$root.guilds[newQuery].unavailable) {
                                     console.log('got info');
                                     dashboardOrSetup(newQuery);
                                 } else {

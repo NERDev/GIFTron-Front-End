@@ -580,7 +580,25 @@ Vue.component('dashboard-panel', {
 });
 
 Vue.component('setup-panel', {
-    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);"><div id="setupContainer"><h1>{{ top }}</h1><h2>{{ greeting }}</h2><div v-show="!loading && finished"><svg style="fill: limegreen;" xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div><div class="innerLoader" v-show="loading && !finished"><div class="lds-roller"><div v-for="index in 7"></div></div></div><div class="inner" v-show="!loading && !finished"><hr><p v-show="step == 1">{{ access_roleCopy }}<br><br></p><p>{{ copy }}</p><setup-options v-bind:step="0" v-bind:prefix="'#'" v-bind:setup="guild.setup.channels"></setup-options><setup-options v-bind:step="1" v-bind:prefix="''" v-bind:setup="guild.setup.access_roles"></setup-options><hr></div><setup-buttons v-bind:step="step" v-show="!loading && !finished"></setup-buttons></div></div>`,
+    template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);">
+                    <div id="setupContainer"><h1>{{ top }}</h1><h2>{{ greeting }}</h2>
+                        <div v-show="!loading && finished"><svg style="fill: limegreen;" xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>
+                        <div class="innerLoader" v-show="loading && !finished"><div class="lds-roller"><div v-for="index in 7"></div></div></div>
+                        <div class="inner" v-show="!loading && !finished">
+                            <hr>
+                            <p v-show="step == 1">{{ access_roleCopy }}
+                            <br>
+                            <br>
+                            </p>
+                            <p>{{ copy }}</p>
+                            <div></div>
+                            <setup-options v-bind:step="1" v-bind:prefix="'#'" v-bind:setup="guild.setup.channels"></setup-options>
+                            <setup-options v-bind:step="2" v-bind:prefix="''" v-bind:setup="guild.setup.access_roles"></setup-options>
+                            <hr>
+                        </div>
+                        <setup-buttons v-bind:step="step" v-show="!loading && !finished"></setup-buttons>
+                    </div>
+               </div>`,
     props: ['guild'],
     data: function () {
         return {
@@ -589,12 +607,16 @@ Vue.component('setup-panel', {
             setup: {},
             step: 0,
             scopes: [
+                'guild_perm',
                 'channel',
                 'access_role'
             ],
             copy: "",
-            top: "Hello!",
+            top: "",
             greeting: "",
+            guild_permCopy: "",
+            guild_permCopy0: "The Manage Channels permission isn't necessary for GIFTron to operate, but it allows GIFTron to be able to automatically fix its channels if permissions are messed with.",
+            guild_permCopy1: "GIFTron operates on the principle of being able to send and recieve messages on a Discord server. Without these, we will not be able to function.",
             channelCopy0: "We didn't detect any giveaway channels on your server. Would you like to create one now, or use an existing channel? This can be changed in the future!",
             channelCopy1: "We've detected that you have a Giveaway channel on your server! Would you like us to use it? If not, select a different channel! This can be changed in the future!",
             channelCopy2: "We've detected multiple Giveaway channels on your server! Would you like us to use them? If not, add or remove channels as you see fit. This can be changed in the future!",
@@ -605,21 +627,83 @@ Vue.component('setup-panel', {
         }
     },
     mounted: function () {
-        var vm = this;
-        vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!"
+        var vm = this,
+        scope = this.scopes[this.step];
+        //vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!";
+        vm.top = "One Moment";
+        vm.greeting = "Checking Permissions...";
+        vm.guild.setup[scope + 's'] = {};
+        vm.loading = true;
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                vm.loading = false;
+                if (this.status == 200) {
+                    var missing = [];
+                    var currentPerms = JSON.parse(this.response);
+                    if (!currentPerms) {
+                        currentPerms = [];
+                    }
+                    console.log(currentPerms);
+                    var desiredPerms = [
+                        'generalManageChannels',
+                        'textReadMessages',
+                        'textSendMessages'
+                    ];
+                    desiredPerms.forEach(function (p) {
+                        if (!currentPerms.includes(p)) {
+                            missing.push(p);
+                        }
+                    });
+
+                    if (missing.length) {
+                        vm.top = "Pardon Us";
+                        if (missing.includes(desiredPerms[0])) {
+                            vm.guild_permCopy += vm.guild_permCopy0;
+                            if (missing.length > 1) {
+                                vm.guild_permCopy += " However, ";
+                            }
+                        }
+                        if (missing.length == 1) {
+                            vm.greeting = "But did you mean to click this?";
+                        } else {
+                            vm.greeting = "But did you mean to click these?";
+                        }
+                        if (missing.includes(desiredPerms[1]) || missing.includes(desiredPerms[2])) {
+                            vm.guild_permCopy += vm.guild_permCopy1;
+                        }
+
+                        vm.guild_permCopy += " You may want to go back and re-add GIFTron to fix this."
+
+                        console.log(missing.join('+') + '.png');
+                    } else {
+                        console.log('We\'ve got everything we need - proceed');
+                        vm.step++;
+                    }
+                }
+            }
+        };
+        xhttp.open("GET", "api/v1/guild/permissions/?" + vm.guild.id, true);
+        xhttp.send();
     },
     updated: function () {
         var vm = this,
             scope = this.scopes[this.step],
             items = this.guild.setup[scope + 's'];
-        if (items.suggested) {
-            if (Object.keys(items.suggested).length > 1) {
-                vm.copy = vm[scope + 'Copy2'];
+        if (typeof items.suggested !== 'undefined') {
+            vm.top = "Hello!";
+            vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!";
+            if (items.suggested) {
+                if (Object.keys(items.suggested).length > 1) {
+                    vm.copy = vm[scope + 'Copy2'];
+                } else {
+                    vm.copy = vm[scope + 'Copy1'];
+                }
             } else {
-                vm.copy = vm[scope + 'Copy1'];
+                vm.copy = vm[scope + 'Copy0'];
             }
         } else {
-            vm.copy = vm[scope + 'Copy0'];
+            vm.copy = vm[scope + 'Copy'];
         }
     }
 });
@@ -677,11 +761,11 @@ Vue.component('setup-options', {
 });
 
 Vue.component('setup-buttons', {
-    template: `<div class="setup-buttons"><button class="main" v-if="step > 0" v-on:click="back">Back</button><button class="main" v-if="step < last" v-on:click="next">Next</button><button class="main" v-if="step == last" v-on:click="apply">Apply</button></div>`,
+    template: `<div class="setup-buttons"><button class="main" v-if="step > 1" v-on:click="back">Back</button><button class="main" v-if="step < last" v-on:click="next">Next</button><button class="main" v-if="step == last" v-on:click="apply">Apply</button></div>`,
     props: ['step'],
     data: function () {
         return {
-            last: 1
+            last: this.$parent.scopes.length - 1
         }
     },
     methods: {

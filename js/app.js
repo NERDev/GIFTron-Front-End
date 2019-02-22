@@ -586,7 +586,7 @@ Vue.component('setup-panel', {
                         <div class="innerLoader" v-show="loading && !finished"><div class="lds-roller"><div v-for="index in 7"></div></div></div>
                         <div class="inner" v-show="!loading && !finished">
                             <hr>
-                            <p v-show="step == 1">{{ access_roleCopy }}
+                            <p v-show="step == scopes.indexOf('access_role')">{{ access_roleCopy }}
                             <br>
                             <br>
                             </p>

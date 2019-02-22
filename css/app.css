@@ -263,7 +263,7 @@ button.main {
 
 .setup-options li button,select {
     text-decoration: none;
-    background-color: inherit;
+    background: #2C2F33;
     color: inherit;
     cursor: pointer;
     width: max-content;
@@ -278,7 +278,7 @@ button.main {
 }
 
 .setup-options li select > option {
-    background-color: #2C2F33!important;
+    background: #2C2F33!important;
     box-shadow: 0 0 10px 100px #fff inset;
 }
 

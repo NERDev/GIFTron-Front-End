@@ -582,9 +582,9 @@ Vue.component('dashboard-panel', {
 Vue.component('setup-panel', {
     template: `<div class="panel" id="setupPanel" style="transform: translateY(-100vh);">
                     <div id="setupContainer"><h1>{{ top }}</h1><h2>{{ greeting }}</h2>
-                        <div v-show="!loading && finished"><svg style="fill: limegreen;" xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>
+                        <div v-show="!loading && finished && success"><svg style="fill: limegreen;" xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg></div>
                         <div class="innerLoader" v-show="loading && !finished"><div class="lds-roller"><div v-for="index in 7"></div></div></div>
-                        <div class="inner" v-show="!loading && !finished">
+                        <div class="inner" v-show="!loading && !success">
                             <hr>
                             <p v-show="step == scopes.indexOf('access_role')">{{ access_roleCopy }}
                             <br>
@@ -604,6 +604,7 @@ Vue.component('setup-panel', {
         return {
             loading: false,
             finished: false,
+            success: false,
             setup: {},
             step: 0,
             scopes: [
@@ -611,11 +612,12 @@ Vue.component('setup-panel', {
                 'channel',
                 'access_role'
             ],
+            missing: [],
             copy: "",
             top: "",
             greeting: "",
             guild_permCopy: "",
-            guild_permCopy0: "The Manage Channels permission isn't necessary for GIFTron to operate, but it allows GIFTron to be able to automatically fix its channels if permissions are messed with.",
+            guild_permCopy0: "The Manage Roles permission isn't necessary for GIFTron to operate, but it allows GIFTron to be able to automatically fix its channels if permissions are messed with.",
             guild_permCopy1: "GIFTron operates on the principle of being able to send and recieve messages on a Discord server. Without these, we will not be able to function.",
             channelCopy0: "We didn't detect any giveaway channels on your server. Would you like to create one now, or use an existing channel? This can be changed in the future!",
             channelCopy1: "We've detected that you have a Giveaway channel on your server! Would you like us to use it? If not, select a different channel! This can be changed in the future!",
@@ -623,12 +625,15 @@ Vue.component('setup-panel', {
             access_roleCopy: "By default, access to this Dashboard will be limited to the Server Owner, and users with the Manage Server permission. By setting up Access Roles, you can give certain users permission to edit this dashboard regardless of their Discord permissions.",
             access_roleCopy0: "",
             access_roleCopy1: "We have detected one that you might want to use.",
-            access_roleCopy2: "We have detected some that you might want to use."
+            access_roleCopy2: "We have detected some that you might want to use.",
+            onemorethingCopy0: "GIFTron has detected that it's not allowed to post in this channel. At some point, please make sure to give it permission.",
+            onemorethingCopy1: "GIFTron has detected that it's not allowed to post in these channels. At some point, please make sure to give it permission.",
+            onemorethingCopy2: "GIFTron has detected that it's not allowed to post any of the channels you picked. At some point, please make sure to give it permission."
         }
     },
     mounted: function () {
         var vm = this,
-        scope = this.scopes[this.step];
+            scope = this.scopes[this.step];
         //vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!";
         vm.top = "One Moment";
         vm.greeting = "Checking Permissions...";
@@ -639,43 +644,42 @@ Vue.component('setup-panel', {
             if (this.readyState == 4) {
                 vm.loading = false;
                 if (this.status == 200) {
-                    var missing = [];
                     var currentPerms = JSON.parse(this.response);
                     if (!currentPerms) {
                         currentPerms = [];
                     }
                     console.log(currentPerms);
                     var desiredPerms = [
-                        'generalManageChannels',
+                        'generalManageRoles',
                         'textReadMessages',
                         'textSendMessages'
                     ];
                     desiredPerms.forEach(function (p) {
                         if (!currentPerms.includes(p)) {
-                            missing.push(p);
+                            vm.missing.push(p);
                         }
                     });
 
-                    if (missing.length) {
+                    if (vm.missing.length) {
                         vm.top = "Pardon Us";
-                        if (missing.includes(desiredPerms[0])) {
+                        if (vm.missing.includes(desiredPerms[0])) {
                             vm.guild_permCopy += vm.guild_permCopy0;
-                            if (missing.length > 1) {
+                            if (vm.missing.length > 1) {
                                 vm.guild_permCopy += " However, ";
                             }
                         }
-                        if (missing.length == 1) {
+                        if (vm.missing.length == 1) {
                             vm.greeting = "But did you mean to click this?";
                         } else {
                             vm.greeting = "But did you mean to click these?";
                         }
-                        if (missing.includes(desiredPerms[1]) || missing.includes(desiredPerms[2])) {
+                        if (vm.missing.includes(desiredPerms[1]) || vm.missing.includes(desiredPerms[2])) {
                             vm.guild_permCopy += vm.guild_permCopy1;
                         }
 
                         vm.guild_permCopy += " You may want to go back and re-add GIFTron to fix this."
 
-                        console.log(missing.join('+') + '.png');
+                        console.log(vm.missing.join('+') + '.png');
                     } else {
                         console.log('We\'ve got everything we need - proceed');
                         vm.step++;
@@ -690,20 +694,25 @@ Vue.component('setup-panel', {
         var vm = this,
             scope = this.scopes[this.step],
             items = this.guild.setup[scope + 's'];
-        if (typeof items.suggested !== 'undefined') {
-            vm.top = "Hello!";
-            vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!";
-            if (items.suggested) {
-                if (Object.keys(items.suggested).length > 1) {
-                    vm.copy = vm[scope + 'Copy2'];
+        if (items) {
+            if (typeof items.suggested !== 'undefined') {
+                if (items.suggested) {
+                    if (Object.keys(items.suggested).length > 1) {
+                        vm.copy = vm[scope + 'Copy2'];
+                    } else {
+                        vm.copy = vm[scope + 'Copy1'];
+                    }
                 } else {
-                    vm.copy = vm[scope + 'Copy1'];
+                    vm.copy = vm[scope + 'Copy0'];
                 }
             } else {
-                vm.copy = vm[scope + 'Copy0'];
+                vm.copy = vm[scope + 'Copy'];
             }
-        } else {
-            vm.copy = vm[scope + 'Copy'];
+    
+            if (!vm.loading && !vm.finished && vm.step) {
+                vm.top = "Hello!";
+                vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!";
+            }
         }
     }
 });
@@ -769,6 +778,21 @@ Vue.component('setup-buttons', {
         }
     },
     methods: {
+        finish: function () {
+            anime({
+                targets: '#setupPanel',
+                translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+            });
+            setTimeout((d) => {
+                //dirty af but it gets the job done
+                vm.$root.guilds[vm.$parent.guild.id] = d;
+                console.log(vm.$root.guilds[vm.$parent.guild.id]);
+                anime({
+                    targets: '#dashboardPanel',
+                    translateY: 0
+                });
+            }, 500);
+        },
         back: function () {
             var scope = this.$parent.scopes[this.step];
             this.$parent.step--;
@@ -798,42 +822,120 @@ Vue.component('setup-buttons', {
             }
             Vue.set(vm.$parent.setup, scope + 's', items.length ? items : false);
             vm.$parent.loading = true;
-            vm.$parent.top = "Almost Done!";
-            vm.$parent.greeting = "Getting you setup, one moment...";
+            vm.$parent.top = "Verifying";
+            if (vm.$parent.missing.includes('generalManageRoles')) {
+                var verb = "Checking";
+            } else {
+                var verb = "Setting";
+            }
+            vm.$parent.greeting = verb + " Channel Permissions...";
             var setup = JSON.stringify(vm.$parent.setup);
             console.log(setup);
 
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    vm.$parent.loading = false;
-                    if (this.status == 200) {
-                        var xhr = this;
-                        vm.$parent.finished = true;
-                        vm.$parent.finished = true;
-                        vm.$parent.top = "Finished!";
-                        vm.$parent.greeting = "All set - She's all yours!";
+            var fixindex = 0,
+                fix = [],
+                options = JSON.stringify({
+                    topic: "Giveaways by GIFTron",
+                    permission_overwrites: [
+                        {
+                            id: "523579896144986125",
+                            type: 'member',
+                            allow: 2048,
+                            deny: 0
+                        },
+                        {
+                            id: vm.$parent.guild.id,
+                            type: 'role',
+                            allow: 0,
+                            deny: 2048
+                        }
+                    ]
+                });
+            vm.$parent.setup.channels.forEach(function (n) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        fixindex++;
+                        if (vm.$parent.missing.includes('generalManageRoles')) {
+                            if (this.status == 200) {
+                                if (!JSON.parse(this.response).includes('textSendMessages')) {
+                                    console.log('asking user to manually fix ' + n);
+                                    fix[n] = vm.$parent.guild.setup.channels.suggested[n];
+                                } else {
+                                    console.log(n + ' is good to go');
+                                }
+                            } else {
+                                console.log('error with ' + n);
+                            }
+                        } else {
+                            if (this.status == 200) {
+                                console.log('fixed ' + n);
+                            } else {
+                                console.log('failed to fix ' + n);
+                            }
+                        }
+                        console.log(fixindex, vm.$parent.setup.channels.length);
+                        if (fixindex == vm.$parent.setup.channels.length) {
+                            if (Object.keys(fix).length) {
+                                console.log('asking user at the end to manually fix the following:', fix);
+                            } else {
+                                console.log('all clear, proceed');
+                            }
 
-                        setTimeout(() => {
-                            anime({
-                                targets: '#setupPanel',
-                                translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
-                            });
-                            setTimeout(() => {
-                                //dirty af but it gets the job done
-                                vm.$root.guilds[vm.$parent.guild.id] = JSON.parse(xhr.response);
-                                console.log(vm.$root.guilds[vm.$parent.guild.id]);
-                                anime({
-                                    targets: '#dashboardPanel',
-                                    translateY: 0
-                                });
-                            }, 500);
-                        }, 1000);
+                            vm.$parent.top = "Almost Done!";
+                            vm.$parent.greeting = "Getting you setup, one moment...";
+
+                            //setup guild
+                            var xhttp = new XMLHttpRequest();
+                            xhttp.onreadystatechange = function () {
+                                if (this.readyState == 4) {
+                                    vm.$parent.loading = false;
+                                    if (this.status == 200) {
+                                        var xhr = this;
+                                        var length = Object.keys(fix).length;
+                                        vm.$parent.finished = true;
+
+                                        if (length) {
+                                            vm.$parent.top = "One More Thing";
+                                            vm.$parent.greeting = "We need your help with this part";
+                                            vm.$parent.step++;
+                                            if (length == 1) {
+                                                vm.$parent.copy = vm.$parent.onemorethingCopy0;
+                                            } else if (length == vm.$parent.setup.channels.length) {
+                                                vm.$parent.copy = vm.$parent.onemorethingCopy2;
+                                            } else if (length > 1) {
+                                                vm.$parent.copy = vm.$parent.onemorethingCopy1;
+                                            }
+                                        } else {
+                                            vm.$parent.success = true;
+                                            vm.$parent.top = "Finished!";
+                                            vm.$parent.greeting = "All set - She's all yours!";
+                                        }
+
+                                        /*
+                                        setTimeout(() => {
+                                            vm.finish(JSON.parse(xhr.response));
+                                        }, 5000);
+                                        */
+                                    }
+                                }
+                            };
+                            xhttp.open("POST", "api/v1/guild/?guild_id=" + vm.$parent.guild.id, true);
+                            xhttp.send(setup);
+                        }
                     }
+                };
+                if (vm.$parent.missing.includes('generalManageRoles')) {
+                    xhttp.open("GET", "api/v1/guild/permissions/?" + n, true);
+                } else {
+                    xhttp.open("POST", "api/v1/guild/permissions/?channel_id=" + n, true);
                 }
-            };
-            xhttp.open("POST", "api/v1/guild/?guild_id=" + vm.$parent.guild.id, true);
-            xhttp.send(setup);
+                xhttp.send(options);
+            });
+
+            /*
+            
+            */
         }
     }
 });

@@ -591,12 +591,12 @@ Vue.component('setup-panel', {
                             <br>
                             </p>
                             <p>{{ copy }}</p>
-                            <div></div>
+                            <ul class="fixList" v-if="Object.keys(fix).length"><li v-for="(channel, id) in fix">#{{ channel }}</li></ul>
                             <setup-options v-bind:step="1" v-bind:prefix="'#'" v-bind:setup="guild.setup.channels"></setup-options>
                             <setup-options v-bind:step="2" v-bind:prefix="''" v-bind:setup="guild.setup.access_roles"></setup-options>
-                            <hr>
+                            <hr style="display: none;">
                         </div>
-                        <setup-buttons v-bind:step="step" v-show="!loading && !finished"></setup-buttons>
+                        <setup-buttons v-bind:step="step" v-show="!loading && !success"></setup-buttons>
                     </div>
                </div>`,
     props: ['guild'],
@@ -613,6 +613,7 @@ Vue.component('setup-panel', {
                 'access_role'
             ],
             missing: [],
+            fix: {},
             copy: "",
             top: "",
             greeting: "",
@@ -628,7 +629,7 @@ Vue.component('setup-panel', {
             access_roleCopy2: "We have detected some that you might want to use.",
             onemorethingCopy0: "GIFTron has detected that it's not allowed to post in this channel. At some point, please make sure to give it permission.",
             onemorethingCopy1: "GIFTron has detected that it's not allowed to post in these channels. At some point, please make sure to give it permission.",
-            onemorethingCopy2: "GIFTron has detected that it's not allowed to post any of the channels you picked. At some point, please make sure to give it permission."
+            onemorethingCopy2: "GIFTron has detected that it's not allowed to post in any of the channels you picked. At some point, please make sure to give it permission."
         }
     },
     mounted: function () {
@@ -668,10 +669,11 @@ Vue.component('setup-panel', {
                                 vm.guild_permCopy += " However, ";
                             }
                         }
+                        vm.greeting = "But did you mean to click ";
                         if (vm.missing.length == 1) {
-                            vm.greeting = "But did you mean to click this?";
+                            vm.greeting += "this?";
                         } else {
-                            vm.greeting = "But did you mean to click these?";
+                            vm.greeting += "these?";
                         }
                         if (vm.missing.includes(desiredPerms[1]) || vm.missing.includes(desiredPerms[2])) {
                             vm.guild_permCopy += vm.guild_permCopy1;
@@ -708,7 +710,7 @@ Vue.component('setup-panel', {
             } else {
                 vm.copy = vm[scope + 'Copy'];
             }
-    
+
             if (!vm.loading && !vm.finished && vm.step) {
                 vm.top = "Hello!";
                 vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!";
@@ -770,7 +772,7 @@ Vue.component('setup-options', {
 });
 
 Vue.component('setup-buttons', {
-    template: `<div class="setup-buttons"><button class="main" v-if="step > 1" v-on:click="back">Back</button><button class="main" v-if="step < last" v-on:click="next">Next</button><button class="main" v-if="step == last" v-on:click="apply">Apply</button></div>`,
+    template: `<div class="setup-buttons"><button class="main" v-if="(step > 1) && (step <= last)" v-on:click="back">Back</button><button class="main" v-if="step < last" v-on:click="next">Next</button><button class="main" v-if="step == last" v-on:click="apply">Apply</button><button class="main" v-if="step > last" v-on:click="finish">Next</button></div>`,
     props: ['step'],
     data: function () {
         return {
@@ -783,10 +785,8 @@ Vue.component('setup-buttons', {
                 targets: '#setupPanel',
                 translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
             });
-            setTimeout((d) => {
+            setTimeout(() => {
                 //dirty af but it gets the job done
-                vm.$root.guilds[vm.$parent.guild.id] = d;
-                console.log(vm.$root.guilds[vm.$parent.guild.id]);
                 anime({
                     targets: '#dashboardPanel',
                     translateY: 0
@@ -833,7 +833,6 @@ Vue.component('setup-buttons', {
             console.log(setup);
 
             var fixindex = 0,
-                fix = [],
                 options = JSON.stringify({
                     topic: "Giveaways by GIFTron",
                     permission_overwrites: [
@@ -860,7 +859,7 @@ Vue.component('setup-buttons', {
                             if (this.status == 200) {
                                 if (!JSON.parse(this.response).includes('textSendMessages')) {
                                     console.log('asking user to manually fix ' + n);
-                                    fix[n] = vm.$parent.guild.setup.channels.suggested[n];
+                                    vm.$parent.fix[n] = vm.$parent.guild.setup.channels.suggested[n];
                                 } else {
                                     console.log(n + ' is good to go');
                                 }
@@ -876,8 +875,8 @@ Vue.component('setup-buttons', {
                         }
                         console.log(fixindex, vm.$parent.setup.channels.length);
                         if (fixindex == vm.$parent.setup.channels.length) {
-                            if (Object.keys(fix).length) {
-                                console.log('asking user at the end to manually fix the following:', fix);
+                            if (Object.keys(vm.$parent.fix).length) {
+                                console.log('asking user at the end to manually fix the following:', vm.$parent.fix);
                             } else {
                                 console.log('all clear, proceed');
                             }
@@ -892,8 +891,11 @@ Vue.component('setup-buttons', {
                                     vm.$parent.loading = false;
                                     if (this.status == 200) {
                                         var xhr = this;
-                                        var length = Object.keys(fix).length;
+                                        var length = Object.keys(vm.$parent.fix).length;
                                         vm.$parent.finished = true;
+                                        vm.$root.guilds[vm.$parent.guild.id] = JSON.parse(xhr.response);
+                                        console.log(vm.$root.guilds[vm.$parent.guild.id]);
+
 
                                         if (length) {
                                             vm.$parent.top = "One More Thing";
@@ -910,13 +912,10 @@ Vue.component('setup-buttons', {
                                             vm.$parent.success = true;
                                             vm.$parent.top = "Finished!";
                                             vm.$parent.greeting = "All set - She's all yours!";
+                                            setTimeout(() => {
+                                                vm.finish();
+                                            }, 5000);
                                         }
-
-                                        /*
-                                        setTimeout(() => {
-                                            vm.finish(JSON.parse(xhr.response));
-                                        }, 5000);
-                                        */
                                     }
                                 }
                             };

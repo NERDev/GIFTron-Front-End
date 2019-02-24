@@ -245,6 +245,19 @@ button.main {
     color: #99aab5;
 }
 
+.fixList {
+    width: fit-content;
+    text-align: left;
+    margin: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #99aab5;
+    list-style: none;
+}
+
 .setup-options {
     list-style: none;
     padding: 0;
@@ -280,6 +293,10 @@ button.main {
 .setup-options li select > option {
     background: #2C2F33!important;
     box-shadow: 0 0 10px 100px #fff inset;
+}
+
+.setup-buttons {
+    margin-top: 2em;
 }
 
 .setup-buttons button:first-child {

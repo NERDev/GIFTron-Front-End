@@ -245,6 +245,19 @@ button.main {
     color: #99aab5;
 }
 
+#setupPanel p.permissions {
+    display: inline-block;
+    width: 50%;
+    vertical-align: top;
+    margin-top: 2em;
+    margin-left: 2em;
+}
+
+#setupPanel img {
+    width: 14em;
+    display: inline-block;
+}
+
 .fixList {
     width: fit-content;
     text-align: left;

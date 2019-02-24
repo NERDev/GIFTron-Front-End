@@ -590,7 +590,8 @@ Vue.component('setup-panel', {
                             <br>
                             <br>
                             </p>
-                            <p>{{ copy }}</p>
+                            <img v-if="missingImage" v-bind:src="'?img/permissions/' + missingImage">
+                            <p v-bind:class="stepClass">{{ copy }}</p>
                             <ul class="fixList" v-if="Object.keys(fix).length"><li v-for="(channel, id) in fix">#{{ channel }}</li></ul>
                             <setup-options v-bind:step="1" v-bind:prefix="'#'" v-bind:setup="guild.setup.channels"></setup-options>
                             <setup-options v-bind:step="2" v-bind:prefix="''" v-bind:setup="guild.setup.access_roles"></setup-options>
@@ -613,6 +614,8 @@ Vue.component('setup-panel', {
                 'access_role'
             ],
             missing: [],
+            missingImage: "",
+            stepClass: "permissions",
             fix: {},
             copy: "",
             top: "",
@@ -680,8 +683,7 @@ Vue.component('setup-panel', {
                         }
 
                         vm.guild_permCopy += " You may want to go back and re-add GIFTron to fix this."
-
-                        console.log(vm.missing.join('+') + '.png');
+                        vm.missingImage = vm.missing.join('+') + '.png';
                     } else {
                         console.log('We\'ve got everything we need - proceed');
                         vm.step++;
@@ -714,6 +716,8 @@ Vue.component('setup-panel', {
             if (!vm.loading && !vm.finished && vm.step) {
                 vm.top = "Hello!";
                 vm.greeting = "Welcome, " + this.guild.name + ", to GIFTron!";
+                vm.missingImage = false;
+                vm.stepClass = "";
             }
         }
     }

@@ -45,6 +45,14 @@ button.main {
     border-radius: .3em;
     padding: .5em 2em .5em 2em;
     color: white;
+    transition: 0.15s ease all;
+}
+
+button.main:hover {
+    transform: translateY(-2px);
+    -webkit-box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
+    -moz-box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
+    box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
 }
 
 .navbar {
@@ -301,11 +309,28 @@ button.main {
     font-size: 1.3em;
     -moz-appearance: none;
     appearance: none;
+    transition: 0.15s ease all;
+}
+
+.setup-options li button i {
+    top: 1px;
+    position: relative;
+    margin-right: .5em;
+}
+
+.setup-options li button:hover,select:hover {
+    background-color: #99aab5;
+    color: #1D1E1F;
+    transform: translateY(-2px);
+    -webkit-box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
+    -moz-box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
+    box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
 }
 
 .setup-options li select > option {
     background: #2C2F33!important;
     box-shadow: 0 0 10px 100px #fff inset;
+    color: #99aab5;
 }
 
 .setup-buttons {

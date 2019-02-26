@@ -236,7 +236,7 @@ Vue.component('giftron-dashboard', {
                             vm.loading = true;
                             //console.log(vm.$root.guildlist);
                         } else if (this.status == 401) {
-                            window.location = "api/v1/user/auth?scope=identify+guilds";
+                            window.location = "api/v1/user/auth/?scope=identify+guilds";
                         }
                     }
                 };
@@ -346,7 +346,7 @@ Vue.component('giftron-dashboard', {
                             }
                         }
                     };
-                    xhttp.open("GET", "api/v1/guild?guild_id=" + newQuery, true);
+                    xhttp.open("GET", "api/v1/guild/?guild_id=" + newQuery, true);
                     xhttp.send();
                 } else {
                     dashboardOrSetup(newQuery);
@@ -556,7 +556,7 @@ Vue.component('server-card', {
                             handleFinishedLoading();
                         }
                     };
-                    xhttp.open("GET", "api/v1/guild?guild_id=" + vm.id, true);
+                    xhttp.open("GET", "api/v1/guild/?guild_id=" + vm.id, true);
                     xhttp.send();
                 } else {
                     console.log('skipping ' + vm.id);
@@ -590,7 +590,7 @@ Vue.component('setup-panel', {
                             <br>
                             <br>
                             </p>
-                            <img v-if="missingImage" v-bind:src="'?img/permissions/' + missingImage">
+                            <img v-if="missingImage" v-bind:src="'?img/permissions/' + missingImage" class="shadow">
                             <p v-bind:class="stepClass">{{ copy }}</p>
                             <ul class="fixList" v-if="Object.keys(fix).length"><li v-for="(channel, id) in fix">#{{ channel }}</li></ul>
                             <setup-options v-bind:step="1" v-bind:prefix="'#'" v-bind:setup="guild.setup.channels"></setup-options>
@@ -726,7 +726,7 @@ Vue.component('setup-panel', {
 Vue.component('setup-options', {
     template: `<ul class="setup-options" v-show="(step == $parent.step)">
         <li v-for="(name, id) in setup.suggested">
-            <button v-on:click="removed" v-bind:value="id">{{ prefix }}{{ name }}</button>
+            <button v-on:click="removed" v-bind:value="id" v-bind:id="id" v-on:mouseenter="hover(id)" v-on:mouseleave="hover(id)"><i class="far fa-times-circle"></i>{{ prefix }}{{ name }}</button>
         </li>
         <li>
             <select v-on:click="selected" v-if="Object.keys(setup.available).length !== 0">
@@ -744,6 +744,17 @@ Vue.component('setup-options', {
         }
     },
     methods: {
+        hover: function (id) {
+            var circle = document.getElementById(id).querySelector('i');
+            console.log(circle.classList.contains('fas'), circle.classList.contains('far'));
+            if (circle.classList.contains('fas')) {
+                circle.classList.remove('fas');
+                circle.classList.add('far');
+            } else if (circle.classList.contains('far')) {
+                circle.classList.remove('far');
+                circle.classList.add('fas');
+            }
+        },
         selected: function (event) {
             var vm = this,
                 newSelect = event.target.value;
@@ -764,6 +775,10 @@ Vue.component('setup-options', {
         removed: function (event) {
             var vm = this,
                 value = event.target.value;
+            if (!value) {
+                value = event.target.parentElement.value;
+            }
+            console.log(value);
             Vue.set(vm.setup.available, value, vm.setup.suggested[value]);
             delete vm.setup.suggested[value];
             vm.oldSelect = null;

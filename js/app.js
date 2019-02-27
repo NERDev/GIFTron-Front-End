@@ -609,7 +609,7 @@ Vue.component('dashboard-scheduler', {
                     <div id="calendarContainer">
                         <table>
                             <tr v-for="week in calendar.weeks">
-                                <td v-for="day in week"><div><h3>{{ day.day }} - {{ day.month }}</h3></div></td>
+                                <td v-for="day in week"><div><h3>{{ day.getDate() }} - {{ day.getMonth() }}</h3></div></td>
                             </tr>
                         </table>
                     </div>
@@ -634,12 +634,12 @@ Vue.component('dashboard-scheduler', {
     mounted: function () {
         function buildWeek(start) {
             var week = {};
-            week[+ start] = {day: start.getDate(), month: + start.getMonth()};
+            week[+start] = start;
 
             for (let index = 1; index < 7; index++) {
                 var tomorrow = new Date(start);
                 tomorrow.setDate(tomorrow.getDate() + index);
-                week[+tomorrow] = {day: tomorrow.getDate(), month: tomorrow.getMonth()};
+                week[+tomorrow] = tomorrow;
             }
             return week;
             //vm.calendar.weeks[sunday] = week;
@@ -661,6 +661,7 @@ Vue.component('dashboard-scheduler', {
                 }
             }
         }
+        
         var vm = this,
             today = new Date(new Date().setHours(0,0,0,0)),
             sunday = new Date((new Date(today).setDate(new Date(today).getDate() - new Date(today).getDay())));
@@ -669,6 +670,19 @@ Vue.component('dashboard-scheduler', {
             generate(10, sunday);
 
             console.log(today, sunday, vm.calendar.weeks, Object.keys(vm.calendar.weeks).length);
+
+            //determine if visible or not
+
+            document.querySelector('#calendarContainer').addEventListener('scroll', () => {
+                var rect = document.querySelector('table').childNodes[1].getBoundingClientRect();
+                console.log('week', rect.bottom);
+                var rect2 = document.querySelector('#calendarContainer').getBoundingClientRect();
+                console.log('container', rect2.top);
+                
+                
+                
+                console.log(rect.bottom < rect2.top);
+            })
             //vm.calendar.weeks[sunday] = week;
     }
 });

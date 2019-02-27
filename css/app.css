@@ -250,6 +250,7 @@ button.main:hover {
 #dashboardMenu .profile h1 {
     width: 100%;
     color: white;
+    font-size: 3vw;
 }
 
 #dashboardMenu .profile h3 {

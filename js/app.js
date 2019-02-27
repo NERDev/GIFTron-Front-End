@@ -604,8 +604,73 @@ Vue.component('dashboard-guild-profile', {
 });
 
 Vue.component('dashboard-scheduler', {
-    template: `<div id="dashboardScheduler"><h1>November 2018</h1></div>`,
-    props: ['guild']
+    template: `<div id="dashboardScheduler">
+                    <h1>November 2018</h1>
+                    <div id="calendarContainer">
+                        <table>
+                            <tr v-for="week in calendar.weeks">
+                                <td v-for="day in week"><div><h3>{{ day.day }} - {{ day.month }}</h3></div></td>
+                            </tr>
+                        </table>
+                    </div>
+               </div>`,
+    props: ['guild'],
+    data: function () {
+        return {
+            calendar: {
+                weeks: {}
+            },
+            days: [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday'
+            ]
+        }
+    },
+    mounted: function () {
+        function buildWeek(start) {
+            var week = {};
+            week[+ start] = {day: start.getDate(), month: + start.getMonth()};
+
+            for (let index = 1; index < 7; index++) {
+                var tomorrow = new Date(start);
+                tomorrow.setDate(tomorrow.getDate() + index);
+                week[+tomorrow] = {day: tomorrow.getDate(), month: tomorrow.getMonth()};
+            }
+            return week;
+            //vm.calendar.weeks[sunday] = week;
+        }
+
+        function generate(number, reference) {
+            if (number > 0) {
+                for (let index = 0; index < number; index++) {
+                    var tomorrow = new Date(reference);
+                    var weekstart = new Date(tomorrow.setDate(tomorrow.getDate() + index * 7));
+                    Vue.set(vm.calendar.weeks, +weekstart, buildWeek(weekstart));
+                }
+            } else {
+                number = Math.abs(number);
+                for (let index = number; index > 0; index--) {
+                    var tomorrow = new Date(reference);
+                    var weekstart = new Date(tomorrow.setDate(tomorrow.getDate() - index * 7));
+                    Vue.set(vm.calendar.weeks, +weekstart, buildWeek(weekstart));
+                }
+            }
+        }
+        var vm = this,
+            today = new Date(new Date().setHours(0,0,0,0)),
+            sunday = new Date((new Date(today).setDate(new Date(today).getDate() - new Date(today).getDay())));
+
+            generate(-10, sunday);
+            generate(10, sunday);
+
+            console.log(today, sunday, vm.calendar.weeks, Object.keys(vm.calendar.weeks).length);
+            //vm.calendar.weeks[sunday] = week;
+    }
 });
 
 Vue.component('setup-panel', {

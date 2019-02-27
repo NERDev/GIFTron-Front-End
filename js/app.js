@@ -63,7 +63,7 @@ Vue.component('user-loader', {
 })
 
 Vue.component('user-badge', {
-    template: `<li><user-loader v-if="loading"></user-loader><button v-if="user.username" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')" class="menuButton userButton" id="userButton"><img v-bind:src="avatar" />{{ user.username }}</button><user-dropdown v-bind:user="user"></user-dropdown><button v-if="!user.username && !loading" v-on:click="login">Login</button></li>`,
+    template: `<li><user-loader v-if="loading"></user-loader><button v-if="user.username" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')" class="menuButton userButton" id="userButton"><img v-bind:src="avatar" />{{ user.username }}<i class="fas fa-lock" v-show="user.mfa_enabled" title="2FA Enabled"></i></button><user-dropdown v-bind:user="user"></user-dropdown><button v-if="!user.username && !loading" v-on:click="login">Login</button></li>`,
     props: ['user'],
     data() {
         var avatar;
@@ -205,7 +205,7 @@ Vue.component('navbar-logo', {
 });
 
 Vue.component('giftron-dashboard', {
-    template: `<div id="dashboard" v-if="user.id"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel></dashboard-panel><setup-panel v-if="guildQuery.setup" v-bind:guild="guildQuery"></setup-panel></div>`,
+    template: `<div id="dashboard" v-if="user.id"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel v-bind:guild="guildQuery"></dashboard-panel><setup-panel v-if="guildQuery.setup" v-bind:guild="guildQuery"></setup-panel></div>`,
     props: ['user'],
     data: function () {
         return {
@@ -584,14 +584,28 @@ Vue.component('server-card', {
 });
 
 Vue.component('dashboard-panel', {
-    template: `<div class="panel" id="dashboardPanel" style="transform: translateY(-100vh);"><h1 style="
-    text-align: center;
-    position: absolute;
-    top: 30vh;
-    font-size: 10em;
-    color: white;
-    width: inherit;
-">DASHBOARD</h1></div>`
+    template: `<div class="panel" id="dashboardPanel" style="transform: translateY(-100vh);"><dashboard-menu v-bind:guild="guild"></dashboard-menu><dashboard-scheduler v-bind:guild="guild"></dashboard-scheduler></div>`,
+    props: ['guild']
+});
+
+Vue.component('dashboard-menu', {
+    template: `<div id="dashboardMenu"><dashboard-guild-profile v-bind:guild="guild"></dashboard-guild-profile></div>`,
+    props: ['guild']
+});
+
+Vue.component('dashboard-guild-profile', {
+    template: `<div class="profile">
+                    <img v-if="guild.icon" v-bind:src="'https://cdn.discordapp.com/icons/' + guild.id + '/' + guild.icon + '.png?size=1024'">
+                    <h1>{{ guild.name }}</h1>
+                    <h3 v-if="typeof guild.wallet !== 'undefined'">\${{ guild.wallet.toFixed(2) }}</h3>
+                    <button class="main" v-if="guild.wallet !== 'undefined'">Add Funds</button>
+               </div>`,
+    props: ['guild']
+});
+
+Vue.component('dashboard-scheduler', {
+    template: `<div id="dashboardScheduler"><h1>November 2018</h1></div>`,
+    props: ['guild']
 });
 
 Vue.component('setup-panel', {

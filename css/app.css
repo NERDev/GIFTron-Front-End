@@ -110,6 +110,11 @@ button.main:hover {
     z-index: 2;
 }
 
+.navbar ul li:last-child button i {
+    font-size: .75em;
+    margin-left: .5em;
+}
+
 .navbar ul li:last-child button.menuButton:active {
     background-color: #1D1E1F;
 }
@@ -217,6 +222,70 @@ button.main:hover {
     position: absolute;
     top: 0;
     background-color: #2C2F33;
+    border-color: #99aab5;
+    border-width: 1px;
+    border-top-style: solid;
+    border-bottom-style: solid;
+}
+
+#dashboardMenu {
+    height: 100%;
+    width: 19.8vw;
+    display: inline-block;
+    text-align: center;
+}
+
+#dashboardMenu .profile {
+    position: absolute;
+    width: inherit;
+    top: 3em;
+}
+
+#dashboardMenu .profile img {
+    height: 6em;
+    margin: auto;
+    display: block;
+}
+
+#dashboardMenu .profile h1 {
+    width: 100%;
+    color: white;
+}
+
+#dashboardMenu .profile h3 {
+    color: white;
+    font-size: 2em;
+    margin-top: .5em;
+}
+
+
+#dashboardMenu .profile button.main {
+    font-size: 1.25em;
+}
+
+#dashboardScheduler {
+    height: 100%;
+    width: 80vw;
+    display: inline-block;
+    border-left-style: solid;
+    border-color: inherit;
+    border-width: 1px;
+}
+
+#dashboardScheduler h1 {
+    display: inherit;
+    margin: 0;
+    position: absolute;
+    width: inherit;
+    text-align: center;
+    color: white;
+    font-size: 2.5em;
+    top: .5em;
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-color: inherit;
+    border-width: 1px;
+    padding-bottom: .5em;
 }
 
 #setupPanel {

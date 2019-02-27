@@ -443,7 +443,13 @@ Vue.component('checkbox-slider', {
 });
 
 Vue.component('server-card', {
-    template: `<li style="transform: scale(0)" v-bind:class="'serverCard ' + 'serverCard-' + id" v-if="info" v-show="manage - filter >= 0"><button v-bind:id="'serverButton-' + id" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')"><img v-if="icon" v-bind:src="icon"><h3>{{ info.name }}</h3></button></li>`,
+    template: `<li style="transform: scale(0)" v-bind:class="'serverCard ' + 'serverCard-' + id" v-if="info" v-show="manage - filter >= 0">
+                    <button v-bind:id="'serverButton-' + id" v-on:mouseenter="mouse('enter')" v-on:mouseleave="mouse('leave')" v-on:click="mouse('click')">
+                        <img v-if="icon" v-bind:src="icon">
+                        <h1 v-if="!icon" v-bind:style="'font-size: ' + sizeFont(short(info.name).length) + 'em; padding-top: ' + (1 / short(info.name).length) * .25 + 'em;'">{{ short(info.name) }}</h1>
+                        <h3>{{ info.name }}</h3>
+                    </button>
+                </li>`,
     props: ['id', 'manage', 'filter'],
     data: function () {
         return {
@@ -453,6 +459,15 @@ Vue.component('server-card', {
         }
     },
     methods: {
+        short: function (n) {
+            return n.split(' ').map(x => x.substring(0,1)).join('')
+        },
+        sizeFont: function (x) {
+            //console.log('called', x);
+            var answer = (12.931759423927547 + -1.6706753766351716 * x + 0.12208718718312236 * Math.pow(x, 2) + -0.0035893955437599147 * Math.pow(x, 3) + 0.00002917557278795848 * Math.pow(x, 4));
+            //console.log(answer | ((answer < 1) & 1));
+            return answer | ((answer < 1) & 1);
+        },
         mouse: function (e) {
             var button = document.getElementById('serverButton-' + this.id);
             if (!this.stillLoading) {
@@ -746,7 +761,6 @@ Vue.component('setup-options', {
     methods: {
         hover: function (id) {
             var circle = document.getElementById(id).querySelector('i');
-            console.log(circle.classList.contains('fas'), circle.classList.contains('far'));
             if (circle.classList.contains('fas')) {
                 circle.classList.remove('fas');
                 circle.classList.add('far');

@@ -479,10 +479,25 @@ button.main:hover {
     padding: 0;
 }
 
+.serverList .serverCard button h1 {
+    padding-top: .5em;
+    font-size: 8em;
+    font-weight: normal;
+    margin: 0;
+    word-break: break-all;
+    line-height: 1em;
+}
+
 .serverList .serverCard button h3 {
     text-overflow: ellipsis;
     overflow: hidden;
     color: #99aab5;
+    margin: 0;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    padding-bottom: 1em;
+    padding-top: calc(100% + 1em);
 }
 
 

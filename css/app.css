@@ -282,8 +282,30 @@ button.main:hover {
     text-align: center;
     color: white;
     font-size: 2.5em;
-    top: .5em;
-    padding-bottom: .5em;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-color: inherit;
+    height: 1.5em;
+}
+
+#dashboardScheduler hr {
+    margin: 0;
+}
+
+#calendarDays {
+    text-align: center;
+    width: 90%;
+    margin: auto;
+    color: white;
+    border-bottom-width: 1px;
+    border-color: inherit;
+    margin-top: .25em;
+    margin-bottom: .25em;
+}
+
+#calendarDays .day {
+    display: inline-block;
+    width: calc(100% / 7);
 }
 
 #calendarContainer {
@@ -324,7 +346,15 @@ button.main:hover {
     font-weight: normal;
 }
 
-#dashboardScheduler table tr td div h3.active {
+#dashboardScheduler table tr td div {
+    background-color: #1D1E1F;
+}
+
+#dashboardScheduler table tr td div.active {
+    background-color: #2C2F33;
+}
+
+#dashboardScheduler table tr td div.active h3 {
     color: white;
     font-weight: bold;
 }

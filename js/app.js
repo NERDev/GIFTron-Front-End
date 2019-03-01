@@ -205,7 +205,7 @@ Vue.component('navbar-logo', {
 });
 
 Vue.component('giftron-dashboard', {
-    template: `<div id="dashboard" v-if="user.id"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel v-bind:guild="guildQuery"></dashboard-panel><setup-panel v-if="guildQuery.setup" v-bind:guild="guildQuery"></setup-panel></div>`,
+    template: `<div id="dashboard"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel v-bind:guild="guildQuery"></dashboard-panel><setup-panel v-if="guildQuery.setup" v-bind:guild="guildQuery"></setup-panel></div>`,
     props: ['user'],
     data: function () {
         return {
@@ -606,6 +606,8 @@ Vue.component('dashboard-guild-profile', {
 Vue.component('dashboard-scheduler', {
     template: `<div id="dashboardScheduler">
                     <h1>{{ [calendar.monthnames[calendar.visibleDate.getMonth()], calendar.visibleDate.getFullYear()].join(' ') }}</h1>
+                    <div id="calendarDays"><div v-for="dayname in calendar.daynames" class="day">{{ dayname }}</div></div>
+                    <hr>
                     <div id="calendarContainer">
                         <table>
                             <calendar-week v-for="(week, id) in calendar.weeks" v-bind:week="week" v-bind:id="id"></calendar-week>
@@ -623,6 +625,7 @@ Vue.component('dashboard-scheduler', {
                 monthnames: ["January", "February", "March", "April", "May", "June",
                     "July", "August", "September", "October", "November", "December"
                 ],
+                daynames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
                 visibleDate: new Date()
             }
         }

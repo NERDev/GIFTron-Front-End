@@ -595,7 +595,7 @@ Vue.component('dashboard-menu', {
 
 Vue.component('dashboard-guild-profile', {
     template: `<div class="profile">
-                    <img v-if="guild.icon" v-bind:src="'https://cdn.discordapp.com/icons/' + guild.id + '/' + guild.icon + '.png?size=1024'">
+                    <img v-if="guild.icon" v-bind:src="'https://cdn.discordapp.com/icons/' + guild.id + '/' + guild.icon + '.png?size=1024'" class="shadow">
                     <h1>{{ guild.name }}</h1>
                     <h3 v-if="typeof guild.wallet !== 'undefined'">\${{ guild.wallet.toFixed(2) }}</h3>
                     <button class="main" v-if="guild.wallet !== 'undefined'">Add Funds</button>
@@ -632,7 +632,7 @@ Vue.component('dashboard-scheduler', {
     },
     mounted: function () {
         function getVisibleDate() {
-            vm.calendar.visibleDate = new Date(+Object.keys(vm.calendar.visibleweeks)[3]);
+            vm.calendar.visibleDate = new Date(+Object.keys(vm.calendar.visibleweeks)[2]);
         }
 
         function buildWeek(start) {
@@ -728,10 +728,10 @@ Vue.component('calendar-week', {
         getDayColor: function (day) {
             var classes = [];
 
-            if (+day ==  +new Date().setHours(0,0,0,0)) {
+            if (+day == +new Date().setHours(0, 0, 0, 0)) {
                 classes.push('today');
             }
-            
+
             if ((day.getMonth() == this.$parent.calendar.visibleDate.getMonth()) && (day.getFullYear() == this.$parent.calendar.visibleDate.getFullYear())) {
                 classes.push('active');
             }
@@ -740,7 +740,7 @@ Vue.component('calendar-week', {
         }
     },
     mounted: function () {
-        function position () {
+        function position() {
             var rect = thisweek.getBoundingClientRect();
             var rect2 = container.getBoundingClientRect();
             if (rect.bottom < rect2.top) {
@@ -1171,7 +1171,20 @@ var app = new Vue({
             } else {
                 vm.title = 'GIFTron';
             }
+
+
+            if (typeof (Storage) !== 'undefined') {
+                console.log('remembering ' + window.location.hash + ' for next time');
+                localStorage.setItem('page', window.location.hash);
+            }
+
             document.title = vm.title;
+        }
+        if (typeof (Storage) !== 'undefined') {
+            if (localStorage.getItem('page')) {
+                window.location.hash = localStorage.getItem('page');
+                console.log('you were on ' + localStorage.getItem('page') + ' last time');
+            }
         }
         pageHandle();
         window.onhashchange = function (e) {
@@ -1181,8 +1194,5 @@ var app = new Vue({
             vm.page = window.location.hash.split('?')[0];
             pageHandle();
         };
-    },
-    updated: function () {
-        console.log('updating navbar');
     }
 });

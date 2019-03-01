@@ -250,7 +250,7 @@ button.main:hover {
 #dashboardMenu .profile h1 {
     width: 100%;
     color: white;
-    font-size: 3vw;
+    font-size: 2vw;
 }
 
 #dashboardMenu .profile h3 {
@@ -306,6 +306,7 @@ button.main:hover {
 #calendarDays .day {
     display: inline-block;
     width: calc(100% / 7);
+    font-size: 1.2em;
 }
 
 #calendarContainer {

@@ -318,8 +318,25 @@ button.main:hover {
     display: inline-block;
 }
 
-#dashboardScheduler table td div h3 {
+#dashboardScheduler table tr td div h3 {
+    color: #99aab5;
     margin-top: 0;
+    font-weight: normal;
+}
+
+#dashboardScheduler table tr td div h3.active {
+    color: white;
+    font-weight: bold;
+}
+
+#dashboardScheduler table tr td div.today {
+    background-color: #7289DA;
+    color: white;
+    font-weight: bold;
+}
+
+#dashboardScheduler table tr td div.today h3 {
+    color: white;
 }
 
 #dashboardScheduler .days {

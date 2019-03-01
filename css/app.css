@@ -220,7 +220,7 @@ button.main:hover {
     height: inherit;
     width: inherit;
     position: absolute;
-    top: 0;
+    top: -.1em;
     background-color: #2C2F33;
     border-color: #99aab5;
     border-width: 1px;
@@ -312,7 +312,7 @@ button.main:hover {
 #calendarContainer {
     width: 90%;
     margin: auto;
-    height: calc(100% - 4.5em);
+    height: calc(100% - 6em);
     overflow: auto;
 }
 

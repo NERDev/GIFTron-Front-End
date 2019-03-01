@@ -460,7 +460,7 @@ Vue.component('server-card', {
     },
     methods: {
         short: function (n) {
-            return n.split(' ').map(x => x.substring(0,1)).join('')
+            return n.split(' ').map(x => x.substring(0, 1)).join('')
         },
         sizeFont: function (x) {
             //console.log('called', x);
@@ -608,9 +608,7 @@ Vue.component('dashboard-scheduler', {
                     <h1>November 2018</h1>
                     <div id="calendarContainer">
                         <table>
-                            <tr v-for="week in calendar.weeks">
-                                <td v-for="day in week"><div><h3>{{ day.getDate() }} - {{ day.getMonth() }}</h3></div></td>
-                            </tr>
+                            <calendar-week v-for="(week, id) in calendar.weeks" v-bind:week="week" v-bind:id="id"></calendar-week>
                         </table>
                     </div>
                </div>`,
@@ -618,17 +616,11 @@ Vue.component('dashboard-scheduler', {
     data: function () {
         return {
             calendar: {
-                weeks: {}
-            },
-            days: [
-                'Sunday',
-                'Monday',
-                'Tuesday',
-                'Wednesday',
-                'Thursday',
-                'Friday',
-                'Saturday'
-            ]
+                weeks: {},
+                topweeks: [],
+                bottomweeks: [],
+                visibleweeks: []
+            }
         }
     },
     mounted: function () {
@@ -661,29 +653,88 @@ Vue.component('dashboard-scheduler', {
                 }
             }
         }
-        
+
         var vm = this,
-            today = new Date(new Date().setHours(0,0,0,0)),
+            today = new Date(new Date().setHours(0, 0, 0, 0)),
             sunday = new Date((new Date(today).setDate(new Date(today).getDate() - new Date(today).getDay())));
 
-            generate(-10, sunday);
-            generate(10, sunday);
+        generate(-10, sunday);
+        generate(10, sunday);
 
-            console.log(today, sunday, vm.calendar.weeks, Object.keys(vm.calendar.weeks).length);
+        console.log(today, sunday, vm.calendar.weeks, Object.keys(vm.calendar.weeks).length);
+        setTimeout(() => {
+            document.querySelector('#calendarContainer').scrollTop = document.getElementById(+sunday).offsetTop;
+        }, 1000);
 
-            //determine if visible or not
+        //determine if visible or not
 
-            document.querySelector('#calendarContainer').addEventListener('scroll', () => {
-                var rect = document.querySelector('table').childNodes[1].getBoundingClientRect();
-                console.log('week', rect.bottom);
-                var rect2 = document.querySelector('#calendarContainer').getBoundingClientRect();
-                console.log('container', rect2.top);
-                
-                
-                
-                console.log(rect.bottom < rect2.top);
-            })
-            //vm.calendar.weeks[sunday] = week;
+        document.querySelector('#calendarContainer').addEventListener('scroll', () => {
+            if (Object.keys(vm.calendar.bottomweeks).length < 4) {
+                console.log('getting close, loading more on the bottom');
+                var date = Object.keys(vm.calendar.bottomweeks).pop();
+                console.log(vm.calendar.bottomweeks);
+                if (!isFinite(date)) {
+                    date = Object.keys(vm.calendar.visibleweeks).pop();
+                }
+
+                if (date) {
+                    console.log(date, new Date(+date));
+                    generate(10, new Date(+date));
+                }
+                //console.log(new Date(Math.min(...Object.keys(vm.calendar.bottomweeks))));
+                //generate(10, new Date(Math.min(...Object.keys(vm.calendar.bottomweeks))));
+            }
+            if (Object.keys(vm.calendar.topweeks).length < 4) {
+                console.log('getting close, loading more on the top');
+                var date = Object.keys(vm.calendar.topweeks)[0];
+                if (!isFinite(date)) {
+                    date = Object.keys(vm.calendar.visibleweeks)[0];
+                }
+
+                if (date) {
+                    console.log(date, new Date(+date));
+                    //generate(-10, new Date(+date));
+                }
+            }
+            //console.log('top', vm.calendar.topweeks);
+            //console.log('visible', vm.calendar.visibleweeks);
+            //console.log('bottom', vm.calendar.bottomweeks);
+        })
+        //vm.calendar.weeks[sunday] = week;
+    }
+});
+
+Vue.component('calendar-week', {
+    template: `<tr v-bind:id="id"><td v-for="day in week"><div><h3>{{ monthnames[day.getMonth()] }} {{ day.getDate() }}, {{ day.getFullYear() }}</h3></div></td></tr>`,
+    props: ['week', 'id'],
+    data: function () {
+        return {
+            monthnames: ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+          ]
+        }
+    },
+    mounted: function () {
+        var vm = this,
+            thisweek = document.getElementById(vm.id),
+            container = document.getElementById('calendarContainer');
+        container.addEventListener('scroll', () => {
+            var rect = thisweek.getBoundingClientRect();
+            var rect2 = container.getBoundingClientRect();
+            if (rect.bottom < rect2.top) {
+                delete vm.$parent.calendar.bottomweeks[vm.id];
+                delete vm.$parent.calendar.visibleweeks[vm.id];
+                vm.$parent.calendar.topweeks[vm.id] = thisweek;
+            } else if (rect.top > rect2.bottom) {
+                delete vm.$parent.calendar.topweeks[vm.id];
+                delete vm.$parent.calendar.visibleweeks[vm.id];
+                vm.$parent.calendar.bottomweeks[vm.id] = thisweek;
+            } else {
+                delete vm.$parent.calendar.topweeks[vm.id];
+                delete vm.$parent.calendar.bottomweeks[vm.id];
+                vm.$parent.calendar.visibleweeks[vm.id] = thisweek;
+            }
+        });
     }
 });
 

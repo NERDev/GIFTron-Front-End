@@ -610,7 +610,7 @@ Vue.component('dashboard-scheduler', {
                     <hr>
                     <div id="calendarContainer">
                         <table>
-                            <calendar-week v-for="(week, id) in calendar.weeks" v-bind:week="week" v-bind:id="id"></calendar-week>
+                            <calendar-week v-for="id in calendar.weekorder" v-bind:week="calendar.weeks[id]" v-bind:id="id"></calendar-week>
                         </table>
                     </div>
                </div>`,
@@ -619,6 +619,7 @@ Vue.component('dashboard-scheduler', {
         return {
             calendar: {
                 weeks: {},
+                weekorder: [],
                 topweeks: [],
                 bottomweeks: [],
                 visibleweeks: [],
@@ -632,7 +633,8 @@ Vue.component('dashboard-scheduler', {
     },
     mounted: function () {
         function getVisibleDate() {
-            vm.calendar.visibleDate = new Date(+Object.keys(vm.calendar.visibleweeks)[2]);
+            console.log(vm.calendar.visibleweeks);
+            vm.calendar.visibleDate = new Date(+Object.keys(vm.calendar.visibleweeks)[1]);
         }
 
         function buildWeek(start) {
@@ -653,13 +655,19 @@ Vue.component('dashboard-scheduler', {
                 for (let index = 0; index < number; index++) {
                     var tomorrow = new Date(reference);
                     var weekstart = new Date(tomorrow.setDate(tomorrow.getDate() + index * 7));
+                    if (vm.calendar.weekorder.indexOf(+weekstart) == -1) {
+                        vm.calendar.weekorder.push(+weekstart);
+                    }
                     Vue.set(vm.calendar.weeks, +weekstart, buildWeek(weekstart));
                 }
             } else {
                 number = Math.abs(number);
-                for (let index = number; index > 0; index--) {
+                for (let index = 0; index < number; index++) {
                     var tomorrow = new Date(reference);
                     var weekstart = new Date(tomorrow.setDate(tomorrow.getDate() - index * 7));
+                    if (vm.calendar.weekorder.indexOf(+weekstart) == -1) {
+                        vm.calendar.weekorder.unshift(+weekstart);
+                    }
                     Vue.set(vm.calendar.weeks, +weekstart, buildWeek(weekstart));
                 }
             }
@@ -673,51 +681,51 @@ Vue.component('dashboard-scheduler', {
         generate(-10, sunday);
         generate(10, sunday);
 
-        console.log(today, sunday, vm.calendar.weeks, Object.keys(vm.calendar.weeks).length);
         setTimeout(() => {
             console.log(today.getMonth());
             document.querySelector('#calendarContainer').scrollTop = document.getElementById(+new Date((new Date(first).setDate(new Date(first).getDate() - new Date(first).getDay())))).offsetTop;
             setTimeout(() => {
                 getVisibleDate();
+                document.querySelector('#calendarContainer').addEventListener('scroll', () => {
+                    //console.log(Object.keys(vm.calendar.topweeks), Object.keys(vm.calendar.bottomweeks))
+                    if (Object.keys(vm.calendar.bottomweeks).length < 4) {
+                        console.log('getting close, loading more on the bottom');
+                        var date = Object.keys(vm.calendar.bottomweeks).pop();
+                        console.log(vm.calendar.bottomweeks);
+                        if (!isFinite(date)) {
+                            date = Object.keys(vm.calendar.visibleweeks).pop();
+                        }
+        
+                        if (date) {
+                            console.log(date, new Date(+date));
+                            generate(10, new Date(+date));
+                        }
+                        //console.log(new Date(Math.min(...Object.keys(vm.calendar.bottomweeks))));
+                        //generate(10, new Date(Math.min(...Object.keys(vm.calendar.bottomweeks))));
+                    } else if (Object.keys(vm.calendar.topweeks).length < 4) {
+                        console.log('getting close, loading more on the top');
+                        var date = Object.keys(vm.calendar.topweeks).shift();
+                        console.log(vm.calendar.topweeks);
+                        if (!isFinite(date)) {
+                            date = Object.keys(vm.calendar.visibleweeks).shift();
+                        }
+        
+                        if (date) {
+                            console.log(date, new Date(+date));
+                            generate(-10, new Date(+date));
+                            console.log(document.getElementById(+date));
+                            document.querySelector('#calendarContainer').scrollTop += document.querySelector('#calendarContainer tr').getBoundingClientRect().height * 9;
+                        }
+                    }
+                    getVisibleDate();
+                    //console.log('top', vm.calendar.topweeks);
+                    //console.log('visible', vm.calendar.visibleweeks);
+                    //console.log('bottom', vm.calendar.bottomweeks);
+                console.log(Object.keys(vm.calendar.topweeks).length, Object.keys(vm.calendar.bottomweeks).length);
+                });
+                //vm.calendar.weeks[sunday] = week;
             }, 1000);
-        }, 100);
-
-        //determine if visible or not
-
-        document.querySelector('#calendarContainer').addEventListener('scroll', () => {
-            if (Object.keys(vm.calendar.bottomweeks).length < 4) {
-                console.log('getting close, loading more on the bottom');
-                var date = Object.keys(vm.calendar.bottomweeks).pop();
-                console.log(vm.calendar.bottomweeks);
-                if (!isFinite(date)) {
-                    date = Object.keys(vm.calendar.visibleweeks).pop();
-                }
-
-                if (date) {
-                    console.log(date, new Date(+date));
-                    generate(10, new Date(+date));
-                }
-                //console.log(new Date(Math.min(...Object.keys(vm.calendar.bottomweeks))));
-                //generate(10, new Date(Math.min(...Object.keys(vm.calendar.bottomweeks))));
-            }
-            if (Object.keys(vm.calendar.topweeks).length < 4) {
-                console.log('getting close, loading more on the top');
-                var date = Object.keys(vm.calendar.topweeks)[0];
-                if (!isFinite(date)) {
-                    date = Object.keys(vm.calendar.visibleweeks)[0];
-                }
-
-                if (date) {
-                    console.log(date, new Date(+date));
-                    //generate(-10, new Date(+date));
-                }
-            }
-            getVisibleDate();
-            //console.log('top', vm.calendar.topweeks);
-            //console.log('visible', vm.calendar.visibleweeks);
-            //console.log('bottom', vm.calendar.bottomweeks);
-        })
-        //vm.calendar.weeks[sunday] = week;
+        }, 2000);
     }
 });
 
@@ -743,10 +751,20 @@ Vue.component('calendar-week', {
         function position() {
             var rect = thisweek.getBoundingClientRect();
             var rect2 = container.getBoundingClientRect();
+
+            if (vm.id == 1554613200000) {
+                console.log((rect.bottom < rect2.top), (rect.top > rect2.bottom), thisweek, vm.id)
+            }
+
+            if (thisweek.id != vm.id) {
+                thisweek = document.getElementById(vm.id);
+            }
+
             if (rect.bottom < rect2.top) {
                 delete vm.$parent.calendar.bottomweeks[vm.id];
                 delete vm.$parent.calendar.visibleweeks[vm.id];
                 vm.$parent.calendar.topweeks[vm.id] = thisweek;
+                //console.log(vm.$parent.calendar.topweeks);
             } else if (rect.top > rect2.bottom) {
                 delete vm.$parent.calendar.topweeks[vm.id];
                 delete vm.$parent.calendar.visibleweeks[vm.id];

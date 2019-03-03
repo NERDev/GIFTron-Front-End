@@ -676,7 +676,7 @@ Vue.component('dashboard-scheduler', {
         var vm = this,
             today = new Date(new Date().setHours(0, 0, 0, 0)),
             sunday = new Date((new Date(today).setDate(new Date(today).getDate() - new Date(today).getDay()))),
-            first = new Date([today.getMonth() + 1, today.getDate(), today.getFullYear()].join(' '));
+            first = new Date([today.getMonth() + 1, today.getDate(), today.getFullYear()].join('/'));
 
         generate(-10, sunday);
         generate(10, sunday);

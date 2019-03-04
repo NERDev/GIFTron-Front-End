@@ -426,7 +426,56 @@ Vue.component('giftron-dashboard', {
 });
 
 Vue.component('snackbar', {
-    template: `<div id="snackbar">kek</div>`,
+    template: `<div id="snackbar" v-bind:class="'shadow default ' + type" style="transform: translateY(5em);"><i v-if="icons[type]" v-bind:class="'fas fa-' + icons[type]"></i><h1>{{ type.toTitleCase() }}:</h1><p>{{ message }}</p><button v-on:click="dismiss()"><i class="fas fa-times"></i></button></div>`,
+    data: function () {
+        return {
+            type: "info",
+            message: "aloha",
+            icons: {
+                info: 'info-circle',
+                warning: 'exclamation-triangle',
+                error: 'exclamation-circle'
+            },
+            callback: null
+        }
+    },
+    methods: {
+        dismiss: function () {
+            var vm = this;
+            anime({
+                targets: '#snackbar',
+                translateY: '5em'
+            });
+            if (vm.callback) {
+                vm.callback();
+                vm.callback = null;
+            }
+        },
+        fire: function (params) {
+            var vm = this;
+            if (typeof params.timeout == 'undefined') {
+                params.timeout = 4000;
+            }
+            vm.message = params.message;
+            if (params.type) {
+                vm.type = params.type;
+            }
+            anime({
+                targets: '#snackbar',
+                translateY: 0
+            });
+            if (params.timeout) {
+                setTimeout(() => {
+                    vm.dismiss();
+                }, params.timeout);
+            }
+            if (params.callback) {
+                vm.callback = params.callback;
+            } else {
+                vm.callback = null;
+            }
+        }
+    }
 })
 
 Vue.component('server-toolbar', {
@@ -642,7 +691,7 @@ Vue.component('dashboard-scheduler', {
         },
         generate: function (number, reference) {
             var vm = this;
-            
+
             function buildWeek(start) {
                 var week = {};
                 week[+start] = start;
@@ -655,7 +704,7 @@ Vue.component('dashboard-scheduler', {
                 return week;
                 //vm.calendar.weeks[sunday] = week;
             }
-            
+
             if (number > 0) {
                 for (let index = 0; index < number; index++) {
                     var tomorrow = new Date(reference);
@@ -1182,6 +1231,18 @@ Vue.component('setup-buttons', {
     }
 });
 
+String.prototype.toTitleCase = function () {
+    var str = this;
+    if (str.length = 0) {
+        return str;
+    }
+    str = str.toLowerCase().split(' ');
+    for (var i = 0; i < str.length; i++) {
+        str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+    }
+    return str.join(' ');
+}
+
 var app = new Vue({
     el: 'main',
     data() {
@@ -1194,6 +1255,9 @@ var app = new Vue({
     methods: {
         delete_cookie: function (name) {
             document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+        },
+        snackbar: function (params) {
+            this.$refs.snackbar.fire(params);
         }
     },
     mounted: function () {

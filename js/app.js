@@ -491,11 +491,25 @@ Vue.component('checkbox-slider', {
     template: `<div class="container"><p v-if="off" style="left: -25px">{{ off }}</p><label class="switch" v-bind:for="id"><input type="checkbox" v-bind:id="id" v-on:click="click" /><div class="slider round"></div></label><p v-if="on" style="right: -65px;">{{ on }}</p></div>`,
     props: ['id', 'on', 'off'],
     methods: {
+        getState: function () {
+            var state = document.getElementById(this.id).checked;
+            if (state) {
+                document.getElementById(this.id).parentElement.nextSibling.classList.add('active');
+                document.getElementById(this.id).parentElement.previousSibling.classList.remove('active');
+            } else {
+                document.getElementById(this.id).parentElement.previousSibling.classList.add('active');
+                document.getElementById(this.id).parentElement.nextSibling.classList.remove('active');
+            }
+        },
         click: function () {
+            this.getState();
             if (this.$parent[this.id]) {
                 this.$parent[this.id]();
             }
         }
+    },
+    mounted: function () {
+        this.getState();
     }
 });
 
@@ -621,9 +635,29 @@ Vue.component('server-card', {
                     var xhttp = new XMLHttpRequest();
                     xhttp.onreadystatechange = function () {
                         if (this.readyState == 4) {
-                            if (this.status == 200) {
-                                vm.$root.guilds[vm.id] = JSON.parse(this.response);
-                                handleGotData();
+                            if (String(this.status).charAt(0) == 2) {
+                                if (this.status == 200) {
+                                    vm.$root.guilds[vm.id] = JSON.parse(this.response);
+                                    handleGotData();
+                                }
+                            } else if (String(this.status).charAt(0) == 5) {
+                                var message = JSON.parse(this.response);
+                                if (!message) {
+                                    message = 'Our server responded with an unknown 5XX error. We\'re looking into it.';
+                                }
+                                vm.$root.snackbar({
+                                    type: 'error',
+                                    message: message
+                                });
+                            } else if (String(this.status).charAt(0) == 4) {
+                                var message = JSON.parse(this.response);
+                                if (!message) {
+                                    message = 'Our server responded with an unknown 4XX error. We\'re looking into it.';
+                                }
+                                vm.$root.snackbar({
+                                    type: 'error',
+                                    message: message
+                                });
                             }
                             handleFinishedLoading();
                         }
@@ -641,13 +675,73 @@ Vue.component('server-card', {
 });
 
 Vue.component('dashboard-panel', {
-    template: `<div class="panel" id="dashboardPanel" style="transform: translateY(-100vh);"><dashboard-menu v-bind:guild="guild"></dashboard-menu><dashboard-scheduler v-bind:guild="guild"></dashboard-scheduler></div>`,
+    template: `<div class="panel" id="dashboardPanel" style="transform: translateY(-100vh);">
+                    <dashboard-menu v-bind:guild="guild"></dashboard-menu>
+                    <div id="schedulerViews">
+                        <dashboard-scheduler v-bind:guild="guild"></dashboard-scheduler>
+                        <dashboard-events v-bind:guild="guild"></dashboard-events>
+                    </div>
+               </div>`,
     props: ['guild']
 });
 
 Vue.component('dashboard-menu', {
-    template: `<div id="dashboardMenu"><dashboard-guild-profile v-bind:guild="guild"></dashboard-guild-profile></div>`,
-    props: ['guild']
+    template: `<div id="dashboardMenu">
+                    <dashboard-guild-profile v-bind:guild="guild"></dashboard-guild-profile>
+                    <div class="view">
+                    </div>
+               </div>`,
+    props: ['guild'],
+    data: function () {
+        return {
+            schedule: {
+                options: [
+                    'Events',
+                    'Shards'
+                ]
+            },
+            settings: {
+                options: [
+                    'Timezone',
+                    'Access Roles',
+                    'Multiplier Roles',
+                    'Win Message'
+                ]
+            }
+        }
+    },
+    methods: {
+        attachMargin: function () {
+            document.querySelectorAll('.view ul')[1].style.marginTop = document.querySelector('#dashboardMenu').getBoundingClientRect().bottom - document.querySelectorAll('.view ul')[0].getBoundingClientRect().bottom + 'px';
+        },
+        goto: function (section) {
+            switch (('' + section).toLowerCase()) {
+                case 'events':
+                    anime({
+                        targets: '#schedulerViews',
+                        translateY: -(document.getElementById('dashboard').clientHeight + 50) + 'px'
+                    });
+                    break;
+                case 'settings':
+                
+                    break;
+            
+                default:
+                    anime({
+                        targets: '#schedulerViews, .view .options',
+                        translateY: 0
+                    });
+                    break;
+            }
+        },
+        viewChange: function () {
+            if (document.getElementById('viewChange').checked) {
+                this.goto('settings');
+            } else {
+                this.goto();
+            }
+        }
+    }
 });
 
 Vue.component('dashboard-guild-profile', {
@@ -657,6 +751,11 @@ Vue.component('dashboard-guild-profile', {
                     <h3 v-if="typeof guild.wallet !== 'undefined'">\${{ guild.wallet.toFixed(2) }}</h3>
                     <button class="main" v-if="typeof guild.wallet !== 'undefined'">Add Funds</button>
                </div>`,
+    props: ['guild']
+});
+
+Vue.component('dashboard-events', {
+    template: `<div id="dashboardEvents"><h1>Events</h1></div>`,
     props: ['guild']
 });
 
@@ -962,6 +1061,15 @@ Vue.component('setup-panel', {
                         console.log('We\'ve got everything we need - proceed');
                         vm.step++;
                     }
+                } else {
+                    var message = JSON.parse(this.response);
+                    if (!message) {
+                        message = "Our server responded with an unknown error. We're looking into it.";
+                    }
+                    vm.$root.snackbar({
+                        type: 'error',
+                        message: message
+                    });
                 }
             }
         };
@@ -1147,6 +1255,16 @@ Vue.component('setup-buttons', {
                 xhttp.onreadystatechange = function () {
                     if (this.readyState == 4) {
                         fixindex++;
+                        if (this.status != 200) {
+                            var message = JSON.parse(this.response);
+                            if (!message) {
+                                message = "We had an unknown problem querying " + n + ".";
+                            }
+                            vm.$root.snackbar({
+                                type: 'warning',
+                                message: message
+                            });
+                        }
                         if (vm.$parent.missing.includes('generalManageRoles')) {
                             if (this.status == 200) {
                                 if (!JSON.parse(this.response).includes('textSendMessages')) {
@@ -1163,6 +1281,7 @@ Vue.component('setup-buttons', {
                                 console.log('fixed ' + n);
                             } else {
                                 console.log('failed to fix ' + n);
+                                vm.$parent.fix[n] = vm.$parent.guild.setup.channels.suggested[n];
                             }
                         }
                         console.log(fixindex, vm.$parent.setup.channels.length);
@@ -1208,6 +1327,15 @@ Vue.component('setup-buttons', {
                                                 vm.finish();
                                             }, 5000);
                                         }
+                                    } else {
+                                        var message = JSON.parse(this.response);
+                                        if (!message) {
+                                            message = "We had an unknown problem setting up you guild. Try refreshing and doing it again.";
+                                        }
+                                        vm.$root.snackbar({
+                                            type: 'warning',
+                                            message: message
+                                        });
                                     }
                                 }
                             };
@@ -1285,8 +1413,10 @@ var app = new Vue({
         }
         if (typeof (Storage) !== 'undefined') {
             if (localStorage.getItem('page')) {
-                window.location.hash = localStorage.getItem('page');
-                console.log('you were on ' + localStorage.getItem('page') + ' last time');
+                if (localStorage.getItem('page').includes('?')) {
+                    //window.location.hash = localStorage.getItem('page');
+                    console.log('you were on ' + localStorage.getItem('page') + ' last time');
+                }
             }
         }
         pageHandle();

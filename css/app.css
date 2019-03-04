@@ -287,6 +287,7 @@ button.main:hover {
     border-width: 1px;
     border-top-style: solid;
     border-bottom-style: solid;
+    overflow: hidden;
 }
 
 #dashboardMenu {
@@ -294,12 +295,76 @@ button.main:hover {
     width: 19.8vw;
     display: inline-block;
     text-align: center;
+    border-right-style: solid;
+    border-color: inherit;
+    border-width: 1px;
 }
 
 #dashboardMenu .profile {
-    position: absolute;
+    position: relative;
     width: inherit;
-    top: 3em;
+    padding-top: 3em;
+}
+
+#dashboardMenu .view {
+    position: relative;
+    margin-top: 3em;
+    overflow: hidden;
+}
+
+#dashboardMenu .view .container {
+    position: relative;
+    left: 0;
+    right: 0;
+    min-width: 13em;
+    margin: auto;
+    background-color: #2C2F33;
+    box-shadow: 0px 0px 50px #2C2F33;
+    z-index: 1;
+}
+
+
+#dashboardMenu .view .container .switch {
+    z-index: 1;
+}
+
+#dashboardMenu .view .container p {
+    top: .35em;
+}
+
+#dashboardMenu .view .container p:first-child {
+    left: 0!important;
+    margin-left: 5em;
+}
+
+#dashboardMenu .view .container p:last-child {
+    right: 0!important;
+    margin-right: 5em;
+}
+
+#dashboardMenu .view ul {
+    list-style: none;
+    padding: 0;
+    width: 50%;
+    margin: auto;
+    padding-top: 3em;
+    opacity: 1;
+    transition: .5s ease opacity;
+}
+
+#dashboardMenu .view ul li {
+    font-size: 1.5em;
+    padding-top: .5em;
+    margin: auto;
+    color: #99aab5;
+    /* background-color: #1D1E1F; */
+    padding-bottom: .5em;
+    border-bottom-width: 1px;
+}
+
+#dashboardMenu .view ul li.active {
+    background-color: #99aab5;
+    color: #1d1e1f;
 }
 
 #dashboardMenu .profile img {
@@ -325,17 +390,17 @@ button.main:hover {
     font-size: 1.25em;
 }
 
-#dashboardScheduler {
+#schedulerViews {
+    position: absolute;
+    top: 0;
     height: 100%;
     width: 80vw;
-    display: inline-block;
-    border-left-style: solid;
+    right: 0;
     border-color: inherit;
-    border-width: 1px;
-    position: absolute;
+    display: inline-block;
 }
 
-#dashboardScheduler h1 {
+#schedulerViews h1 {
     display: inherit;
     margin: 0;
     position: relative;
@@ -347,6 +412,30 @@ button.main:hover {
     border-bottom-width: 1px;
     border-color: inherit;
     height: 1.5em;
+}
+
+#dashboardEvents {
+    height: 100%;
+    width: 80vw;
+    display: inline-block;
+    position: absolute;
+    border-color: inherit;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    padding-bottom: 1px;
+    top: 100%;
+    margin-top: 50px;
+}
+
+#dashboardScheduler {
+    height: 100%;
+    width: 80vw;
+    display: inline-block;
+    position: absolute;
+    border-color: inherit;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    padding-bottom: 1px;
 }
 
 #dashboardScheduler hr {
@@ -619,6 +708,11 @@ button.main:hover {
     text-align: unset;
     position: absolute;
     top: 5px;
+    transition: .5s ease color;
+  }
+
+  .container p.active {
+      color: white;
   }
   
   .slider {

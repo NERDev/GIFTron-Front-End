@@ -440,7 +440,7 @@ button.main:hover {
     height: 1.5em;
 }
 
-#dashboardEvents {
+#schedulerViews .main {
     height: 100%;
     width: 80vw;
     display: inline-block;
@@ -449,32 +449,16 @@ button.main:hover {
     border-bottom-style: solid;
     border-bottom-width: 1px;
     padding-bottom: 1px;
+}
+
+#dashboardEvents {
     top: 100%;
     margin-top: 50px;
 }
 
 #dashboardShards {
-    height: 100%;
-    width: 80vw;
-    display: inline-block;
-    position: absolute;
-    border-color: inherit;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    padding-bottom: 1px;
     top: 100%;
     margin-top: 50px;
-}
-
-#dashboardScheduler {
-    height: 100%;
-    width: 80vw;
-    display: inline-block;
-    position: absolute;
-    border-color: inherit;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    padding-bottom: 1px;
 }
 
 #dashboardScheduler hr {

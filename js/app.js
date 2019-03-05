@@ -677,9 +677,11 @@ Vue.component('server-card', {
 Vue.component('dashboard-panel', {
     template: `<div class="panel" id="dashboardPanel" style="transform: translateY(-100vh);">
                     <dashboard-menu v-bind:guild="guild"></dashboard-menu>
-                    <div id="schedulerViews">
+                    <dashboard-settings v-bind:guild="guild"></dashboard-settings>
+                    <div id="schedulerViews" class="main">
                         <dashboard-scheduler v-bind:guild="guild"></dashboard-scheduler>
                         <dashboard-events v-bind:guild="guild"></dashboard-events>
+                        <dashboard-shards v-bind:guild="guild"></dashboard-shards>
                     </div>
                </div>`,
     props: ['guild']
@@ -689,58 +691,89 @@ Vue.component('dashboard-menu', {
     template: `<div id="dashboardMenu">
                     <dashboard-guild-profile v-bind:guild="guild"></dashboard-guild-profile>
                     <div class="view">
+                        <div v-for="(options, item) in navigation">
+                            <h3 v-on:click="goto(item)" v-bind:class="active == item.toLowerCase() ? 'shadow active' : 'shadow'"><i v-bind:class="icons[item]"></i>{{ item.toTitleCase() }}</h3>
+                            <ul style="max-height: 0;" v-bind:id="item + 'Options'">
+                                <li v-for="option in options.options" v-on:click="goto(option)" v-bind:class="active == option.toLowerCase() ? 'active' : ''">{{ option }}</li>
+                            </ul>
+                        </div>
                     </div>
                </div>`,
     props: ['guild'],
     data: function () {
         return {
-            schedule: {
-                options: [
-                    'Events',
-                    'Shards'
-                ]
+            active: '',
+            icons: {
+                schedule: 'fas fa-calendar-alt',
+                settings: 'fas fa-cog'
             },
-            settings: {
-                options: [
-                    'Timezone',
-                    'Access Roles',
-                    'Multiplier Roles',
-                    'Win Message'
-                ]
+            navigation: {
+                schedule: {
+                    options: [
+                        'Events',
+                        'Shards'
+                    ]
+                },
+                settings: {
+                    options: [
+                        'Timezone',
+                        'Access Roles',
+                        'Multiplier Roles',
+                        'Win Message'
+                    ]
+                }
             }
         }
     },
     methods: {
-        attachMargin: function () {
-            document.querySelectorAll('.view ul')[1].style.marginTop = document.querySelector('#dashboardMenu').getBoundingClientRect().bottom - document.querySelectorAll('.view ul')[0].getBoundingClientRect().bottom + 'px';
-        },
         goto: function (section) {
-            switch (('' + section).toLowerCase()) {
+            this.active = ('' + section).toLowerCase();
+            switch (this.active) {
                 case 'events':
+                    //document.getElementById('scheduleOptions').style.maxHeight = (this.navigation.schedule.options.length * 3.5) + 'em';
+                    //document.getElementById('settingsOptions').style.maxHeight = 0;
+                    document.getElementById('dashboardEvents').style.display = '';
+                    document.getElementById('dashboardShards').style.display = 'none';
                     anime({
                         targets: '#schedulerViews',
                         translateY: -(document.getElementById('dashboard').clientHeight + 50) + 'px'
                     });
                     break;
+                case 'shards':
+                    document.getElementById('dashboardEvents').style.display = 'none';
+                    document.getElementById('dashboardShards').style.display = '';
+                    anime({
+                        targets: '#schedulerViews',
+                        translateY: -(document.getElementById('dashboard').clientHeight + 50) + 'px'
+                    });
+                    break;
+                    
                 case 'settings':
-                
+                    document.getElementById('scheduleOptions').style.maxHeight = 0;
+                    document.getElementById('settingsOptions').style.maxHeight = (this.navigation.settings.options.length * 3.5) + 'em';
+                    anime({
+                        targets: '#dashboardSettings',
+                        translateY: 0
+                    });
                     break;
             
                 default:
+                    document.getElementById('scheduleOptions').style.maxHeight = (this.navigation.schedule.options.length * 3.5) + 'em';
+                    document.getElementById('settingsOptions').style.maxHeight = 0;
                     anime({
                         targets: '#schedulerViews, .view .options',
                         translateY: 0
                     });
+                    anime({
+                        targets: '#dashboardSettings',
+                        translateY: -(document.getElementById('dashboard').clientHeight + 50) + 'px'
+                    });
                     break;
             }
-        },
-        viewChange: function () {
-            if (document.getElementById('viewChange').checked) {
-                this.goto('settings');
-            } else {
-                this.goto();
-            }
         }
+    },
+    mounted: function () {
+        this.goto('schedule');
     }
 });
 
@@ -756,6 +789,16 @@ Vue.component('dashboard-guild-profile', {
 
 Vue.component('dashboard-events', {
     template: `<div id="dashboardEvents"><h1>Events</h1></div>`,
+    props: ['guild']
+});
+
+Vue.component('dashboard-shards', {
+    template: `<div id="dashboardShards"><h1>Shards</h1></div>`,
+    props: ['guild']
+});
+
+Vue.component('dashboard-settings', {
+    template: `<div id="dashboardSettings" class="main"><h1>Settings</h1></div>`,
     props: ['guild']
 });
 

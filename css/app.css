@@ -303,56 +303,54 @@ button.main:hover {
 #dashboardMenu .profile {
     position: relative;
     width: inherit;
-    padding-top: 3em;
+    margin-top: 3em;
 }
 
 #dashboardMenu .view {
     position: relative;
-    margin-top: 3em;
     overflow: hidden;
-}
-
-#dashboardMenu .view .container {
-    position: relative;
-    left: 0;
-    right: 0;
-    min-width: 13em;
+    width: 75%;
     margin: auto;
-    background-color: #2C2F33;
-    box-shadow: 0px 0px 50px #2C2F33;
-    z-index: 1;
+    margin-top: 3em;
 }
 
-
-#dashboardMenu .view .container .switch {
-    z-index: 1;
+#dashboardMenu .view h3 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #99aab5;
+    background-color: #1D1E1F;
+    padding-top: .25em;
+    padding-bottom: .25em;
+    cursor: pointer;
+    transition: .15s ease color;
 }
 
-#dashboardMenu .view .container p {
-    top: .35em;
+#dashboardMenu .view h3 i {
+    position: absolute;
+    left: 0;
+    right: 6em;
+    margin-top: .2em;
 }
 
-#dashboardMenu .view .container p:first-child {
-    left: 0!important;
-    margin-left: 5em;
+#dashboardMenu .view h3:hover {
+    color: white;
 }
 
-#dashboardMenu .view .container p:last-child {
-    right: 0!important;
-    margin-right: 5em;
-}
-
-#dashboardMenu .view ul {
+#dashboardMenu .view div ul {
     list-style: none;
     padding: 0;
-    width: 50%;
     margin: auto;
-    padding-top: 3em;
     opacity: 1;
-    transition: .5s ease opacity;
+    overflow: hidden;
+    transition: .5s ease opacity, .5s ease max-height;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-width: 1px;
+    border-color: #99aab5;
 }
 
-#dashboardMenu .view ul li {
+#dashboardMenu .view div ul li {
     font-size: 1.5em;
     padding-top: .5em;
     margin: auto;
@@ -360,11 +358,12 @@ button.main:hover {
     /* background-color: #1D1E1F; */
     padding-bottom: .5em;
     border-bottom-width: 1px;
+    cursor: pointer;
+    transition: .15s ease color, .15s ease background-color;
 }
 
-#dashboardMenu .view ul li.active {
-    background-color: #99aab5;
-    color: #1d1e1f;
+#dashboardMenu .view div ul li.active,#dashboardMenu .view h3.active,#dashboardMenu .view div ul li:hover {
+    color: white;
 }
 
 #dashboardMenu .profile img {
@@ -388,6 +387,33 @@ button.main:hover {
 
 #dashboardMenu .profile button.main {
     font-size: 1.25em;
+}
+
+#dashboardSettings {
+    height: 100%;
+    width: 80vw;
+    display: inline-block;
+    position: absolute;
+    border-color: inherit;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    padding-bottom: 1px;
+    background-color: inherit;
+    z-index: 1;
+}
+
+#dashboardSettings h1 {
+    display: inherit;
+    margin: 0;
+    position: relative;
+    width: inherit;
+    text-align: center;
+    color: white;
+    font-size: 2.5em;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-color: inherit;
+    height: 1.5em;
 }
 
 #schedulerViews {
@@ -415,6 +441,19 @@ button.main:hover {
 }
 
 #dashboardEvents {
+    height: 100%;
+    width: 80vw;
+    display: inline-block;
+    position: absolute;
+    border-color: inherit;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    padding-bottom: 1px;
+    top: 100%;
+    margin-top: 50px;
+}
+
+#dashboardShards {
     height: 100%;
     width: 80vw;
     display: inline-block;

@@ -679,7 +679,7 @@ Vue.component('dashboard-panel', {
                     <dashboard-menu v-bind:guild="guild"></dashboard-menu>
                     <dashboard-settings v-bind:guild="guild"></dashboard-settings>
                     <div id="schedulerViews">
-                        <dashboard-scheduler v-bind:guild="guild" class="main"></dashboard-scheduler>
+                        <dashboard-scheduler v-bind:guild="guild" class="main" v-if="Object.keys(guild).length"></dashboard-scheduler>
                         <dashboard-events v-bind:guild="guild" class="main"></dashboard-events>
                         <dashboard-shards v-bind:guild="guild" class="main"></dashboard-shards>
                     </div>
@@ -1071,6 +1071,7 @@ Vue.component('setup-panel', {
                     console.log(currentPerms);
                     var desiredPerms = [
                         'generalManageRoles',
+                        'generalManageChannels',
                         'textReadMessages',
                         'textSendMessages'
                     ];
@@ -1282,7 +1283,7 @@ Vue.component('setup-buttons', {
                         {
                             id: "523579896144986125",
                             type: 'member',
-                            allow: 2048,
+                            allow: 133120,
                             deny: 0
                         },
                         {
@@ -1373,7 +1374,7 @@ Vue.component('setup-buttons', {
                                     } else {
                                         var message = JSON.parse(this.response);
                                         if (!message) {
-                                            message = "We had an unknown problem setting up you guild. Try refreshing and doing it again.";
+                                            message = "We had an unknown problem setting up your guild. Try refreshing and doing it again.";
                                         }
                                         vm.$root.snackbar({
                                             type: 'warning',

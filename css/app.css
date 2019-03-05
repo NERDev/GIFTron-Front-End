@@ -298,6 +298,7 @@ button.main:hover {
     border-right-style: solid;
     border-color: inherit;
     border-width: 1px;
+    overflow: auto;
 }
 
 #dashboardMenu .profile {
@@ -308,7 +309,6 @@ button.main:hover {
 
 #dashboardMenu .view {
     position: relative;
-    overflow: hidden;
     width: 75%;
     margin: auto;
     margin-top: 3em;

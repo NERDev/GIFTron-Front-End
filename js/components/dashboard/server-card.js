@@ -46,15 +46,14 @@ Vue.component('server-card', {
                 }
 
                 if (e == 'click') {
-                    window.location.hash = '#dashboard?' + this.id;
-                    /*
-                    anime({
-                        targets: '.serverCard',
-                        translateY: -screenheight,
-                        delay: anime.stagger(100, {order: 'reverse'}),
-                        duration: 3000
-                    });
-                    */
+                    if (this.info.unavailable) {
+                        this.$root.snackbar({
+                            type: 'warning',
+                            message: 'GIFTron was removed from this server.'
+                        });
+                    } else {
+                        window.location.hash = '#dashboard?' + this.id;
+                    }
                 }
             }
         }
@@ -81,7 +80,6 @@ Vue.component('server-card', {
                     if (vm.info) {
                         if (vm.info.unavailable) {
                             var button = document.getElementById('serverButton-' + vm.id);
-                            button.disabled = true;
                             button.parentElement.style.opacity = '.5';
                             button.style.cursor = 'not-allowed';
                         }

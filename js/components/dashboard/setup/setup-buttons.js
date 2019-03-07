@@ -72,7 +72,7 @@ Vue.component('setup-buttons', {
                         {
                             id: "523579896144986125",
                             type: 'member',
-                            allow: 133120,
+                            allow: 134144,
                             deny: 0
                         },
                         {
@@ -89,6 +89,7 @@ Vue.component('setup-buttons', {
                     xhttp.onreadystatechange = function () {
                         if (this.readyState == 4) {
                             fixindex++;
+                            /*
                             if (this.status != 200) {
                                 var message = JSON.parse(this.response);
                                 if (!message) {
@@ -99,6 +100,7 @@ Vue.component('setup-buttons', {
                                     message: message
                                 });
                             }
+                            */
                             if (vm.$parent.missing.includes('generalManageRoles')) {
                                 if (this.status == 200) {
                                     if (!JSON.parse(this.response).includes('textSendMessages')) {

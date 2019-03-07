@@ -47,7 +47,7 @@ Vue.component('user-badge', {
         close: function () {
             var userButton = document.querySelector('#userButton'),
                 dropdown = document.querySelector('.dropdown');
-            if (userButton && dropdown) {
+            if (!!userButton && !!dropdown) {
                 userButton.parentElement.classList.remove('shadow');
                 anime({
                     targets: '.userButton',

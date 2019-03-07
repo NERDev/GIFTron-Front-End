@@ -1,5 +1,5 @@
 Vue.component('giftron-dashboard', {
-    template: `<div id="dashboard"><server-toolbar></server-toolbar><ul class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel v-bind:guild="guildQuery"></dashboard-panel><setup-panel v-if="guildQuery.setup" v-bind:guild="guildQuery"></setup-panel></div>`,
+    template: `<div id="dashboard"><server-toolbar></server-toolbar><ul v-show="!Object.keys(guildQuery).length" class="serverList"><server-card v-for="(value, guild) in guildlist" v-bind:id="guild" v-bind:manage="value" v-bind:filter="filter"></server-card></ul><dashboard-panel v-bind:guild="guildQuery"></dashboard-panel><setup-panel v-if="guildQuery.setup" v-bind:guild="guildQuery"></setup-panel></div>`,
     props: ['user'],
     data: function () {
         return {

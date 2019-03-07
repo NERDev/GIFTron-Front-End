@@ -75,7 +75,7 @@ Vue.component('user-badge', {
                 }
             }
         };
-        xhttp.open("GET", "api/v1/user", true);
+        xhttp.open("GET", "api/v1/user/", true);
         xhttp.send();
 
         window.addEventListener('click', (e) => {

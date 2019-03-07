@@ -85,30 +85,35 @@ Vue.component('setup-panel', {
                     });
 
                     if (vm.missing.length) {
-                        vm.top = "Pardon Us";
-                        vm.greeting = "But did you mean to click ";
-                        if (vm.missing.length == 1) {
-                            vm.greeting += "this?";
+                        if (currentPerms.sort().join() == [desiredPerms[0], desiredPerms[1]].sort().join()) {
+                            console.log('We\'ve got a weird mix of perms, but we can fix this.');
+                            vm.step++;
                         } else {
-                            vm.greeting += "these?";
-                        }
-
-                        var set1 = vm.missing.includes(desiredPerms[0]) || vm.missing.includes(desiredPerms[1]),
-                            set2 = vm.missing.includes(desiredPerms[2]) || vm.missing.includes(desiredPerms[3]);
-
-                        if (set1) {
-                            vm.guild_permCopy += vm.guild_permCopy0;
-                            if (set2) {
-                                vm.guild_permCopy += " However, ";
+                            vm.top = "Pardon Us";
+                            vm.greeting = "But did you mean to click ";
+                            if (vm.missing.length == 1) {
+                                vm.greeting += "this?";
+                            } else {
+                                vm.greeting += "these?";
                             }
+    
+                            var set1 = vm.missing.includes(desiredPerms[0]) || vm.missing.includes(desiredPerms[1]),
+                                set2 = vm.missing.includes(desiredPerms[2]) || vm.missing.includes(desiredPerms[3]);
+    
+                            if (set1) {
+                                vm.guild_permCopy += vm.guild_permCopy0;
+                                if (set2) {
+                                    vm.guild_permCopy += " However, ";
+                                }
+                            }
+    
+                            if (set2) {
+                                vm.guild_permCopy += vm.guild_permCopy1;
+                            }
+    
+                            vm.guild_permCopy += " You may want to go back and re-add GIFTron to fix this."
+                            vm.missingImage = vm.missing.join('+') + '.png';                            
                         }
-
-                        if (set2) {
-                            vm.guild_permCopy += vm.guild_permCopy1;
-                        }
-
-                        vm.guild_permCopy += " You may want to go back and re-add GIFTron to fix this."
-                        vm.missingImage = vm.missing.join('+') + '.png';
                     } else {
                         console.log('We\'ve got everything we need - proceed');
                         vm.step++;

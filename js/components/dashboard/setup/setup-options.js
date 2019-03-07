@@ -32,17 +32,19 @@ Vue.component('setup-options', {
         selected: function (event) {
             var vm = this,
                 newSelect = event.target.value;
-            if (newSelect && newSelect != vm.oldSelect) {
-                if (!vm.setup.suggested) {
-                    vm.setup.suggested = {};
-                }
-                vm.oldSelect = newSelect;
-                Vue.set(vm.setup.suggested, newSelect, vm.setup.available[newSelect]);
-                delete vm.setup.available[newSelect];
-                if (event.target.tagName == 'OPTION') {
-                    event.target.parentElement.selectedIndex = 0;
-                } else {
-                    event.target.selectedIndex = 0;
+            if (newSelect) {
+                if (newSelect != vm.oldSelect) {
+                    if (!vm.setup.suggested) {
+                        vm.setup.suggested = {};
+                    }
+                    vm.oldSelect = newSelect;
+                    Vue.set(vm.setup.suggested, newSelect, vm.setup.available[newSelect]);
+                    delete vm.setup.available[newSelect];
+                    if (event.target.tagName == 'OPTION') {
+                        event.target.parentElement.selectedIndex = 0;
+                    } else {
+                        event.target.selectedIndex = 0;
+                    }
                 }
             }
         },

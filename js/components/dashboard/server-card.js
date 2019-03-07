@@ -62,7 +62,7 @@ Vue.component('server-card', {
     mounted: function () {
         var vm = this;
         function handleGotData() {
-            vm.info = vm.$root.guilds[vm.id] || {};
+            vm.info = vm.$root.guilds[vm.id];
             if (vm.info.icon) {
                 vm.icon = 'https://cdn.discordapp.com/icons/' + vm.id + '/' + vm.info.icon + '.png?size=1024'
             } else {
@@ -78,16 +78,18 @@ Vue.component('server-card', {
             //console.log('.serverCard-' + vm.id);
             setTimeout(function () {
                 if (vm.$parent.loading) {
-                    if (vm.info.unavailable) {
-                        var button = document.getElementById('serverButton-' + vm.id);
-                        button.disabled = true;
-                        button.parentElement.style.opacity = '.5';
-                        button.style.cursor = 'not-allowed';
+                    if (vm.info) {
+                        if (vm.info.unavailable) {
+                            var button = document.getElementById('serverButton-' + vm.id);
+                            button.disabled = true;
+                            button.parentElement.style.opacity = '.5';
+                            button.style.cursor = 'not-allowed';
+                        }
+                        anime({
+                            targets: ('.serverCard-' + vm.id.toString()),
+                            scale: 1
+                        });
                     }
-                    anime({
-                        targets: ('.serverCard-' + vm.id.toString()),
-                        scale: 1
-                    });
                 }
                 setTimeout(() => {
                     vm.stillLoading = false;

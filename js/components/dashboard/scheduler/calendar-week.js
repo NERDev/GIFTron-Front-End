@@ -29,7 +29,6 @@ Vue.component('calendar-week', {
                 delete vm.$parent.calendar.bottomweeks[vm.id];
                 delete vm.$parent.calendar.visibleweeks[vm.id];
                 vm.$parent.calendar.topweeks[vm.id] = thisweek;
-                //console.log(vm.$parent.calendar.topweeks);
             } else if (rect.top > rect2.bottom) {
                 delete vm.$parent.calendar.topweeks[vm.id];
                 delete vm.$parent.calendar.visibleweeks[vm.id];
@@ -50,5 +49,52 @@ Vue.component('calendar-week', {
             container.addEventListener('scroll', vm.$parent.handleCalendar);
             this.$parent.jumpTo(new Date());
         }
+
+        /*
+
+        The gist of this is that every week goes and gets its own data.
+
+        vm.$parent.guild.giveaways.forEach((id) => {
+            var giveaway = vm.$parent.giveaways[id];
+            if (+reference < g && g < +tomorrow) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+                            var giveawaydata = JSON.parse(this.response);
+                            //var starttime = new Date(+giveawaydata.start * 1000);
+                            //var endtime = new Date(+giveawaydata.end * 1000);
+                            Vue.set(vm.giveaways, giveaway, giveawaydata);
+                        }
+                    }
+                };
+                xhttp.open("GET", "api/v1/guild/schedule/giveaway/?" + id, true);
+                xhttp.send();
+            }
+        });
+
+        */
+
+        setTimeout(() => {
+            Object.keys(vm.$parent.giveaways).forEach((id) => {
+                giveaway = vm.$parent.giveaways[id];
+                console.log(giveaway.start * 1000, giveaway.end * 1000, this.id);
+                var weekofstart = (this.id < (giveaway.start * 1000) && (giveaway.start * 1000) < this.week[Object.keys(this.week).pop()].setHours(23, 59, 59, 999));
+                var weekofend = (this.id < (giveaway.end * 1000) && (giveaway.end * 1000) < this.week[Object.keys(this.week).pop()].setHours(23, 59, 59, 999));
+                var interimweek = (this.id > (giveaway.start * 1000) && (giveaway.end * 1000) > this.week[Object.keys(this.week).pop()].setHours(23, 59, 59, 999));
+                if (weekofstart) {
+                    console.log('the week of ' + new Date(this.id) + ' is the start of ' + id);
+                }
+
+                if (weekofend) {
+                    console.log('the week of ' + new Date(this.id) + ' is the end of ' + id);
+                }
+
+                if (!weekofstart && !weekofend && interimweek) {
+                    console.log('the week of ' + new Date(this.id) + ' is an interim of ' + id);
+                }
+
+            });
+        }, 1000);
     }
 });

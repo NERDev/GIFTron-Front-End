@@ -63,6 +63,25 @@ Vue.component('dashboard-scheduler', {
                     Vue.set(vm.calendar.weeks, +weekstart, buildWeek(weekstart));
                 }
             }
+
+            vm.guild.giveaways.forEach((giveaway) => {
+                var start = giveaway.split('-')[1] * 1000;
+                if (+reference < start && start < +tomorrow) {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                var giveawaydata = JSON.parse(this.response);
+                                //var starttime = new Date(+giveawaydata.start * 1000);
+                                //var endtime = new Date(+giveawaydata.end * 1000);
+                                Vue.set(vm.giveaways, giveaway, giveawaydata);
+                            }
+                        }
+                    };
+                    xhttp.open("GET", "api/v1/guild/schedule/giveaway/?" + giveaway, true);
+                    xhttp.send();
+                }
+            });
         },
         handleCalendar: function () {
             var vm = this;
@@ -80,7 +99,6 @@ Vue.component('dashboard-scheduler', {
                 }
 
                 if (date) {
-                    console.log(date, new Date(+date));
                     vm.generate(10, new Date(+date));
                 }
                 //console.log(new Date(Math.min(...Object.keys(vm.calendar.bottomweeks))));
@@ -109,6 +127,7 @@ Vue.component('dashboard-scheduler', {
     },
     data: function () {
         return {
+            giveaways: {},
             calendar: {
                 shortDay: false,
                 weeks: {},

@@ -127,6 +127,11 @@ Vue.component('dashboard-scheduler', {
         },
         buildCalendarElements: function () {
             var vm = this;
+
+            function getbackgroundcolor(id) {
+                return 'rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5)';
+            }
+
             if (Object.keys(vm.giveaways).length) {
                 Object.keys(vm.giveaways).forEach((id) => {
                     if (!vm.giveaways[id].recurring && typeof vm.blocks[[id.split('-')[1], id.split('-')[2]].join('-')] == 'undefined') {
@@ -145,7 +150,7 @@ Vue.component('dashboard-scheduler', {
                         } else {
                             //This is a one-off giveaway. We're definitely rendering the start block, so we can at least take care of that right away.
                             Vue.set(vm.blocks, [idParts[1], idParts[2]].join('-'), {
-                                style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);'],
+                                style: ['background-color: ' + getbackgroundcolor(id) + ';'],
                                 week: +startWeek,
                                 day: giveawayStart.getDay(),
                             });
@@ -161,7 +166,7 @@ Vue.component('dashboard-scheduler', {
 
                             //Alright, let's go ahead and make the end block.
                             Vue.set(vm.blocks, [idParts[0], idParts[2]].join('-'), {
-                                style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);'],
+                                style: ['background-color: ' + getbackgroundcolor(id) + ';'],
                                 week: +endWeek,
                                 day: giveawayEnd.getDay(),
                             });
@@ -172,7 +177,7 @@ Vue.component('dashboard-scheduler', {
                             if (giveawayStart.getDay() < 6) {
                                 //We've got some space to fill for the start, we'll make a connector.
                                 Vue.set(vm.connectors, [+startWeek, idParts[2]].join('-'), {
-                                    style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);', 'left: 10vw;'],
+                                    style: ['background-color: ' + getbackgroundcolor(id) + ';', 'left: 10vw;'],
                                     week: +startWeek,
                                     day: giveawayStart.getDay(),
                                 });
@@ -181,7 +186,7 @@ Vue.component('dashboard-scheduler', {
                             if (giveawayEnd.getDay()) {
                                 //We've got some space to fill for the end, we'll make a connector.
                                 Vue.set(vm.connectors, [+endWeek, idParts[2]].join('-'), {
-                                    style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);', 'right: 10vw;'],
+                                    style: ['background-color: ' + getbackgroundcolor(id) + ';', 'right: 10vw;'],
                                     week: +endWeek,
                                     day: giveawayEnd.getDay(),
                                 });
@@ -193,7 +198,7 @@ Vue.component('dashboard-scheduler', {
                                 var interimweek = new Date(+workingTime + (7 * (index + 1)) * 24 * 60 * 60 * 1000);
                                 interimweek.setHours(0, 0, 0, 0);
                                 Vue.set(vm.connectors, [+interimweek, idParts[2]].join('-'), {
-                                    style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);'],
+                                    style: ['background-color: ' + getbackgroundcolor(id) + ';'],
                                     week: +interimweek,
                                     day: interimweek.getDay(),
                                 });

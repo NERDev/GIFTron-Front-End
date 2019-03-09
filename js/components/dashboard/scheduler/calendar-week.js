@@ -2,7 +2,7 @@ Vue.component('calendar-week', {
     template: `<tr v-bind:id="id">
                     <td v-for="day in week">
                         <div v-bind:class="getDayColor(day)">
-                            <div class="connector" v-for="connector in $parent.connectors" v-if="day.getDay() == connector.day && id == connector.week" v-bind:style="connector.style.join(' ')"></div>
+                            <div class="connector" v-for="(connector, index) in $parent.connectors" v-if="day.getDay() == connector.day && id == connector.week" v-bind:style="connector.style.join(' ') + ' margin-top: ' + connectorMargin() + ';'"></div>
                             <div class="block" v-for="block in $parent.blocks" v-if="day.getDay() == block.day && id == block.week" v-bind:style="block.style.join(' ')"></div>
                             <h3 v-bind:class="getDayColor(day)">{{ day.getDate() }}</h3>
                         </div>
@@ -10,6 +10,25 @@ Vue.component('calendar-week', {
                </tr>`,
     props: ['week', 'id'],
     methods: {
+        connectorMargin: function () {
+            setTimeout(() => {
+                var connectors = document.getElementById(this.id).querySelectorAll('.connector');
+                for (let index = 0; index < connectors.length; index++) {
+                    var connector = connectors[index];
+
+                    if (connectors.length - 1 == 0) {
+                        return;
+                    }
+                    
+                    if (index < connectors.length / 2) {
+                        connector.style.marginTop = 3.5 / connectors.length + 'vw';
+                    }
+                    if (index >= connectors.length / 2) {
+                        connector.style.marginTop = -3.5 / connectors.length + 'vw';
+                    }
+                }
+            }, 1000);
+        },
         getDayColor: function (day) {
             var classes = [];
 

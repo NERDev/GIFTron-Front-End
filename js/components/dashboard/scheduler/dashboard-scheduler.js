@@ -141,7 +141,9 @@ Vue.component('dashboard-scheduler', {
                 daynames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
                 visibleDate: new Date(),
                 initialized: false
-            }
+            },
+            connectors: {},
+            blocks: {}
         }
     },
     mounted: function () {
@@ -152,5 +154,86 @@ Vue.component('dashboard-scheduler', {
 
         vm.generate(-10, sunday);
         vm.generate(10, sunday);
+    },
+    updated: function () {
+        var vm = this;
+        if (Object.keys(vm.giveaways).length) {
+            Object.keys(vm.giveaways).forEach((id) => {
+                if (!vm.giveaways[id].recurring && typeof vm.blocks[[id.split('-')[1], id.split('-')[2]].join('-')] == 'undefined') {
+                    var idParts = id.split('-');
+                    console.log(vm.blocks[[idParts[1], idParts[2]].join('-')]);
+                    giveaway = vm.giveaways[id];
+                    giveawayStart = new Date(idParts[1] * 1000);
+                    giveawayEnd = new Date(idParts[0] * 1000);
+
+                    var startWeek = new Date(new Date((new Date(giveawayStart).setDate(new Date(giveawayStart).getDate() - new Date(giveawayStart).getDay()))).setHours(0,0,0,0));
+                    var endWeek = new Date(new Date((new Date(giveawayEnd).setDate(new Date(giveawayEnd).getDate() - new Date(giveawayEnd).getDay()))).setHours(0,0,0,0));
+                    //console.log(startWeek, endWeek);
+
+                    if (giveaway.recurring) {
+
+                    } else {
+                        //This is a one-off giveaway. We're definitely rendering the start block, so we can at least take care of that right away.
+                        Vue.set(vm.blocks, [idParts[1], idParts[2]].join('-'), {
+                            style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);'],
+                            week: +startWeek,
+                            day: giveawayStart.getDay(),
+                        });
+
+                        //The question now is, do we need anything else? Let's find out.
+                        if (+startWeek == +endWeek) {
+                            //This one-off giveaway has the same week for its start and end.
+                            if (giveawayStart.getDay() == giveawayEnd.getDay()) {
+                                //It's on the same day though. We're not going to bother with rendering anything else.
+                                return;
+                            }
+                        }
+
+                        //Alright, let's go ahead and make the end block.
+                        Vue.set(vm.blocks, [idParts[0], idParts[2]].join('-'), {
+                            style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);'],
+                            week: +endWeek,
+                            day: giveawayEnd.getDay(),
+                        });
+
+                        //So... now we have to figure out connectors. We've got two types of connectors: start/end, and interim.
+                        //Let's take care of the start/end first, where applicable.
+
+                        if (giveawayStart.getDay() < 6) {
+                            //We've got some space to fill for the start, we'll make a connector.
+                            Vue.set(vm.connectors, [+startWeek, idParts[2]].join('-'), {
+                                style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);', 'left: 10vw;'],
+                                week: +startWeek,
+                                day: giveawayStart.getDay(),
+                            });
+                        }
+
+                        if (giveawayEnd.getDay()) {
+                            //We've got some space to fill for the end, we'll make a connector.
+                            Vue.set(vm.connectors, [+endWeek, idParts[2]].join('-'), {
+                                style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);', 'right: 10vw;'],
+                                week: +endWeek,
+                                day: giveawayEnd.getDay(),
+                            });
+                        }
+
+                        //Now for the interim weeks.
+                        var workingTime = new Date(startWeek);
+                        for (let index = 0; index < Math.round((+endWeek - +startWeek) / (7 * 24 * 60 * 60 * 1000)) - 1; index++) {
+                            var interimweek = new Date(+workingTime + (7 * (index + 1)) * 24 * 60 * 60 * 1000);
+                            interimweek.setHours(0,0,0,0);
+                            Vue.set(vm.connectors, [+interimweek, idParts[2]].join('-'), {
+                                style: ['background-color: rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5);'],
+                                week: +interimweek,
+                                day: interimweek.getDay(),
+                            });
+                            if (+interimweek == '1552798800000') {
+                                console.log(vm.connectors[[+interimweek, idParts[2]].join('-')]);
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 });

@@ -9,6 +9,7 @@ main {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: auto;
     -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 hr {
@@ -487,6 +488,7 @@ button.main:hover {
     margin: auto;
     height: calc(100% - 6em);
     overflow: auto;
+    scrollbar-width: none;
 }
 
 #dashboardScheduler table {
@@ -494,12 +496,19 @@ button.main:hover {
     color: white;
     position: relative;
     max-height: inherit;
+    overflow: hidden;
+}
+
+#dashboardScheduler .block {
+    position: absolute;
 }
 
 #dashboardScheduler .connector {
     height: .5vw;
     position: absolute;
     margin-top: 3.5vw;
+    z-index: 1;
+    width: 100vw;
 }
 
 #dashboardScheduler table td {

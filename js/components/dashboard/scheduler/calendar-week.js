@@ -2,7 +2,7 @@ Vue.component('calendar-week', {
     template: `<tr v-bind:id="id">
                     <td v-for="day in week">
                         <div v-bind:class="getDayColor(day)">
-                            <div class="connector" v-for="(connector, index) in $parent.connectors" v-if="day.getDay() == connector.day && id == connector.week" v-bind:style="connector.style.join(' ') + ' margin-top: ' + connectorMargin() + ';'"></div>
+                            <div class="connector" v-for="(connector, index) in $parent.connectors" v-if="day.getDay() == connector.day && id == connector.week" v-bind:style="connector.style.join(' ')"></div>
                             <div class="block" v-for="block in $parent.blocks" v-if="day.getDay() == block.day && id == block.week" v-bind:style="block.style.join(' ')"></div>
                             <h3 v-bind:class="getDayColor(day)">{{ day.getDate() }}</h3>
                         </div>
@@ -10,25 +10,6 @@ Vue.component('calendar-week', {
                </tr>`,
     props: ['week', 'id'],
     methods: {
-        connectorMargin: function () {
-            setTimeout(() => {
-                var connectors = document.getElementById(this.id).querySelectorAll('.connector');
-                for (let index = 0; index < connectors.length; index++) {
-                    var connector = connectors[index];
-    
-                    if (connectors.length - 1 == 0) {
-                        return;
-                    }
-    
-                    if (index < connectors.length / 2) {
-                        connector.style.marginTop = 3.5 / connectors.length + 'vw';
-                    }
-                    if (index >= connectors.length / 2) {
-                        connector.style.marginTop = -3.5 / connectors.length + 'vw';
-                    }
-                }
-            }, 0);
-        },
         getDayColor: function (day) {
             var classes = [];
 
@@ -67,12 +48,6 @@ Vue.component('calendar-week', {
             }
         }
 
-        function getbackgroundcolor(id) {
-            return 'rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5)';
-        }
-
-
-
         var vm = this,
             thisweek = document.getElementById(vm.id),
             container = document.getElementById('calendarContainer');
@@ -110,9 +85,22 @@ Vue.component('calendar-week', {
         */
 
         //the issue at hand here is that we can't just treat each week as immutable. We need to have vue determine how many blocks and connectors need to be rendered.
+    },
+    updated: function () {
+        var connectors = document.getElementById(this.id).querySelectorAll('.connector');
+        for (let index = 0; index < connectors.length; index++) {
+            var connector = connectors[index];
 
-        setTimeout(() => {
+            if (connectors.length - 1 == 0) {
+                return;
+            }
 
-        }, 1000);
+            if (index < connectors.length / 2) {
+                connector.style.marginTop = 3.5 / connectors.length + 'vw';
+            }
+            if (index >= connectors.length / 2) {
+                connector.style.marginTop = -3.5 / connectors.length + 'vw';
+            }
+        }
     }
 });

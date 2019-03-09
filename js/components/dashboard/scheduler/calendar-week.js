@@ -15,11 +15,11 @@ Vue.component('calendar-week', {
                 var connectors = document.getElementById(this.id).querySelectorAll('.connector');
                 for (let index = 0; index < connectors.length; index++) {
                     var connector = connectors[index];
-
+    
                     if (connectors.length - 1 == 0) {
                         return;
                     }
-                    
+    
                     if (index < connectors.length / 2) {
                         connector.style.marginTop = 3.5 / connectors.length + 'vw';
                     }
@@ -27,7 +27,7 @@ Vue.component('calendar-week', {
                         connector.style.marginTop = -3.5 / connectors.length + 'vw';
                     }
                 }
-            }, 1000);
+            }, 0);
         },
         getDayColor: function (day) {
             var classes = [];

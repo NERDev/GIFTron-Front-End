@@ -64,9 +64,11 @@ Vue.component('dashboard-scheduler', {
                 }
             }
 
+
             vm.guild.giveaways.forEach((giveaway) => {
                 var start = giveaway.split('-')[1] * 1000;
-                if (+reference < start && start < +tomorrow) {
+                var parts = [+reference, +tomorrow].sort();
+                if (parts[0] < start && start < parts[1]) {
                     var xhttp = new XMLHttpRequest();
                     xhttp.onreadystatechange = function () {
                         if (this.readyState == 4) {

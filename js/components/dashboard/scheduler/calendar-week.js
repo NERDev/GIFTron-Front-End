@@ -2,8 +2,8 @@ Vue.component('calendar-week', {
     template: `<tr v-bind:id="id">
                     <td v-for="day in week">
                         <div v-bind:class="getDayColor(day)">
-                            <div class="connector" v-for="(connector, index) in $parent.connectors" v-if="day.getDay() == connector.day && id == connector.week" v-bind:style="connector.style.join(' ')"></div>
-                            <div class="block" v-for="block in $parent.blocks" v-if="day.getDay() == block.day && id == block.week" v-bind:style="block.style.join(' ')"></div>
+                            <div class="connector" v-for="(connector, index) in $parent.connectors" v-if="day.getDay() == connector.day && id == connector.week" v-bind:id="index"></div>
+                            <div class="block" v-for="(block, index) in $parent.blocks" v-if="day.getDay() == block.day && id == block.week" v-bind:id="index" v-bind:style="block.style.join(' ')"></div>
                             <h3 v-bind:class="getDayColor(day)">{{ day.getDate() }}</h3>
                         </div>
                     </td>
@@ -87,20 +87,67 @@ Vue.component('calendar-week', {
         //the issue at hand here is that we can't just treat each week as immutable. We need to have vue determine how many blocks and connectors need to be rendered.
     },
     updated: function () {
-        var connectors = document.getElementById(this.id).querySelectorAll('.connector');
-        for (let index = 0; index < connectors.length; index++) {
-            var connector = connectors[index];
 
-            if (connectors.length - 1 == 0) {
-                return;
-            }
+        var vm = this;
 
-            if (index < connectors.length / 2) {
-                connector.style.marginTop = 3.5 / connectors.length + 'vw';
+        setTimeout(() => {
+            var blocks = document.getElementById(this.id).querySelectorAll('.block');
+            for (let index = 0; index < blocks.length; index++) {
+                var block = blocks[index];
+                var day = block.parentElement;
+                var dayblocks = day.querySelectorAll('.block');
+                var calculatedwidth = ((1 / dayblocks.length) * 100);
+                if (calculatedwidth < 100) {
+                    block.style.width = calculatedwidth + '%';
+                }
             }
-            if (index >= connectors.length / 2) {
-                connector.style.marginTop = -3.5 / connectors.length + 'vw';
+    
+    
+    
+            var connectors = document.getElementById(this.id).querySelectorAll('.connector');
+            var mid = Math.floor(connectors.length / 2);
+            for (let index = 0; index < connectors.length; index++) {
+                var connector = connectors[index];
+                connector.style = vm.$parent.connectors[connector.id].style.join(' ');
+                var blocks = Array.from(document.getElementById(this.id).querySelectorAll('[id$="' + connector.id.split('-')[1] + '"]')).map((x) => {
+                    if (x.classList[0] != 'connector') {
+                        return x;
+                    }
+                }).filter(x => x);
+
+                if (blocks.length == 1) {
+                    var leftdifference = connector.getBoundingClientRect().left - blocks[0].getBoundingClientRect().right;
+                    var rightdifference = connector.getBoundingClientRect().right - blocks[0].getBoundingClientRect().left;
+                    console.log(blocks[0], connector, leftdifference, rightdifference);
+                    if (Math.abs(leftdifference) < Math.abs(rightdifference)) {
+                        if (parseInt(leftdifference)) {
+                            console.log('we have ' + 'left: ' + (-leftdifference) + 'px;' + ' to clear left');
+                            vm.$parent.connectors[connector.id].style.push('left: calc(10vw + ' + (-leftdifference) + 'px);');
+                        }
+                    } else {
+                        if (parseInt(rightdifference)) {
+                            console.log('we have ' + 'right: ' + (-rightdifference) + 'px;' + ' to clear left');
+                            vm.$parent.connectors[connector.id].style.push('right: calc(10vw - ' + (-rightdifference) + 'px);');
+                        }
+                    }
+                } else if (blocks.length == 2) {
+                    console.log('looks like weve got two blocks to connect');
+                }
+                connector.style = vm.$parent.connectors[connector.id].style.join(' ');
+    
+                if (connectors.length - 1 != 0) {
+                    if (index < mid) {
+                        var unit = 3.5 / connectors.length;
+                        console.log((unit * (Math.abs(mid - index))));
+                        connector.style.marginTop = (unit * (Math.abs(mid - index))) + 'vw';
+                    }
+                    if (index > mid) {
+                        var unit = -3.5 / connectors.length;
+                        console.log((unit * (Math.abs(mid - index))));
+                        connector.style.marginTop = (unit * (Math.abs(mid - index))) + 'vw';
+                    }
+                }
             }
-        }
+        }, 10);
     }
 });

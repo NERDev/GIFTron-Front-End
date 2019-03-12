@@ -132,7 +132,7 @@ Vue.component('dashboard-scheduler', {
             var vm = this;
 
             function getbackgroundcolor(id) {
-                return 'rgba(' + id.substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',0.5)';
+                return 'rgba(' + id.split('-')[2].substring(0, 9).match(/.{1,3}/g).map(x => x % 250).join(',') + ',1)';
             }
 
             if (Object.keys(vm.giveaways).length) {
@@ -183,15 +183,17 @@ Vue.component('dashboard-scheduler', {
                                     style: ['background-color: ' + getbackgroundcolor(id) + ';', 'left: 10vw;'],
                                     week: +startWeek,
                                     day: giveawayStart.getDay(),
+                                    block: [idParts[1], idParts[2]].join('-')
                                 });
                             }
 
                             if (giveawayEnd.getDay()) {
                                 //We've got some space to fill for the end, we'll make a connector.
-                                Vue.set(vm.connectors, [+endWeek, idParts[2]].join('-'), {
+                                Vue.set(vm.connectors, [idParts[0], idParts[2]].join('-'), {
                                     style: ['background-color: ' + getbackgroundcolor(id) + ';', 'right: 10vw;'],
                                     week: +endWeek,
                                     day: giveawayEnd.getDay(),
+                                    block: [idParts[1], idParts[2]].join('-')
                                 });
                             }
 

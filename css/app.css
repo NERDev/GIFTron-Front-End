@@ -500,7 +500,7 @@ button.main:hover {
 }
 
 #dashboardScheduler .block {
-    position: absolute;
+    display: inline-block;
 }
 
 #dashboardScheduler .connector {
@@ -536,6 +536,7 @@ button.main:hover {
     line-height: 1em;
     position: absolute;
     z-index: 1;
+    top: 0;
 }
 
 #dashboardScheduler table tr td div {

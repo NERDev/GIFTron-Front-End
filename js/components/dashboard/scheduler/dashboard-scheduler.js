@@ -162,15 +162,49 @@ Vue.component('dashboard-scheduler', {
                             var newStart = giveaway.end;
                             var newEnd = giveaway.end + (giveaway.end - giveaway.start);
                             var newId = [newEnd, newStart, id.split('-')[2]].join('-');
-                            Vue.set(vm.giveaways, newId, {
+                            var newGiveaway = {
                                 start: newStart,
                                 end: newEnd,
                                 recurring: true,
                                 channel: giveaway.channel,
                                 game_id: giveaway.game_id,
                                 visible: giveaway.visible,
-                                guild_id: giveaway.guild_id
-                            });
+                                guild_id: giveaway.guild_id,
+                                beginning: giveaway.beginning
+                            };
+
+                            if (giveaway.beginning < giveaway.start) {
+                                //lets get the most recent expected ID...
+                                var priorEnd = giveaway.start;
+                                var priorStart = priorEnd - (giveaway.end - giveaway.start);
+                                var priorId = [priorEnd, priorStart, id.split('-')[2]].join('-');
+                                var priorGiveaway = {
+                                    start: priorStart,
+                                    end: priorEnd,
+                                    recurring: true,
+                                    channel: giveaway.channel,
+                                    game_id: giveaway.game_id,
+                                    visible: giveaway.visible,
+                                    guild_id: giveaway.guild_id,
+                                    beginning: giveaway.beginning
+                                };
+                                if (priorStart >= giveaway.beginning) {
+                                    if (!vm.giveaways[priorId]) {
+                                        Vue.set(vm.giveaways, priorId, priorGiveaway);
+                                    }
+                                }
+                            } else {
+                                console.log('this is the start, there is no prior giveaways to this');
+                            }
+
+                            if (giveaway.count > 0 || typeof giveaway.count === 'undefined') {
+                                if (giveaway.count > 0) {
+                                    newGiveaway['count'] = giveaway.count - 1;
+                                }
+                                if (!vm.giveaways[newId]) {
+                                    Vue.set(vm.giveaways, newId, newGiveaway);
+                                }
+                            }
                         } else {
                             //This is a one-off giveaway. We're definitely rendering the start block, so we can at least take care of that right away.
 

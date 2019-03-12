@@ -158,13 +158,20 @@ Vue.component('dashboard-scheduler', {
                                 day: giveawayStart.getDay(),
                             });
 
+                            var needsendconnector = false;
                             //The question now is, do we need anything else? Let's find out.
                             if (+startWeek == +endWeek) {
                                 //This one-off giveaway has the same week for its start and end.
                                 if (giveawayStart.getDay() == giveawayEnd.getDay()) {
                                     //It's on the same day though. We're not going to bother with rendering anything else.
                                     return;
+                                } else if (giveawayEnd.getDay() - giveawayStart.getDay() <= 1) {
+                                    //It's only a day's difference... No need to render a connector.
+                                } else {
+                                    //We have more than a day's difference... We are going to need a single conector.
                                 }
+                            } else {
+                                needsendconnector = true;
                             }
 
                             //Alright, let's go ahead and make the end block.
@@ -187,14 +194,16 @@ Vue.component('dashboard-scheduler', {
                                 });
                             }
 
-                            if (giveawayEnd.getDay()) {
-                                //We've got some space to fill for the end, we'll make a connector.
-                                Vue.set(vm.connectors, [idParts[0], idParts[2]].join('-'), {
-                                    style: ['background-color: ' + getbackgroundcolor(id) + ';', 'right: 10vw;'],
-                                    week: +endWeek,
-                                    day: giveawayEnd.getDay(),
-                                    block: [idParts[1], idParts[2]].join('-')
-                                });
+                            if (needsendconnector) {
+                                if (giveawayEnd.getDay()) {
+                                    //We've got some space to fill for the end, we'll make a connector.
+                                    Vue.set(vm.connectors, [idParts[0], idParts[2]].join('-'), {
+                                        style: ['background-color: ' + getbackgroundcolor(id) + ';', 'right: 10vw;'],
+                                        week: +endWeek,
+                                        day: giveawayEnd.getDay(),
+                                        block: [idParts[0], idParts[2]].join('-')
+                                    });
+                                }
                             }
 
                             //Now for the interim weeks.
@@ -207,9 +216,6 @@ Vue.component('dashboard-scheduler', {
                                     week: +interimweek,
                                     day: interimweek.getDay(),
                                 });
-                                if (+interimweek == '1552798800000') {
-                                    console.log(vm.connectors[[+interimweek, idParts[2]].join('-')]);
-                                }
                             }
                         }
                     }

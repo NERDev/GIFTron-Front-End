@@ -123,15 +123,22 @@ Vue.component('calendar-week', {
                         if (parseInt(leftdifference)) {
                             console.log('we have ' + 'left: ' + (-leftdifference) + 'px;' + ' to clear left');
                             vm.$parent.connectors[connector.id].style.push('left: calc(10vw + ' + (-leftdifference) + 'px);');
+                            vm.$parent.connectors[connector.id].style.push('width: ' + (document.getElementById(this.id).childNodes[document.getElementById(this.id).childNodes.length - 1].getBoundingClientRect().right - blocks[0].getBoundingClientRect().right) + 'px;');
                         }
                     } else {
                         if (parseInt(rightdifference)) {
-                            console.log('we have ' + 'right: ' + (-rightdifference) + 'px;' + ' to clear left');
+                            console.log('we have ' + 'right: ' + (-rightdifference) + 'px;' + ' to clear right');
                             vm.$parent.connectors[connector.id].style.push('right: calc(10vw - ' + (-rightdifference) + 'px);');
+                            console.log('kek', blocks[0], document.getElementById(this.id).childNodes[0]);
+                            vm.$parent.connectors[connector.id].style.push('width: ' + (blocks[0].getBoundingClientRect().left - document.getElementById(this.id).childNodes[0].getBoundingClientRect().left) + 'px;');
                         }
                     }
                 } else if (blocks.length == 2) {
-                    console.log('looks like weve got two blocks to connect');
+                    vm.$parent.connectors[connector.id].style.push('left: calc(10vw - 1px);');
+                    vm.$parent.connectors[connector.id].style.push('width: ' + (blocks[1].getBoundingClientRect().left - blocks[0].getBoundingClientRect().right) + 'px;');
+                } else {
+                    vm.$parent.connectors[connector.id].style.push('left: -1px;');
+                    vm.$parent.connectors[connector.id].style.push('width: ' + (document.getElementById(this.id).childNodes[document.getElementById(this.id).childNodes.length - 1].getBoundingClientRect().right - connector.getBoundingClientRect().left - 1) + 'px;');
                 }
                 connector.style = vm.$parent.connectors[connector.id].style.join(' ');
     

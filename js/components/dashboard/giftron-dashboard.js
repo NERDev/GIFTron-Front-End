@@ -139,7 +139,7 @@ Vue.component('giftron-dashboard', {
                                 console.log('no guild');
                                 anime({
                                     targets: '.panel',
-                                    translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+                                    translateY: -(document.getElementById('content').clientHeight) + 'px'
                                 });
                             }
                         }
@@ -173,7 +173,7 @@ Vue.component('giftron-dashboard', {
                             if (p.style.transform == 'translateY(0vh)') {
                                 anime({
                                     targets: '#' + p.id,
-                                    translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+                                    translateY: -(document.getElementById('content').clientHeight) + 'px'
                                 });
                             }
                         });
@@ -207,7 +207,7 @@ Vue.component('giftron-dashboard', {
                                     });
                                     anime({
                                         targets: '.panel',
-                                        translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+                                        translateY: -(document.getElementById('content').clientHeight) + 'px'
                                     });
                                 }
                             }

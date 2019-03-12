@@ -15,7 +15,7 @@ Vue.component('setup-buttons', {
             setTimeout(() => {
                 anime({
                     targets: '#setupPanel',
-                    translateY: -(document.getElementById('dashboard').clientHeight) + 'px'
+                    translateY: -(document.getElementById('content').clientHeight) + 'px'
                 });
                 setTimeout(() => {
                     //dirty af but it gets the job done

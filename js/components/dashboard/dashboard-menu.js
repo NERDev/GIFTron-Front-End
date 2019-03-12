@@ -47,7 +47,7 @@ Vue.component('dashboard-menu', {
                     document.getElementById('dashboardShards').style.display = 'none';
                     anime({
                         targets: '#schedulerViews',
-                        translateY: -(document.getElementById('dashboard').clientHeight + 50) + 'px'
+                        translateY: -(document.getElementById('content').clientHeight + 50) + 'px'
                     });
                     break;
                 case 'shards':
@@ -55,7 +55,7 @@ Vue.component('dashboard-menu', {
                     document.getElementById('dashboardShards').style.display = '';
                     anime({
                         targets: '#schedulerViews',
-                        translateY: -(document.getElementById('dashboard').clientHeight + 50) + 'px'
+                        translateY: -(document.getElementById('content').clientHeight + 50) + 'px'
                     });
                     break;
 
@@ -77,13 +77,14 @@ Vue.component('dashboard-menu', {
                     });
                     anime({
                         targets: '#dashboardSettings',
-                        translateY: -(document.getElementById('dashboard').clientHeight + 50) + 'px'
+                        translateY: -(document.getElementById('content').clientHeight + 50) + 'px'
                     });
                     break;
             }
         }
     },
     mounted: function () {
+        console.log('going to schedule');
         this.goto('schedule');
     }
 });

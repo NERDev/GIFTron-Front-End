@@ -2,8 +2,8 @@ Vue.component('calendar-week', {
     template: `<tr v-bind:id="id">
                     <td v-for="day in week">
                         <div v-bind:class="getDayColor(day)">
-                            <div class="connector" v-for="(connector, index) in $parent.connectors" v-if="day.getDay() == connector.day && id == connector.week" v-bind:id="index"></div>
-                            <div class="block" v-for="(block, index) in $parent.blocks" v-if="day.getDay() == block.day && id == block.week" v-bind:id="index" v-bind:style="block.style.join(' ')"></div>
+                            <div class="connector" v-for="(connector, index) in $parent.connectors[id]" v-if="day.getDay() == connector.day" v-bind:id="index"></div>
+                            <div class="block" v-for="(block, index) in $parent.blocks[id]" v-if="day.getDay() == block.day" v-bind:id="index" v-bind:style="block.style.join(' ')"></div>
                             <h3 v-bind:class="getDayColor(day)">{{ day.getDate() }}</h3>
                         </div>
                     </td>
@@ -108,7 +108,7 @@ Vue.component('calendar-week', {
             var mid = Math.floor(connectors.length / 2);
             for (let index = 0; index < connectors.length; index++) {
                 var connector = connectors[index];
-                connector.style = vm.$parent.connectors[connector.id].style.join(' ');
+                connector.style = vm.$parent.connectors[connector.closest('tr').id][connector.id].style.join(' ');
                 var blocks = Array.from(document.getElementById(this.id).querySelectorAll('[id$="' + connector.id.split('-')[1] + '"]')).map((x) => {
                     if (x.classList[0] != 'connector') {
                         return x;
@@ -118,39 +118,44 @@ Vue.component('calendar-week', {
                 if (blocks.length == 1) {
                     var leftdifference = connector.getBoundingClientRect().left - blocks[0].getBoundingClientRect().right;
                     var rightdifference = connector.getBoundingClientRect().right - blocks[0].getBoundingClientRect().left;
-                    console.log(blocks[0], connector, leftdifference, rightdifference);
+                    //console.log(blocks[0], connector, leftdifference, rightdifference);
                     if (Math.abs(leftdifference) < Math.abs(rightdifference)) {
                         if (parseInt(leftdifference)) {
-                            console.log('we have ' + 'left: ' + (-leftdifference) + 'px;' + ' to clear left');
-                            vm.$parent.connectors[connector.id].style.push('left: calc(10vw + ' + (-leftdifference) + 'px);');
-                            vm.$parent.connectors[connector.id].style.push('width: ' + (document.getElementById(this.id).childNodes[document.getElementById(this.id).childNodes.length - 1].getBoundingClientRect().right - blocks[0].getBoundingClientRect().right) + 'px;');
+                            //console.log('we have ' + 'left: ' + (-leftdifference) + 'px;' + ' to clear left');
+                            vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: calc(10vw + ' + (-leftdifference) + 'px);');
+                            vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + (document.getElementById(this.id).childNodes[document.getElementById(this.id).childNodes.length - 1].getBoundingClientRect().right - blocks[0].getBoundingClientRect().right) + 'px;');
                         }
                     } else {
                         if (parseInt(rightdifference)) {
-                            console.log('we have ' + 'right: ' + (-rightdifference) + 'px;' + ' to clear right');
-                            vm.$parent.connectors[connector.id].style.push('right: calc(10vw - ' + (-rightdifference) + 'px);');
-                            console.log('kek', blocks[0], document.getElementById(this.id).childNodes[0]);
-                            vm.$parent.connectors[connector.id].style.push('width: ' + (blocks[0].getBoundingClientRect().left - document.getElementById(this.id).childNodes[0].getBoundingClientRect().left) + 'px;');
+                            //console.log('we have ' + 'right: ' + (-rightdifference) + 'px;' + ' to clear right');
+                            vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('right: calc(10vw - ' + (-rightdifference) + 'px);');
+                            //console.log('kek', blocks[0], document.getElementById(this.id).childNodes[0]);
+                            vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + (blocks[0].getBoundingClientRect().left - document.getElementById(this.id).childNodes[0].getBoundingClientRect().left) + 'px;');
                         }
                     }
                 } else if (blocks.length == 2) {
-                    vm.$parent.connectors[connector.id].style.push('left: calc(10vw - 1px);');
-                    vm.$parent.connectors[connector.id].style.push('width: ' + (blocks[1].getBoundingClientRect().left - blocks[0].getBoundingClientRect().right) + 'px;');
+                    var difference = Math.abs(blocks[0].getBoundingClientRect().right - connector.getBoundingClientRect().left);
+                    if (parseInt(difference) > 2) {
+                        console.log(difference);
+                        vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: ' + (difference - 1) + 'px;');
+                    }
+
+                    vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + (blocks[1].getBoundingClientRect().left - blocks[0].getBoundingClientRect().right) + 'px;');
                 } else {
-                    vm.$parent.connectors[connector.id].style.push('left: -1px;');
-                    vm.$parent.connectors[connector.id].style.push('width: ' + (document.getElementById(this.id).childNodes[document.getElementById(this.id).childNodes.length - 1].getBoundingClientRect().right - connector.getBoundingClientRect().left - 1) + 'px;');
+                    vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: -1px;');
+                    vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + (document.getElementById(this.id).childNodes[document.getElementById(this.id).childNodes.length - 1].getBoundingClientRect().right - connector.getBoundingClientRect().left - 1) + 'px;');
                 }
-                connector.style = vm.$parent.connectors[connector.id].style.join(' ');
+                connector.style = vm.$parent.connectors[connector.closest('tr').id][connector.id].style.join(' ');
     
                 if (connectors.length - 1 != 0) {
                     if (index < mid) {
                         var unit = 3.5 / connectors.length;
-                        console.log((unit * (Math.abs(mid - index))));
+                        //console.log((unit * (Math.abs(mid - index))));
                         connector.style.marginTop = (unit * (Math.abs(mid - index))) + 'vw';
                     }
                     if (index > mid) {
                         var unit = -3.5 / connectors.length;
-                        console.log((unit * (Math.abs(mid - index))));
+                        //console.log((unit * (Math.abs(mid - index))));
                         connector.style.marginTop = (unit * (Math.abs(mid - index))) + 'vw';
                     }
                 }

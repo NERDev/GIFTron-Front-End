@@ -97,7 +97,7 @@ Vue.component('dashboard-scheduler', {
             if (Object.keys(vm.calendar.bottomweeks).length < 4) {
                 console.log('getting close, loading more on the bottom');
                 var date = Object.keys(vm.calendar.bottomweeks).pop();
-                console.log(vm.calendar.bottomweeks);
+                //console.log(vm.calendar.bottomweeks);
                 if (!isFinite(date)) {
                     date = Object.keys(vm.calendar.visibleweeks).pop();
                 }
@@ -110,15 +110,15 @@ Vue.component('dashboard-scheduler', {
             } else if (Object.keys(vm.calendar.topweeks).length < 4) {
                 console.log('getting close, loading more on the top');
                 var date = Object.keys(vm.calendar.topweeks).shift();
-                console.log(vm.calendar.topweeks);
+                //console.log(vm.calendar.topweeks);
                 if (!isFinite(date)) {
                     date = Object.keys(vm.calendar.visibleweeks).shift();
                 }
 
                 if (date) {
-                    console.log(date, new Date(+date));
+                    //console.log(date, new Date(+date));
                     vm.generate(-10, new Date(+date));
-                    console.log(document.getElementById(+date));
+                    //console.log(document.getElementById(+date));
                     document.querySelector('#calendarContainer').scrollTop += document.querySelector('#calendarContainer tr').getBoundingClientRect().height * 9;
                 }
             }
@@ -139,7 +139,7 @@ Vue.component('dashboard-scheduler', {
                 Object.keys(vm.giveaways).forEach((id) => {
                     if (typeof vm.blocks[[id.split('-')[1], id.split('-')[2]].join('-')] == 'undefined') {
                         var idParts = id.split('-');
-                        console.log(vm.blocks[[idParts[1], idParts[2]].join('-')]);
+                        //console.log(vm.blocks[[idParts[1], idParts[2]].join('-')]);
                         giveaway = vm.giveaways[id];
                         giveawayStart = new Date(idParts[1] * 1000);
                         giveawayEnd = new Date(idParts[0] * 1000);
@@ -158,7 +158,7 @@ Vue.component('dashboard-scheduler', {
 
                         if (giveaway.recurring) {
                             //This is a recurring giveaway.
-                            console.log(giveaway);
+                            //console.log(giveaway);
                             var newStart = giveaway.end;
                             var newEnd = giveaway.end + (giveaway.end - giveaway.start);
                             var newId = [newEnd, newStart, id.split('-')[2]].join('-');
@@ -194,7 +194,7 @@ Vue.component('dashboard-scheduler', {
                                     }
                                 }
                             } else {
-                                console.log('this is the start, there is no prior giveaways to this');
+                                //console.log('this is the start, there is no prior giveaways to this');
                             }
 
                             if (giveaway.count > 0 || typeof giveaway.count === 'undefined') {

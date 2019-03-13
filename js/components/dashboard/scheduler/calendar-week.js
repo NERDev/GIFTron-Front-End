@@ -97,7 +97,7 @@ Vue.component('calendar-week', {
                 var day = block.parentElement;
                 var dayblocks = day.querySelectorAll('.block');
                 var calculatedwidth = ((1 / dayblocks.length) * 100);
-                if (calculatedwidth < 100) {
+                if (calculatedwidth != block.style.width) {
                     block.style.width = calculatedwidth + '%';
                 }
             }
@@ -136,7 +136,6 @@ Vue.component('calendar-week', {
                 } else if (blocks.length == 2) {
                     var difference = Math.abs(blocks[0].getBoundingClientRect().right - connector.getBoundingClientRect().left);
                     if (parseInt(difference) > 2) {
-                        console.log(difference);
                         vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: ' + (difference - 1) + 'px;');
                     }
 

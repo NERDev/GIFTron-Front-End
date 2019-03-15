@@ -10,6 +10,12 @@ main {
     overflow: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 hr {
@@ -823,6 +829,14 @@ button.main:hover {
     border-style: solid;
     overflow: hidden;
     transition: box-shadow 0.15s ease;
+}
+
+.serverList .serverCard i {
+    position: absolute;
+    right: .25em;
+    top: .25em;
+    cursor: pointer;
+    z-index: 1;
 }
 
 .serverList .serverCard button {

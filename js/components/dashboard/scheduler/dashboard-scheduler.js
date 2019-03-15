@@ -310,6 +310,102 @@ Vue.component('dashboard-scheduler', {
 
         vm.generate(-10, sunday);
         vm.generate(10, sunday);
+
+        var flag = 0;
+        var isdown = false;
+        var element = document.querySelector('table');
+        var startingElement;
+        var endingElement;
+        var changedElements;
+        var lastindex = 0;
+        element.addEventListener("mousedown", function (e) {
+            flag = 0;
+            var elements = element.querySelectorAll('td');
+            isdown = true;
+            startingElement = document.elementFromPoint(e.clientX, e.clientY).closest('td');
+            lastindex = Array.prototype.indexOf.call(elements, startingElement);
+            changedElements = [];
+        }, false);
+        element.addEventListener("mousemove", function (e) {
+            flag = 1;
+            if (isdown) {
+                var elements = element.querySelectorAll('td');
+                var currentElement = document.elementFromPoint(e.clientX, e.clientY).closest('td');
+                if (currentElement) {
+                    var startingElementIndex = Array.prototype.indexOf.call(elements, startingElement);
+                    var currentElementIndex = Array.prototype.indexOf.call(elements, currentElement);
+                    var indeces = [startingElementIndex, currentElementIndex].sort(function(a, b){return a-b});
+                    for (let index = indeces[0]; index <= indeces[1]; index++) {
+                        var thisindex = currentElementIndex + 1;
+                        console.log(thisindex, lastindex, startingElementIndex);
+
+                        elements[startingElementIndex].childNodes[0].style.backgroundColor = '#9a9a9a';
+                        changedElements.push(elements[startingElementIndex].childNodes[0]);
+                        
+                        if (thisindex > lastindex) {
+                            if (thisindex <= startingElementIndex + 1) {
+                                console.log('were goin forward again', lastindex);
+                                Array(thisindex - lastindex).fill(lastindex - 1).map((x, y) => x + y).forEach((x) => {
+                                    changedElements.splice(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]),1);
+                                    elements[x].childNodes[0].style.backgroundColor = '';
+                                });
+                            } else {
+                                console.log('advancing ' + (thisindex - lastindex));
+                                console.log(Array(thisindex - lastindex).fill(thisindex).map((x, y) => x + y));
+                                Array(thisindex - lastindex).fill(lastindex).map((x, y) => x + y).forEach((x) => {
+                                    changedElements.push(elements[x].childNodes[0]);
+                                    if (elements[x].childNodes[0].style.backgroundColor) {
+                                        elements[x].childNodes[0].style.backgroundColor = '';
+                                    } else {
+                                        elements[x].childNodes[0].style.backgroundColor = '#9a9a9a';
+                                    }
+                                });
+                            }
+                        } else if (thisindex < lastindex) {
+                            if (thisindex <= startingElementIndex) {
+                                console.log('were goin backwards from ', startingElementIndex, elements[startingElementIndex], ' to ', thisindex - 1, elements[thisindex - 1]);
+                                console.log(startingElementIndex - (thisindex - 1), thisindex - 1);
+                                console.log(Array(startingElementIndex - thisindex + 2).fill(thisindex - 1).map((x, y) => x + y));
+                                Array(startingElementIndex - thisindex + 2).fill(thisindex - 1).map((x, y) => x + y).forEach((x) => {
+                                    console.log(elements[x]);
+                                    changedElements.push(elements[x].childNodes[0]);
+                                    elements[x].childNodes[0].style.backgroundColor = '#9a9a9a';
+                                });
+                            } else {
+                                console.log('subtracting ' + (lastindex - thisindex));
+                                Array(lastindex - thisindex).fill(thisindex).map((x, y) => x + y).forEach((x) => {
+                                    changedElements.splice(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]),1);
+                                    elements[x].childNodes[0].style.backgroundColor = '';
+                                });
+                            }
+                        } else {
+                            //console.log('staying');
+                        }
+                        lastindex = thisindex;
+                        /*
+                        elements[index].childNodes[0].style.backgroundColor = '#9a9a9a';
+                        changedElements.push(elements[index].childNodes[0]);                    
+                        console.log(startingElementIndex, currentElementIndex);
+                        */
+                    }
+                }
+            }
+        }, false);
+        document.addEventListener("mouseup", function (e) {
+            isdown = false;
+            for (let index = 0; index < changedElements.length; index++) {
+                console.log(changedElements[index]);
+                changedElements[index].style.backgroundColor = '';
+            }
+            endingElement = document.elementFromPoint(e.clientX, e.clientY).closest('td');
+            if (flag === 0) {
+                console.log("click");
+            }
+            else if (flag === 1) {
+                console.log("drag");
+                console.log(startingElement, endingElement);
+            }
+        }, false);
     },
     updated: function () {
         this.buildCalendarElements();

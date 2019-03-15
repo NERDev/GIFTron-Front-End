@@ -209,6 +209,16 @@ button.main:hover {
     align-items: center;
 }
 
+.vex-overlay {
+    background: rgba(0, 0, 0, 0.69)!important;
+}
+
+.vex.vex-theme-default .vex-content.modal {
+    background-color: #2C2F33;
+    color: #99aab5;
+    width: 45vw;
+}
+
 #snackbar {
     position: fixed;
     width: 90%;

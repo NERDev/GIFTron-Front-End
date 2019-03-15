@@ -92,4 +92,10 @@ window.onload = () => {
             };
         }
     });
+
+    vex.defaultOptions.contentClassName = 'modal';
+
+    setTimeout(() => {
+        app.$forceUpdate()
+    }, 10000);
 };

@@ -516,15 +516,22 @@ button.main:hover {
 }
 
 #dashboardScheduler .block {
-    display: inline-block;
+    display: inline-flex;
+    width: 15%!important;
+    height: 18%;
+    cursor: pointer;
+    margin-left: 5%;
 }
 
 #dashboardScheduler .connector {
     height: .5vw;
     position: absolute;
-    top: 3.5vw;
+    top: 0;
     z-index: 1;
     width: 100vw;
+    opacity: 0;
+    transition: .15s ease opacity;
+    visibility: hidden;
 }
 
 #dashboardScheduler table td {
@@ -542,6 +549,9 @@ button.main:hover {
     height: 8vw;
     width: 100%;
     position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 #dashboardScheduler table tr td div h3 {

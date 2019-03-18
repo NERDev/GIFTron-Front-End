@@ -3,13 +3,26 @@ Vue.component('calendar-week', {
                     <td v-for="day in week">
                         <div v-bind:class="getDayColor(day)">
                             <div class="connector" v-for="(connector, index) in $parent.connectors[id]" v-if="day.getDay() == connector.day" v-bind:id="index"></div>
-                            <div class="block" v-for="(block, index) in $parent.blocks[id]" v-if="day.getDay() == block.day" v-bind:id="index" v-bind:style="block.style.join(' ')"></div>
+                            <div class="block" v-for="(block, index) in $parent.blocks[id]" v-if="day.getDay() == block.day" v-bind:id="index" v-bind:style="block.style.join(' ')" v-on:mouseover="highlight('on', index)" v-on:mouseleave="highlight('off', index)"></div>
                             <h3 v-bind:class="getDayColor(day)">{{ day.getDate() }}</h3>
                         </div>
                     </td>
                </tr>`,
     props: ['week', 'id'],
     methods: {
+        highlight: function (event, id) {
+            if (event == 'on') {
+                document.getElementById(this.id).parentElement.querySelectorAll('[id$="' + id.split('-')[1] + '"]').forEach((e) => {
+                    e.style.opacity = 1;
+                    e.style.visibility = 'visible';
+                });
+            } else {
+                document.getElementById(this.id).parentElement.querySelectorAll('[id$="' + id.split('-')[1] + '"]').forEach((e) => {
+                    e.style.opacity = '';
+                    e.style.visibility = '';
+                });
+            }
+        },
         getDayColor: function (day) {
             var classes = [];
 
@@ -101,9 +114,9 @@ Vue.component('calendar-week', {
                     block.style.width = calculatedwidth + '%';
                 }
             }
-    
-    
-    
+
+
+
             var connectors = document.getElementById(this.id).querySelectorAll('.connector');
             var mid = Math.floor(connectors.length / 2);
             for (let index = 0; index < connectors.length; index++) {
@@ -118,6 +131,10 @@ Vue.component('calendar-week', {
                 if (blocks.length == 1) {
                     var leftdifference = connector.getBoundingClientRect().left - blocks[0].getBoundingClientRect().right;
                     var rightdifference = connector.getBoundingClientRect().right - blocks[0].getBoundingClientRect().left;
+                    var topdifference = blocks[0].getBoundingClientRect().top - connector.getBoundingClientRect().top;
+                    if (parseInt((topdifference + (connector.clientHeight / 1.1)))) {
+                        vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('top: ' + (topdifference + (connector.clientHeight / 1.1)) + 'px;');
+                    }
                     //console.log(blocks[0], connector, leftdifference, rightdifference);
                     if (Math.abs(leftdifference) < Math.abs(rightdifference)) {
                         if (parseInt(leftdifference)) {
@@ -142,10 +159,14 @@ Vue.component('calendar-week', {
                     vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + (blocks[1].getBoundingClientRect().left - blocks[0].getBoundingClientRect().right) + 'px;');
                 } else {
                     vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: -1px;');
+                    vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('top: 3.75vw;');
                     vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + (document.getElementById(this.id).childNodes[document.getElementById(this.id).childNodes.length - 1].getBoundingClientRect().right - connector.getBoundingClientRect().left - 1) + 'px;');
                 }
                 connector.style = vm.$parent.connectors[connector.closest('tr').id][connector.id].style.join(' ');
-    
+
+
+
+                /*
                 if (connectors.length - 1 != 0) {
                     if (index < mid) {
                         var unit = 3.5 / connectors.length;
@@ -158,6 +179,7 @@ Vue.component('calendar-week', {
                         connector.style.marginTop = (unit * (Math.abs(mid - index))) + 'vw';
                     }
                 }
+                */
             }
         }, 10);
     }

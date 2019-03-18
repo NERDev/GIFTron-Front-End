@@ -236,31 +236,24 @@ Vue.component('dashboard-scheduler', {
                             //So... now we have to figure out connectors. We've got two types of connectors: start/end, and interim.
                             //Let's take care of the start/end first, where applicable.
 
-                            if (giveawayStart.getDay() < 6) {
-                                //We've got some space to fill for the start, we'll make a connector.
-                                if (typeof vm.connectors[+startWeek] === 'undefined') {
-                                    Vue.set(vm.connectors, +startWeek, {});
-                                }
-                                Vue.set(vm.connectors[+startWeek], [+startWeek, idParts[2]].join('-'), {
-                                    style: ['background-color: ' + getbackgroundcolor(id) + ';', 'left: 10vw;'],
-                                    day: giveawayStart.getDay(),
-                                    block: [idParts[1], idParts[2]].join('-')
-                                });
+                            //We've got some space to fill for the start, we'll make a connector.
+                            if (typeof vm.connectors[+startWeek] === 'undefined') {
+                                Vue.set(vm.connectors, +startWeek, {});
                             }
-
-                            if (needsendconnector) {
-                                if (giveawayEnd.getDay()) {
-                                    //We've got some space to fill for the end, we'll make a connector.
-                                    if (typeof vm.connectors[+endWeek] === 'undefined') {
-                                        Vue.set(vm.connectors, +endWeek, {});
-                                    }
-                                    Vue.set(vm.connectors[+endWeek], [idParts[0], idParts[2]].join('-'), {
-                                        style: ['background-color: ' + getbackgroundcolor(id) + ';', 'right: 10vw;'],
-                                        day: giveawayEnd.getDay(),
-                                        block: [idParts[0], idParts[2]].join('-')
-                                    });
-                                }
+                            Vue.set(vm.connectors[+startWeek], [+startWeek, idParts[2]].join('-'), {
+                                style: ['background-color: ' + getbackgroundcolor(id) + ';', 'left: 10vw;'],
+                                day: giveawayStart.getDay(),
+                                block: [idParts[1], idParts[2]].join('-')
+                            });
+                            //We've got some space to fill for the end, we'll make a connector.
+                            if (typeof vm.connectors[+endWeek] === 'undefined') {
+                                Vue.set(vm.connectors, +endWeek, {});
                             }
+                            Vue.set(vm.connectors[+endWeek], [idParts[0], idParts[2]].join('-'), {
+                                style: ['background-color: ' + getbackgroundcolor(id) + ';', 'right: 10vw;'],
+                                day: giveawayEnd.getDay(),
+                                block: [idParts[0], idParts[2]].join('-')
+                            });
 
                             //Now for the interim weeks.
                             var workingTime = new Date(startWeek);
@@ -423,9 +416,10 @@ Vue.component('dashboard-scheduler', {
                     } else {
                         if (flag === 0) {
                             console.log("creating a recurring giveaway starting on ", startDate);
-                            vex.open({
+                            
+                            /*vex.open({
                                 unsafeContent: `<giveaway-setup></giveaway-setup>`
-                            });
+                            });*/
                         }
                         else if (flag === 1) {
                             console.log('creating a one-off giveaway from ', startDate, ' to ', endDate);

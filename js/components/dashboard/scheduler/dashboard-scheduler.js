@@ -245,15 +245,17 @@ Vue.component('dashboard-scheduler', {
                                 day: giveawayStart.getDay(),
                                 block: [idParts[1], idParts[2]].join('-')
                             });
-                            //We've got some space to fill for the end, we'll make a connector.
-                            if (typeof vm.connectors[+endWeek] === 'undefined') {
-                                Vue.set(vm.connectors, +endWeek, {});
+                            if (+startWeek != +endWeek) {
+                                //We've got some space to fill for the end, we'll make a connector.
+                                if (typeof vm.connectors[+endWeek] === 'undefined') {
+                                    Vue.set(vm.connectors, +endWeek, {});
+                                }
+                                Vue.set(vm.connectors[+endWeek], [idParts[0], idParts[2]].join('-'), {
+                                    style: ['background-color: ' + getbackgroundcolor(id) + ';', 'right: 10vw;'],
+                                    day: giveawayEnd.getDay(),
+                                    block: [idParts[0], idParts[2]].join('-')
+                                });
                             }
-                            Vue.set(vm.connectors[+endWeek], [idParts[0], idParts[2]].join('-'), {
-                                style: ['background-color: ' + getbackgroundcolor(id) + ';', 'right: 10vw;'],
-                                day: giveawayEnd.getDay(),
-                                block: [idParts[0], idParts[2]].join('-')
-                            });
 
                             //Now for the interim weeks.
                             var workingTime = new Date(startWeek);
@@ -416,7 +418,7 @@ Vue.component('dashboard-scheduler', {
                     } else {
                         if (flag === 0) {
                             console.log("creating a recurring giveaway starting on ", startDate);
-                            
+
                             /*vex.open({
                                 unsafeContent: `<giveaway-setup></giveaway-setup>`
                             });*/

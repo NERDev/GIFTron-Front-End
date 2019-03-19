@@ -151,12 +151,39 @@ Vue.component('calendar-week', {
                         }
                     }
                 } else if (blocks.length == 2) {
+                    var topdifference = blocks[0].getBoundingClientRect().top - connector.getBoundingClientRect().top;
+                    var blockdifference = blocks[0].getBoundingClientRect().top - blocks[1].getBoundingClientRect().top;
                     var difference = Math.abs(blocks[0].getBoundingClientRect().right - connector.getBoundingClientRect().left);
-                    if (parseInt(difference) > 2) {
-                        vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: ' + (difference - 1) + 'px;');
+
+                    if (parseInt((topdifference + (connector.clientHeight / 1.1)))) {
+                        vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('top: ' + (topdifference + (connector.clientHeight / 1.1)) + 'px;');
                     }
 
-                    vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + (blocks[1].getBoundingClientRect().left - blocks[0].getBoundingClientRect().right) + 'px;');
+                    if (blockdifference) {
+                        if (parseInt(difference) > 2) {
+                            vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: calc(10vw + ' + (-difference) + 'px);');
+                            vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + ((blocks[1].getBoundingClientRect().left - blocks[0].getBoundingClientRect().right) + ((blocks[1].clientWidth / 2) + (connector.clientHeight / 2)) + 'px;'));
+                        }
+
+                        if (connector.childNodes.length == 0) {
+                            var tendril = document.createElement('div');
+                            tendril.style.height = Math.abs(blockdifference) + 'px';
+                            tendril.style.backgroundColor = connector.style.backgroundColor;
+                            connector.appendChild(tendril);
+                        } else {
+                            connector.childNodes[0].style.height = Math.abs(blockdifference);
+                        }
+
+                        if (blockdifference > 0) {
+                            tendril.style.marginTop = blockdifference;
+                        }
+                    } else {
+                        if (parseInt(difference) > 2) {
+                            vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: calc(10vw + ' + (-difference) + 'px);');
+                            vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('width: ' + (blocks[1].getBoundingClientRect().left - blocks[0].getBoundingClientRect().right) + 'px;');
+                        }
+                    }
+
                 } else {
                     vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('left: -1px;');
                     vm.$parent.connectors[connector.closest('tr').id][connector.id].style.push('top: 3.75vw;');

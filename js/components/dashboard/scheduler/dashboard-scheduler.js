@@ -328,6 +328,7 @@ Vue.component('dashboard-scheduler', {
             changedElements = [];
         }, false);
         element.addEventListener("mousemove", function (e) {
+            const activeColor = '#9a9a9a';
             if (isdown && Math.abs(e.clientX - startcoordinates.x) > 5 && Math.abs(e.clientY - startcoordinates.y) > 5) {
                 flag = 1;
                 var elements = element.querySelectorAll('td');
@@ -341,7 +342,7 @@ Vue.component('dashboard-scheduler', {
                         var thisindex = currentElementIndex + 1;
                         console.log(thisindex, lastindex, startingElementIndex);
 
-                        elements[startingElementIndex].childNodes[0].style.backgroundColor = '#9a9a9a';
+                        elements[startingElementIndex].childNodes[0].style.backgroundColor = activeColor;
                         if (!(Array.prototype.indexOf.call(changedElements, elements[startingElementIndex].childNodes[0]) + 1)) {
                             changedElements.push(elements[startingElementIndex].childNodes[0]);
                         }
@@ -364,7 +365,7 @@ Vue.component('dashboard-scheduler', {
                                     if (elements[x].childNodes[0].style.backgroundColor) {
                                         elements[x].childNodes[0].style.backgroundColor = '';
                                     } else {
-                                        elements[x].childNodes[0].style.backgroundColor = '#9a9a9a';
+                                        elements[x].childNodes[0].style.backgroundColor = activeColor;
                                     }
                                 });
                             }
@@ -378,7 +379,7 @@ Vue.component('dashboard-scheduler', {
                                     if (!(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]) + 1)) {
                                         changedElements.push(elements[x].childNodes[0]);
                                     }
-                                    elements[x].childNodes[0].style.backgroundColor = '#9a9a9a';
+                                    elements[x].childNodes[0].style.backgroundColor = activeColor;
                                 });
                             } else {
                                 console.log('subtracting ' + (lastindex - thisindex));

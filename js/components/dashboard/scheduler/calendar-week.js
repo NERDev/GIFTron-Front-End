@@ -2,8 +2,8 @@ Vue.component('calendar-week', {
     template: `<tr v-bind:id="id">
                     <td v-for="day in week">
                         <div v-bind:class="getDayColor(day)">
-                            <div class="connector" v-for="(connector, index) in $parent.connectors[id]" v-if="day.getDay() == connector.day" v-bind:id="index"></div>
-                            <div class="block" v-for="(block, index) in $parent.blocks[id]" v-if="day.getDay() == block.day" v-bind:id="index" v-bind:style="block.style.join(' ')" v-on:mouseover="highlight('on', index)" v-on:mouseleave="highlight('off', index)"></div>
+                            <giveaway-connector v-for="(connector, index) in $parent.connectors[id]" v-if="day.getDay() == connector.day" v-bind:id="index" v-bind:block="connector.block"></giveaway-connector>
+                            <giveaway-block v-for="(block, index) in $parent.blocks[id]" v-if="day.getDay() == block.day" v-bind:id="index" v-bind:style="block.style.join(' ')" v-bind:giveaway="block.giveaway"></giveaway-block>
                             <h3 v-bind:class="getDayColor(day)">{{ day.getDate() }}</h3>
                         </div>
                     </td>
@@ -114,8 +114,6 @@ Vue.component('calendar-week', {
                     block.style.width = calculatedwidth + '%';
                 }
             }
-
-
 
             var connectors = document.getElementById(this.id).querySelectorAll('.connector');
             var mid = Math.floor(connectors.length / 2);

@@ -154,6 +154,7 @@ Vue.component('dashboard-scheduler', {
                         Vue.set(vm.blocks[+startWeek], [idParts[1], idParts[2]].join('-'), {
                             style: ['background-color: ' + getbackgroundcolor(id) + ';'],
                             day: giveawayStart.getDay(),
+                            giveaway: id
                         });
 
                         if (giveaway.recurring) {
@@ -170,7 +171,8 @@ Vue.component('dashboard-scheduler', {
                                 game_id: giveaway.game_id,
                                 visible: giveaway.visible,
                                 guild_id: giveaway.guild_id,
-                                beginning: giveaway.beginning
+                                beginning: giveaway.beginning,
+                                name: giveaway.name
                             };
 
                             if (giveaway.beginning < giveaway.start) {
@@ -186,7 +188,8 @@ Vue.component('dashboard-scheduler', {
                                     game_id: giveaway.game_id,
                                     visible: giveaway.visible,
                                     guild_id: giveaway.guild_id,
-                                    beginning: giveaway.beginning
+                                    beginning: giveaway.beginning,
+                                    name: giveaway.name
                                 };
                                 if (priorStart >= giveaway.beginning) {
                                     if (!vm.giveaways[priorId]) {
@@ -231,6 +234,7 @@ Vue.component('dashboard-scheduler', {
                             Vue.set(vm.blocks[+endWeek], [idParts[0], idParts[2]].join('-'), {
                                 style: ['background-color: ' + getbackgroundcolor(id) + ';'],
                                 day: giveawayEnd.getDay(),
+                                giveaway: id
                             });
 
                             //So... now we have to figure out connectors. We've got two types of connectors: start/end, and interim.
@@ -398,36 +402,41 @@ Vue.component('dashboard-scheduler', {
         }, false);
         document.addEventListener("mouseup", function (e) {
             isdown = false;
-            endingElement = document.elementFromPoint(e.clientX, e.clientY).closest('td');
-            if (startingElement) {
-                if (endingElement) {
-                    for (let index = 0; index < changedElements.length; index++) {
-                        console.log(changedElements[index]);
-                        changedElements[index].style.backgroundColor = '';
-                    }
-                    var start = +new Date(+((Array.prototype.indexOf.call(startingElement.parentElement.querySelectorAll('td'), startingElement) * 86400000) + parseInt(startingElement.parentElement.id))).setHours(0, 0, 0, 0);
-                    var end = +new Date(+((Array.prototype.indexOf.call(endingElement.parentElement.querySelectorAll('td'), endingElement) * 86400000) + parseInt(endingElement.parentElement.id))).setHours(0, 0, 0, 0);
-                    var dates = [start, end].sort(function (a, b) { return a - b });
-                    var startDate = new Date(dates[0]);
-                    var endDate = new Date(dates[1]);
-                    if (+new Date().setHours(0, 0, 0, 0) > start || +new Date().setHours(0, 0, 0, 0) > end) {
-                        vm.$root.snackbar({
-                            type: 'error',
-                            message: 'You can\'t change the past.'
-                        });
-                    } else {
-                        if (flag === 0) {
-                            console.log("creating a recurring giveaway starting on ", startDate);
-
-                            /*vex.open({
-                                unsafeContent: `<giveaway-setup></giveaway-setup>`
-                            });*/
+            endingElement = document.elementFromPoint(e.clientX, e.clientY);
+            if (endingElement.classList.contains('block', 'connector')) {
+                console.log('ayy we clicked on a giveaway m88', vm.giveaways[vm.blocks[endingElement.closest('tr').id][endingElement.id].giveaway]);
+            } else {
+                endingElement = endingElement.closest('td');
+                if (startingElement) {
+                    if (endingElement) {
+                        for (let index = 0; index < changedElements.length; index++) {
+                            console.log(changedElements[index]);
+                            changedElements[index].style.backgroundColor = '';
                         }
-                        else if (flag === 1) {
-                            console.log('creating a one-off giveaway from ', startDate, ' to ', endDate);
-                            vex.open({
-                                unsafeContent: '<h1>One-off Giveaway</h1>'
+                        var start = +new Date(+((Array.prototype.indexOf.call(startingElement.parentElement.querySelectorAll('td'), startingElement) * 86400000) + parseInt(startingElement.parentElement.id))).setHours(0, 0, 0, 0);
+                        var end = +new Date(+((Array.prototype.indexOf.call(endingElement.parentElement.querySelectorAll('td'), endingElement) * 86400000) + parseInt(endingElement.parentElement.id))).setHours(0, 0, 0, 0);
+                        var dates = [start, end].sort(function (a, b) { return a - b });
+                        var startDate = new Date(dates[0]);
+                        var endDate = new Date(dates[1]);
+                        if (+new Date().setHours(0, 0, 0, 0) > start || +new Date().setHours(0, 0, 0, 0) > end) {
+                            vm.$root.snackbar({
+                                type: 'error',
+                                message: 'You can\'t change the past.'
                             });
+                        } else {
+                            if (flag === 0) {
+                                console.log("creating a recurring giveaway starting on ", startDate);
+    
+                                /*vex.open({
+                                    unsafeContent: `<giveaway-setup></giveaway-setup>`
+                                });*/
+                            }
+                            else if (flag === 1) {
+                                console.log('creating a one-off giveaway from ', startDate, ' to ', endDate);
+                                vex.open({
+                                    unsafeContent: '<h1>One-off Giveaway</h1>'
+                                });
+                            }
                         }
                     }
                 }

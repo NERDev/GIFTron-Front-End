@@ -521,6 +521,7 @@ button.main:hover {
     height: 18%;
     cursor: pointer;
     margin-left: 5%;
+    outline: none;
 }
 
 #dashboardScheduler .connector {

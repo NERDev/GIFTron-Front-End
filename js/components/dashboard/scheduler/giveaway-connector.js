@@ -6,11 +6,13 @@ Vue.component('giveaway-connector', {
         if (vm.block) {
             var giveaway = vm.$parent.$parent.giveaways[vm.$parent.$parent.blocks[vm.$parent.id][vm.block].giveaway];
             if (giveaway) {
+                /*
                 tippy("[id=\'" + vm.id + "\'].connector", {
                     content: giveaway.name,
                     interactive: true,
                     followCursor: 'horizontal'
                 });
+                */
             }
         }
     }

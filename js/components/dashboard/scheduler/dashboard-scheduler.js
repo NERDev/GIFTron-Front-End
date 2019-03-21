@@ -206,8 +206,14 @@ Vue.component('dashboard-scheduler', {
                                 }
                                 if (!vm.giveaways[newId]) {
                                     Vue.set(vm.giveaways, newId, newGiveaway);
+
+                                    if (newStart * 1000 < (+Object.keys(vm.calendar.bottomweeks)[2])) {
+                                        vm.buildCalendarElements();
+                                        //console.log(newStart * 1000, +Object.keys(vm.calendar.visibleweeks).pop());
+                                    }
                                 }
                             }
+
                         } else {
                             //This is a one-off giveaway. We're definitely rendering the start block, so we can at least take care of that right away.
 
@@ -427,7 +433,7 @@ Vue.component('dashboard-scheduler', {
                         } else {
                             if (flag === 0) {
                                 console.log("creating a recurring giveaway starting on ", startDate);
-    
+
                                 /*vex.open({
                                     unsafeContent: `<giveaway-setup></giveaway-setup>`
                                 });*/

@@ -2,7 +2,7 @@ Vue.component('dashboard-menu', {
     template: `<div id="dashboardMenu">
                     <dashboard-guild-profile v-bind:guild="guild"></dashboard-guild-profile>
                     <div class="view">
-                        <div v-for="(options, item) in navigation">
+                        <div v-for="(options, item) in navigation" v-show="typeof guild.settings !== 'undefined'">
                             <h3 v-on:click="goto(item)" v-bind:class="active == item.toLowerCase() ? 'shadow active' : 'shadow'"><i v-bind:class="icons[item]"></i>{{ item.toTitleCase() }}</h3>
                             <ul style="max-height: 0;" v-bind:id="item + 'Options'">
                                 <li v-for="option in options.options" v-on:click="goto(option)" v-bind:class="active == option.toLowerCase() ? 'active' : ''">{{ option }}</li>

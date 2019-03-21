@@ -324,6 +324,7 @@ Vue.component('dashboard-scheduler', {
         var endingElement;
         var changedElements;
         var lastindex = 0;
+
         element.addEventListener("mousedown", function (e) {
             flag = 0;
             startcoordinates = { x: e.clientX, y: e.clientY };
@@ -335,114 +336,121 @@ Vue.component('dashboard-scheduler', {
         }, false);
         element.addEventListener("mousemove", function (e) {
             const activeColor = '#9a9a9a';
-            if (isdown && Math.abs(e.clientX - startcoordinates.x) > 5 && Math.abs(e.clientY - startcoordinates.y) > 5) {
-                flag = 1;
-                var elements = element.querySelectorAll('td');
-                var hoveredElement = document.elementFromPoint(e.clientX, e.clientY);
-                var currentElement = hoveredElement.closest('td');
-                if (currentElement) {
-                    var startingElementIndex = Array.prototype.indexOf.call(elements, startingElement);
-                    var currentElementIndex = Array.prototype.indexOf.call(elements, currentElement);
-                    var indeces = [startingElementIndex, currentElementIndex].sort(function (a, b) { return a - b });
-                    for (let index = indeces[0]; index <= indeces[1]; index++) {
-                        var thisindex = currentElementIndex + 1;
-                        console.log(thisindex, lastindex, startingElementIndex);
 
-                        elements[startingElementIndex].childNodes[0].style.backgroundColor = activeColor;
-                        if (!(Array.prototype.indexOf.call(changedElements, elements[startingElementIndex].childNodes[0]) + 1)) {
-                            changedElements.push(elements[startingElementIndex].childNodes[0]);
-                        }
+            if (typeof vm.guild.settings !== 'undefined') {
+                if (isdown && Math.abs(e.clientX - startcoordinates.x) > 5 && Math.abs(e.clientY - startcoordinates.y) > 5) {
+                    flag = 1;
+                    var elements = element.querySelectorAll('td');
+                    var hoveredElement = document.elementFromPoint(e.clientX, e.clientY);
+                    var currentElement = hoveredElement.closest('td');
+                    if (currentElement) {
+                        var startingElementIndex = Array.prototype.indexOf.call(elements, startingElement);
+                        var currentElementIndex = Array.prototype.indexOf.call(elements, currentElement);
+                        var indeces = [startingElementIndex, currentElementIndex].sort(function (a, b) { return a - b });
+                        for (let index = indeces[0]; index <= indeces[1]; index++) {
+                            var thisindex = currentElementIndex + 1;
+                            console.log(thisindex, lastindex, startingElementIndex);
 
-                        if (thisindex > lastindex) {
-                            if (thisindex <= startingElementIndex + 1) {
-                                console.log('were goin forward again', lastindex);
-                                Array(thisindex - lastindex).fill(lastindex - 1).map((x, y) => x + y).forEach((x) => {
-                                    changedElements.splice(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]), 1);
-                                    elements[x].childNodes[0].style.backgroundColor = '';
-                                });
-                            } else {
-                                console.log('advancing ' + (thisindex - lastindex));
-                                console.log(Array(thisindex - lastindex).fill(thisindex).map((x, y) => x + y));
-                                Array(thisindex - lastindex).fill(lastindex).map((x, y) => x + y).forEach((x) => {
-                                    console.log(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]));
-                                    if (!(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]) + 1)) {
-                                        changedElements.push(elements[x].childNodes[0]);
-                                    }
-                                    if (elements[x].childNodes[0].style.backgroundColor) {
+                            elements[startingElementIndex].childNodes[0].style.backgroundColor = activeColor;
+                            if (!(Array.prototype.indexOf.call(changedElements, elements[startingElementIndex].childNodes[0]) + 1)) {
+                                changedElements.push(elements[startingElementIndex].childNodes[0]);
+                            }
+
+                            if (thisindex > lastindex) {
+                                if (thisindex <= startingElementIndex + 1) {
+                                    console.log('were goin forward again', lastindex);
+                                    Array(thisindex - lastindex).fill(lastindex - 1).map((x, y) => x + y).forEach((x) => {
+                                        changedElements.splice(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]), 1);
                                         elements[x].childNodes[0].style.backgroundColor = '';
-                                    } else {
+                                    });
+                                } else {
+                                    console.log('advancing ' + (thisindex - lastindex));
+                                    console.log(Array(thisindex - lastindex).fill(thisindex).map((x, y) => x + y));
+                                    Array(thisindex - lastindex).fill(lastindex).map((x, y) => x + y).forEach((x) => {
+                                        console.log(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]));
+                                        if (!(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]) + 1)) {
+                                            changedElements.push(elements[x].childNodes[0]);
+                                        }
+                                        if (elements[x].childNodes[0].style.backgroundColor) {
+                                            elements[x].childNodes[0].style.backgroundColor = '';
+                                        } else {
+                                            elements[x].childNodes[0].style.backgroundColor = activeColor;
+                                        }
+                                    });
+                                }
+                            } else if (thisindex < lastindex) {
+                                if (thisindex <= startingElementIndex) {
+                                    console.log('were goin backwards from ', startingElementIndex, elements[startingElementIndex], ' to ', thisindex - 1, elements[thisindex - 1]);
+                                    console.log(startingElementIndex - (thisindex - 1), thisindex - 1);
+                                    console.log(Array(startingElementIndex - thisindex + 2).fill(thisindex - 1).map((x, y) => x + y));
+                                    Array(startingElementIndex - thisindex + 2).fill(thisindex - 1).map((x, y) => x + y).forEach((x) => {
+                                        console.log(elements[x]);
+                                        if (!(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]) + 1)) {
+                                            changedElements.push(elements[x].childNodes[0]);
+                                        }
                                         elements[x].childNodes[0].style.backgroundColor = activeColor;
-                                    }
-                                });
-                            }
-                        } else if (thisindex < lastindex) {
-                            if (thisindex <= startingElementIndex) {
-                                console.log('were goin backwards from ', startingElementIndex, elements[startingElementIndex], ' to ', thisindex - 1, elements[thisindex - 1]);
-                                console.log(startingElementIndex - (thisindex - 1), thisindex - 1);
-                                console.log(Array(startingElementIndex - thisindex + 2).fill(thisindex - 1).map((x, y) => x + y));
-                                Array(startingElementIndex - thisindex + 2).fill(thisindex - 1).map((x, y) => x + y).forEach((x) => {
-                                    console.log(elements[x]);
-                                    if (!(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]) + 1)) {
-                                        changedElements.push(elements[x].childNodes[0]);
-                                    }
-                                    elements[x].childNodes[0].style.backgroundColor = activeColor;
-                                });
+                                    });
+                                } else {
+                                    console.log('subtracting ' + (lastindex - thisindex));
+                                    Array(lastindex - thisindex).fill(thisindex).map((x, y) => x + y).forEach((x) => {
+                                        changedElements.splice(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]), 1);
+                                        elements[x].childNodes[0].style.backgroundColor = '';
+                                    });
+                                }
                             } else {
-                                console.log('subtracting ' + (lastindex - thisindex));
-                                Array(lastindex - thisindex).fill(thisindex).map((x, y) => x + y).forEach((x) => {
-                                    changedElements.splice(Array.prototype.indexOf.call(changedElements, elements[x].childNodes[0]), 1);
-                                    elements[x].childNodes[0].style.backgroundColor = '';
-                                });
+                                //console.log('staying');
                             }
-                        } else {
-                            //console.log('staying');
+                            lastindex = thisindex;
+                            /*
+                            elements[index].childNodes[0].style.backgroundColor = '#9a9a9a';
+                            changedElements.push(elements[index].childNodes[0]);                    
+                            console.log(startingElementIndex, currentElementIndex);
+                            */
                         }
-                        lastindex = thisindex;
-                        /*
-                        elements[index].childNodes[0].style.backgroundColor = '#9a9a9a';
-                        changedElements.push(elements[index].childNodes[0]);                    
-                        console.log(startingElementIndex, currentElementIndex);
-                        */
                     }
                 }
             }
         }, false);
         document.addEventListener("mouseup", function (e) {
             isdown = false;
-            endingElement = document.elementFromPoint(e.clientX, e.clientY);
-            if (endingElement.classList.contains('block', 'connector')) {
-                console.log('ayy we clicked on a giveaway m88', vm.giveaways[vm.blocks[endingElement.closest('tr').id][endingElement.id].giveaway]);
-            } else {
-                endingElement = endingElement.closest('td');
-                if (startingElement) {
-                    if (endingElement) {
-                        for (let index = 0; index < changedElements.length; index++) {
-                            console.log(changedElements[index]);
-                            changedElements[index].style.backgroundColor = '';
-                        }
-                        var start = +new Date(+((Array.prototype.indexOf.call(startingElement.parentElement.querySelectorAll('td'), startingElement) * 86400000) + parseInt(startingElement.parentElement.id))).setHours(0, 0, 0, 0);
-                        var end = +new Date(+((Array.prototype.indexOf.call(endingElement.parentElement.querySelectorAll('td'), endingElement) * 86400000) + parseInt(endingElement.parentElement.id))).setHours(0, 0, 0, 0);
-                        var dates = [start, end].sort(function (a, b) { return a - b });
-                        var startDate = new Date(dates[0]);
-                        var endDate = new Date(dates[1]);
-                        if (+new Date().setHours(0, 0, 0, 0) > start || +new Date().setHours(0, 0, 0, 0) > end) {
-                            vm.$root.snackbar({
-                                type: 'error',
-                                message: 'You can\'t change the past.'
-                            });
-                        } else {
-                            if (flag === 0) {
-                                console.log("creating a recurring giveaway starting on ", startDate);
-
-                                /*vex.open({
-                                    unsafeContent: `<giveaway-setup></giveaway-setup>`
-                                });*/
-                            }
-                            else if (flag === 1) {
-                                console.log('creating a one-off giveaway from ', startDate, ' to ', endDate);
-                                vex.open({
-                                    unsafeContent: '<h1>One-off Giveaway</h1>'
-                                });
+            if (e.which == 1) {
+                endingElement = document.elementFromPoint(e.clientX, e.clientY);
+                if (endingElement.classList.contains('block', 'connector')) {
+                    console.log('ayy we clicked on a giveaway m88', vm.giveaways[vm.blocks[endingElement.closest('tr').id][endingElement.id].giveaway]);
+                } else {
+                    if (typeof vm.guild.settings !== 'undefined') {
+                        endingElement = endingElement.closest('td');
+                        if (startingElement) {
+                            if (endingElement) {
+                                for (let index = 0; index < changedElements.length; index++) {
+                                    console.log(changedElements[index]);
+                                    changedElements[index].style.backgroundColor = '';
+                                }
+                                var start = +new Date(+((Array.prototype.indexOf.call(startingElement.parentElement.querySelectorAll('td'), startingElement) * 86400000) + parseInt(startingElement.parentElement.id))).setHours(0, 0, 0, 0);
+                                var end = +new Date(+((Array.prototype.indexOf.call(endingElement.parentElement.querySelectorAll('td'), endingElement) * 86400000) + parseInt(endingElement.parentElement.id))).setHours(0, 0, 0, 0);
+                                var dates = [start, end].sort(function (a, b) { return a - b });
+                                var startDate = new Date(dates[0]);
+                                var endDate = new Date(dates[1]);
+                                if (+new Date().setHours(0, 0, 0, 0) > start || +new Date().setHours(0, 0, 0, 0) > end) {
+                                    vm.$root.snackbar({
+                                        type: 'error',
+                                        message: 'You can\'t change the past.'
+                                    });
+                                } else {
+                                    if (flag === 0) {
+                                        console.log("creating a recurring giveaway starting on ", startDate);
+                                        console.log(e);
+                                        /*vex.open({
+                                            unsafeContent: `<giveaway-setup></giveaway-setup>`
+                                        });*/
+                                    }
+                                    else if (flag === 1) {
+                                        console.log('creating a one-off giveaway from ', startDate, ' to ', endDate);
+                                        vex.open({
+                                            unsafeContent: '<h1>One-off Giveaway</h1>'
+                                        });
+                                    }
+                                }
                             }
                         }
                     }

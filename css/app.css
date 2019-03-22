@@ -219,6 +219,42 @@ button.main:hover {
     width: 45vw;
 }
 
+.vex-content.modal h1 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.vex-content.modal ul {
+    text-align: center;
+    padding: 0;
+    list-style: none;
+    width: calc(100% - 10em);
+}
+
+.vex-content.modal ul li {
+    font-size: 1.5em;
+    line-height: 1.5em;
+}
+
+.vex-content.modal div {
+    width: max-content;
+    margin-right: 0;
+    margin-left: auto;
+    position: relative;
+    top: -5em;
+}
+
+.vex-content.modal img {
+    margin: auto;
+    display: block;
+    width: 10em;
+}
+
+.vex-content.modal h2 {
+    text-align: center;
+    margin-bottom: -2em;
+}
+
 #snackbar {
     position: fixed;
     width: 90%;

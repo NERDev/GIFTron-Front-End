@@ -284,6 +284,45 @@ Vue.component('dashboard-scheduler', {
                     }
                 });
             }
+        },
+        buildModalHTML: function (giveaway) {
+            var vm = this;
+            if (giveaway) {
+                //This is 'display mode'
+                var game = '';
+                return `
+                        <h1>{{name}}</h1>
+                        <hr>
+                        <ul>
+                            <li>Start: {{start}}</li>
+                            <li>End: {{end}}</li>
+                        </ul>
+                        <div>
+                            <img src="{{img}}">
+                            <h2>{{game}}</h2>
+                        </div>
+                       `.replace(/{{name}}/g, giveaway.name)
+                        .replace(/{{start}}/g, new Date(+giveaway.start * 1000).toLocaleString(vm.$root.user.locale))
+                        .replace(/{{end}}/g, new Date(+giveaway.end * 1000).toLocaleString(vm.$root.user.locale))
+                        .replace(/{{img}}/g, () => {
+                            if (giveaway.visible) {
+                                if (giveaway.game_id) {
+                                    //display pic
+                                    game = 'rocket league'.toTitleCase();
+                                    return 'https://images.g2a.com/newlayout/323x433/1x1x0/c5cce5c915b4/591311205bafe31cbf5cd2db';
+                                } else {
+                                    //display unknown
+                                    return 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg'
+                                }
+                            } else {
+                                game = 'Mystery';
+                                return 'https://upload.wikimedia.org/wikipedia/commons/6/61/Emojione_2754.svg';
+                            }
+                        })
+                        .replace(/{{game}}/g, game)
+            } else {
+                //This is 'new mode'
+            }
         }
     },
     data: function () {
@@ -324,6 +363,7 @@ Vue.component('dashboard-scheduler', {
         var endingElement;
         var changedElements;
         var lastindex = 0;
+        var misclicks = 0;
 
         element.addEventListener("mousedown", function (e) {
             flag = 0;
@@ -417,6 +457,9 @@ Vue.component('dashboard-scheduler', {
                 endingElement = document.elementFromPoint(e.clientX, e.clientY);
                 if (endingElement.classList.contains('block', 'connector')) {
                     console.log('ayy we clicked on a giveaway m88', vm.giveaways[vm.blocks[endingElement.closest('tr').id][endingElement.id].giveaway]);
+                    vex.open({
+                        unsafeContent: vm.buildModalHTML(vm.giveaways[vm.blocks[endingElement.closest('tr').id][endingElement.id].giveaway])
+                    });
                 } else {
                     if (typeof vm.guild.settings !== 'undefined') {
                         endingElement = endingElement.closest('td');
@@ -432,10 +475,24 @@ Vue.component('dashboard-scheduler', {
                                 var startDate = new Date(dates[0]);
                                 var endDate = new Date(dates[1]);
                                 if (+new Date().setHours(0, 0, 0, 0) > start || +new Date().setHours(0, 0, 0, 0) > end) {
-                                    vm.$root.snackbar({
-                                        type: 'error',
-                                        message: 'You can\'t change the past.'
-                                    });
+                                    misclicks++;
+                                    if (misclicks == 1) {
+                                        //
+                                    } else if (misclicks > 1 && misclicks < 5) {
+                                        vm.$root.snackbar({
+                                            type: 'info',
+                                            message: 'You can\'t change the past.',
+                                            callback: function () {
+                                                misclicks = 1;
+                                            }
+                                        });
+                                    } else {
+                                        vm.$root.snackbar({
+                                            type: 'error',
+                                            message: 'Hey Dumbass! You can\'t change the past!',
+                                            timeout: 0
+                                        });
+                                    }
                                 } else {
                                     if (flag === 0) {
                                         console.log("creating a recurring giveaway starting on ", startDate);

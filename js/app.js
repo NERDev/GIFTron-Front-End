@@ -10,7 +10,12 @@ String.prototype.toTitleCase = function () {
     return str.join(' ');
 }
 
-function arr_diff (a1, a2) {
+Number.prototype.AddZero = function (b, c) {
+    var l = (String(b || 10).length - String(this).length) + 1;
+    return l > 0 ? new Array(l).join(c || '0') + this : this;
+}
+
+function arr_diff(a1, a2) {
 
     var a = [], diff = [];
 
@@ -33,8 +38,9 @@ function arr_diff (a1, a2) {
     return diff;
 }
 
+var app;
 window.onload = () => {
-    var app = new Vue({
+    app = new Vue({
         el: 'main',
         data() {
             return {

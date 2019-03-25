@@ -285,43 +285,92 @@ Vue.component('dashboard-scheduler', {
                 });
             }
         },
-        buildModalHTML: function (giveaway) {
+        buildModalHTML: function (param, start, end) {
             var vm = this;
-            if (giveaway) {
+            function getLocalDateTime(date) {
+                return [start.getFullYear(), (date.getMonth() + 1).AddZero(), date.getDate().AddZero()].join('-') + 'T' +
+                [date.getHours().AddZero(),
+                date.getMinutes().AddZero()].join(':');
+            }
+            if (param === 0) {
+                //create one-off
+                return `
+                        <h1>Create One-Off Giveaway</h1>
+                        <hr>
+                        <div class="create">
+                        <div id="step1" class="step">
+                            <div class="start">
+                                <h2>Start</h2>
+                                <input type="datetime-local" value="{{start}}" class="datetime" required="required">
+                            </div>
+                            <div class="end">
+                                <h2>End</h2>
+                                <input type="datetime-local" value="{{end}}" class="datetime" required="required">
+                            </div>
+                        </div>
+                        </div>
+                       `.replace(/{{start}}/g, getLocalDateTime(start))
+                        .replace(/{{end}}/g, getLocalDateTime(end))
+            } else if (param === 1) {
+                //create recurring
+                return `
+                        <h1>Create Recurring Giveaway</h1>
+                        <hr>
+                        <div class="create">
+                        <div id="step1" class="step">
+                            <div class="start">
+                                <h2>Start</h2>
+                                <input type="datetime-local" value="{{start}}" class="datetime" required="required">
+                            </div>
+                            <div class="interval">
+                                <h2>Interval (needs revision, default to next week)</h2>
+                                <input type="datetime-local" class="datetime" required="required">
+                            </div>
+                        </div>
+                        </div>
+                       `.replace(/{{start}}/g, getLocalDateTime(start))
+
+                //5/12/2019, 7:00:00 PM
+                //2018-06-12T19:30
+            } else {
                 //This is 'display mode'
                 var game = '';
                 return `
                         <h1>{{name}}</h1>
                         <hr>
-                        <ul>
-                            <li>Start: {{start}}</li>
-                            <li>End: {{end}}</li>
-                        </ul>
-                        <div>
-                            <img src="{{img}}">
-                            <h2>{{game}}</h2>
+                        <div class="display">
+                            <ul>
+                                <li>Start: {{start}}</li>
+                                <li>End: {{end}}</li>
+                            </ul>
+                            <div>
+                                <img src="{{img}}">
+                                <h2>{{game}}</h2>
+                            </div>
                         </div>
                        `.replace(/{{name}}/g, giveaway.name)
-                        .replace(/{{start}}/g, new Date(+giveaway.start * 1000).toLocaleString(vm.$root.user.locale))
-                        .replace(/{{end}}/g, new Date(+giveaway.end * 1000).toLocaleString(vm.$root.user.locale))
-                        .replace(/{{img}}/g, () => {
-                            if (giveaway.visible) {
-                                if (giveaway.game_id) {
-                                    //display pic
-                                    game = 'rocket league'.toTitleCase();
-                                    return 'https://images.g2a.com/newlayout/323x433/1x1x0/c5cce5c915b4/591311205bafe31cbf5cd2db';
+                    .replace(/{{start}}/g, new Date(+giveaway.start * 1000).toLocaleString(vm.$root.user.locale))
+                    .replace(/{{end}}/g, new Date(+giveaway.end * 1000).toLocaleString(vm.$root.user.locale))
+                    .replace(/{{img}}/g, () => {
+                        if (giveaway.visible) {
+                            if (giveaway.game_id) {
+                                //go find pic and game name
+                                game = 'rocket league'.toTitleCase();
+                                return 'https://images.g2a.com/newlayout/323x433/1x1x0/c5cce5c915b4/591311205bafe31cbf5cd2db';
+                            } else {
+                                //display unknown
+                                if (giveaway.image) {
+                                    return giveaway.image;
                                 } else {
-                                    //display unknown
                                     return 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg'
                                 }
-                            } else {
-                                game = 'Mystery';
-                                return 'https://upload.wikimedia.org/wikipedia/commons/6/61/Emojione_2754.svg';
                             }
-                        })
-                        .replace(/{{game}}/g, game)
-            } else {
-                //This is 'new mode'
+                        } else {
+                            game = 'Mystery';
+                            return 'https://upload.wikimedia.org/wikipedia/commons/6/61/Emojione_2754.svg';
+                        }
+                    })
+                    .replace(/{{game}}/g, game)
             }
         }
     },
@@ -473,7 +522,20 @@ Vue.component('dashboard-scheduler', {
                                 var end = +new Date(+((Array.prototype.indexOf.call(endingElement.parentElement.querySelectorAll('td'), endingElement) * 86400000) + parseInt(endingElement.parentElement.id))).setHours(0, 0, 0, 0);
                                 var dates = [start, end].sort(function (a, b) { return a - b });
                                 var startDate = new Date(dates[0]);
+                                if (+startDate == new Date().setHours(0,0,0,0)) {
+                                    var d = new Date();
+                                    d.setMinutes(d.getMinutes() + 30);
+                                    d.setMinutes(0);
+                                    if (+d <= +new Date()) {
+                                        d.setHours(d.getHours() + 1);
+                                    }
+                                    startDate = d;
+                                }
                                 var endDate = new Date(dates[1]);
+                                if (+endDate == new Date().setHours(0,0,0,0)) {
+                                    endDate = new Date(new Date(+startDate).setHours(startDate.getHours() + 1));
+                                }
+                                console.log(endDate);
                                 if (+new Date().setHours(0, 0, 0, 0) > start || +new Date().setHours(0, 0, 0, 0) > end) {
                                     misclicks++;
                                     if (misclicks == 1) {
@@ -497,14 +559,14 @@ Vue.component('dashboard-scheduler', {
                                     if (flag === 0) {
                                         console.log("creating a recurring giveaway starting on ", startDate);
                                         console.log(e);
-                                        /*vex.open({
-                                            unsafeContent: `<giveaway-setup></giveaway-setup>`
-                                        });*/
+                                        vex.open({
+                                            unsafeContent: vm.buildModalHTML(1, startDate)
+                                        });
                                     }
                                     else if (flag === 1) {
                                         console.log('creating a one-off giveaway from ', startDate, ' to ', endDate);
                                         vex.open({
-                                            unsafeContent: '<h1>One-off Giveaway</h1>'
+                                            unsafeContent: vm.buildModalHTML(0, startDate, endDate)
                                         });
                                     }
                                 }

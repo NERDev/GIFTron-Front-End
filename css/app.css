@@ -62,6 +62,30 @@ button.main:hover {
     box-shadow: 0px 6px 12px -2px rgba(0,0,0,0.69);
 }
 
+input.datetime {
+    text-decoration: none;
+    outline: none;
+    background-color: #2C2F33;
+    border-style: solid;
+    border-color: #99aab5;
+    border-width: 1px;
+    border-radius: .3em;
+    font-family: unset;
+    font-size: 1.3em;
+    text-align: right;
+    color: #99aab5;
+    height: 1.75em;
+}
+
+::-webkit-calendar-picker-indicator {
+    background: #2C2F33;
+    color: #99aab5
+}
+
+::-webkit-inner-spin-button {
+    display: none;
+}
+
 .navbar {
     padding-top: 0.2em;
     background-color: #2C2F33;
@@ -224,19 +248,23 @@ button.main:hover {
     text-align: center;
 }
 
-.vex-content.modal ul {
+.vex-content.modal .display {
+    height: max-content;
+}
+
+.vex-content.modal .display ul {
     text-align: center;
     padding: 0;
     list-style: none;
     width: calc(100% - 10em);
 }
 
-.vex-content.modal ul li {
+.vex-content.modal .display ul li {
     font-size: 1.5em;
     line-height: 1.5em;
 }
 
-.vex-content.modal div {
+.vex-content.modal .display div {
     width: max-content;
     margin-right: 0;
     margin-left: auto;
@@ -244,15 +272,51 @@ button.main:hover {
     top: -5em;
 }
 
-.vex-content.modal img {
+.vex-content.modal .display img {
     margin: auto;
     display: block;
     width: 10em;
 }
 
-.vex-content.modal h2 {
+.vex-content.modal .display h2 {
     text-align: center;
     margin-bottom: -2em;
+}
+
+.vex-content.modal .create .step {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.vex-content.modal .create #step1 div {
+    display: inline-block;
+    text-align: center;
+}
+
+.vex-content.modal .create #step1 div:first-child {
+    margin-right: 1em;
+}
+
+.vex-content.modal .create #step1 div:last-child {
+    margin-left: 1em;
+}
+
+.vex-content.modal .create #step1 select {    
+    text-decoration: none;
+    background: #2C2F33;
+    color: inherit;
+    cursor: pointer;
+    width: max-content;
+    padding: 5px 10px 5px 10px;
+    border-color: #99aab5;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: .3em;
+    font-size: 1.3em;
+    -moz-appearance: none;
+    appearance: none;
+    transition: 0.15s ease all;
 }
 
 #snackbar {

@@ -287,6 +287,7 @@ input.datetime {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .vex-content.modal .create #step1 div {
@@ -294,12 +295,21 @@ input.datetime {
     text-align: center;
 }
 
-.vex-content.modal .create #step1 div:first-child {
+.vex-content.modal .create #step1 div {
     margin-right: 1em;
+    margin-left: 1em;
 }
 
-.vex-content.modal .create #step1 div:last-child {
-    margin-left: 1em;
+.vex-content.modal .create #step1 .interval h2 {
+    display: inline-block;
+}
+
+.vex-content.modal .create #step1 .interval h2:first-child {
+    margin-right: .5em;
+}
+
+.vex-content.modal .create #step1 .interval h2:last-child {
+    margin-left: .5em;
 }
 
 .vex-content.modal .create #step1 select {    
@@ -317,6 +327,16 @@ input.datetime {
     -moz-appearance: none;
     appearance: none;
     transition: 0.15s ease all;
+}
+
+.vex-content.modal .create #giveawaySetupButtons {
+    text-align: center;
+    margin-top: 3.5em;
+}
+
+.vex-content.modal .create #giveawaySetupButtons button {
+    margin-left: .5em;
+    margin-right: .5em;
 }
 
 #snackbar {

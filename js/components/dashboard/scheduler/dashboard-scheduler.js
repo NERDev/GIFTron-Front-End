@@ -287,80 +287,46 @@ Vue.component('dashboard-scheduler', {
         },
         buildModalHTML: function (param, start, end) {
             var vm = this;
+            
             function getLocalDateTime(date) {
                 return [start.getFullYear(), (date.getMonth() + 1).AddZero(), date.getDate().AddZero()].join('-') + 'T' +
                 [date.getHours().AddZero(),
                 date.getMinutes().AddZero()].join(':');
             }
-            if (param === 0) {
-                //create one-off
-                return `
-                        <h1>Create One-Off Giveaway</h1>
-                        <hr>
-                        <div class="create">
-                        <div id="step1" class="step">
-                            <div class="start">
-                                <h2>Start</h2>
-                                <input type="datetime-local" value="{{start}}" class="datetime" required="required">
-                            </div>
-                            <div class="end">
-                                <h2>End</h2>
-                                <input type="datetime-local" value="{{end}}" class="datetime" required="required">
-                            </div>
-                        </div>
-                        </div>
-                       `.replace(/{{start}}/g, getLocalDateTime(start))
-                        .replace(/{{end}}/g, getLocalDateTime(end))
-            } else if (param === 1) {
-                //create recurring
-                return `
-                        <h1>Create Recurring Giveaway</h1>
-                        <hr>
-                        <div class="create">
-                        <div id="step1" class="step">
-                            <div class="start">
-                                <h2>Start</h2>
-                                <input type="datetime-local" value="{{start}}" class="datetime" required="required">
-                            </div>
-                            <div class="interval">
-                                <h2>Interval (needs revision, default to next week)</h2>
-                                <input type="datetime-local" class="datetime" required="required">
-                            </div>
-                        </div>
-                        </div>
-                       `.replace(/{{start}}/g, getLocalDateTime(start))
+            
+            return function () {
+                var modalContent = document.querySelector('.vex-content');
+                var title = document.createElement('h1');
+                var undertitle = document.createElement('hr');
+                if (isNaN(parseInt(param))) {
+                    //display giveaway
+                    title.innerText = param.name;
+                    modalContent.appendChild(title);
+                    modalContent.appendChild(undertitle);
 
-                //5/12/2019, 7:00:00 PM
-                //2018-06-12T19:30
-            } else {
-                //This is 'display mode'
-                var game = '';
-                return `
-                        <h1>{{name}}</h1>
-                        <hr>
-                        <div class="display">
-                            <ul>
-                                <li>Start: {{start}}</li>
-                                <li>End: {{end}}</li>
-                            </ul>
-                            <div>
-                                <img src="{{img}}">
-                                <h2>{{game}}</h2>
-                            </div>
-                        </div>
-                       `.replace(/{{name}}/g, giveaway.name)
-                    .replace(/{{start}}/g, new Date(+giveaway.start * 1000).toLocaleString(vm.$root.user.locale))
-                    .replace(/{{end}}/g, new Date(+giveaway.end * 1000).toLocaleString(vm.$root.user.locale))
-                    .replace(/{{img}}/g, () => {
-                        if (giveaway.visible) {
-                            if (giveaway.game_id) {
+                    var display = document.createElement('div');
+                    var displayparamscontainer = document.createElement('ul');
+                    var giveawaystart = document.createElement('li');
+                    var giveawayend = document.createElement('li');
+                    var imagecontainer = document.createElement('div');
+                    var image = document.createElement('img');
+
+                    var game = '';
+
+                    display.className = 'display';
+                    giveawaystart.innerText = "Start: " + new Date(+giveaway.start * 1000).toLocaleString(vm.$root.user.locale);
+                    giveawayend.innerText = "End: " + new Date(+giveaway.end * 1000).toLocaleString(vm.$root.user.locale);
+
+                    image.src = (() => {
+                        if (param.visible) {
+                            if (param.game_id) {
                                 //go find pic and game name
                                 game = 'rocket league'.toTitleCase();
                                 return 'https://images.g2a.com/newlayout/323x433/1x1x0/c5cce5c915b4/591311205bafe31cbf5cd2db';
                             } else {
                                 //display unknown
-                                if (giveaway.image) {
-                                    return giveaway.image;
+                                if (param.image) {
+                                    return param.image;
                                 } else {
                                     return 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg'
                                 }
@@ -369,8 +335,111 @@ Vue.component('dashboard-scheduler', {
                             game = 'Mystery';
                             return 'https://upload.wikimedia.org/wikipedia/commons/6/61/Emojione_2754.svg';
                         }
-                    })
-                    .replace(/{{game}}/g, game)
+                    })();
+
+                    modalContent.appendChild(display);
+                    display.appendChild(displayparamscontainer);
+                    displayparamscontainer.appendChild(giveawaystart);
+                    displayparamscontainer.appendChild(giveawayend);
+                    display.appendChild(imagecontainer);
+                    imagecontainer.appendChild(image);
+
+                    if (game) {
+                        var gametitle = document.createElement('h2');
+                        gametitle.innerText = game;
+                        imagecontainer.appendChild(gametitle);
+                    }
+
+
+                } else {
+                    //create
+                    var create = document.createElement('div');
+                    var step1 = document.createElement('div');
+                    var startdiv = document.createElement('div');
+                    var starttitle = document.createElement('h2');
+                    var startinput = document.createElement('input');
+                    var secondinput = document.createElement('input');
+                    create.className = 'create';
+                    step1.id = 'step1';
+                    step1.classList.add('step');
+                    startdiv.classList.add('start');
+                    starttitle.innerText = 'Start';
+                    startinput.type = secondinput.type = 'datetime-local';
+                    startinput.value = startinput.min = getLocalDateTime(start);
+                    startinput.className = secondinput.className = 'datetime';
+                    startinput.required = secondinput.required = 'required';
+
+                    modalContent.appendChild(title);
+                    modalContent.appendChild(undertitle);
+                    modalContent.appendChild(create);
+                    create.appendChild(step1);
+                    step1.appendChild(startdiv);
+                    startdiv.appendChild(starttitle);
+                    startdiv.appendChild(startinput);
+                    
+                    if (param) {
+                        //create recurring
+                        title.innerText = 'Create Recurring Giveaway';
+                        var nextdiv = document.createElement('div');
+                        var nexttitle = document.createElement('h2');
+                        var intervaldiv = document.createElement('div');
+                        var intervalpart1 = document.createElement('h2');
+                        var intervalpart2 = document.createElement('h2');
+                        var intervalselect = document.createElement('select');
+
+                        nextdiv.className = nexttitle.innerText = 'Next';
+                        intervaldiv.className = 'interval';
+                        secondinput.value = getLocalDateTime(new Date(start.getTime() + 604800000));
+                        secondinput.min = getLocalDateTime(new Date(start.getTime() + 60000));
+
+                        intervalpart1.innerText = 'Repeat';
+                        intervalpart2.innerText = 'Times';
+
+                        step1.appendChild(nextdiv);
+                        step1.appendChild(intervaldiv);
+                        nextdiv.appendChild(nexttitle);
+                        nextdiv.appendChild(secondinput);
+                        intervaldiv.appendChild(intervalpart1);
+                        intervaldiv.appendChild(intervalselect);
+                        intervaldiv.appendChild(intervalpart2);
+                        
+                        for (let index = 0; index <= 10; index++) {
+                            var option = document.createElement('option');
+                            if (!index) {
+                                option.innerText = 'Infinite';
+                            } else {
+                                option.innerText = index;
+                            }
+                            intervalselect.appendChild(option);
+                        }
+                    } else {
+                        //create one-off
+                        title.innerText = 'Create One-Off Giveaway';
+                        var enddiv = document.createElement('div');
+                        var endtitle = document.createElement('h2');
+                        
+                        endtitle.innerText = 'End';
+                        secondinput.value = getLocalDateTime(end);
+
+                        step1.appendChild(enddiv);
+                        enddiv.appendChild(endtitle);
+                        enddiv.appendChild(secondinput);
+                    }
+
+                    var buttoncontainer = document.createElement('div');
+                    buttoncontainer.id = 'giveawaySetupButtons';
+                    var backbutton = document.createElement('button');
+                    var nextbutton = document.createElement('button');
+
+                    backbutton.innerText = 'Back';
+                    nextbutton.innerText = 'Next';
+
+                    backbutton.className = nextbutton.className = 'main';
+
+                    create.appendChild(buttoncontainer);
+                    buttoncontainer.appendChild(backbutton);
+                    buttoncontainer.appendChild(nextbutton);
+                }
             }
         }
     },
@@ -507,7 +576,7 @@ Vue.component('dashboard-scheduler', {
                 if (endingElement.classList.contains('block', 'connector')) {
                     console.log('ayy we clicked on a giveaway m88', vm.giveaways[vm.blocks[endingElement.closest('tr').id][endingElement.id].giveaway]);
                     vex.open({
-                        unsafeContent: vm.buildModalHTML(vm.giveaways[vm.blocks[endingElement.closest('tr').id][endingElement.id].giveaway])
+                        afterOpen: vm.buildModalHTML(vm.giveaways[vm.blocks[endingElement.closest('tr').id][endingElement.id].giveaway])
                     });
                 } else {
                     if (typeof vm.guild.settings !== 'undefined') {
@@ -560,13 +629,13 @@ Vue.component('dashboard-scheduler', {
                                         console.log("creating a recurring giveaway starting on ", startDate);
                                         console.log(e);
                                         vex.open({
-                                            unsafeContent: vm.buildModalHTML(1, startDate)
+                                            afterOpen: vm.buildModalHTML(1, startDate)
                                         });
                                     }
                                     else if (flag === 1) {
                                         console.log('creating a one-off giveaway from ', startDate, ' to ', endDate);
                                         vex.open({
-                                            unsafeContent: vm.buildModalHTML(0, startDate, endDate)
+                                            afterOpen: vm.buildModalHTML(0, startDate, endDate)
                                         });
                                     }
                                 }

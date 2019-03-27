@@ -314,8 +314,8 @@ Vue.component('dashboard-scheduler', {
                     var game = '';
 
                     display.className = 'display';
-                    giveawaystart.innerText = "Start: " + new Date(+giveaway.start * 1000).toLocaleString(vm.$root.user.locale);
-                    giveawayend.innerText = "End: " + new Date(+giveaway.end * 1000).toLocaleString(vm.$root.user.locale);
+                    giveawaystart.innerText = "Start: " + new Date(+param.start * 1000).toLocaleString(vm.$root.user.locale);
+                    giveawayend.innerText = "End: " + new Date(+param.end * 1000).toLocaleString(vm.$root.user.locale);
 
                     image.src = (() => {
                         if (param.visible) {
@@ -355,13 +355,19 @@ Vue.component('dashboard-scheduler', {
                     //create
                     var create = document.createElement('div');
                     var step1 = document.createElement('div');
+                    var step2 = document.createElement('div');
+                    var step3 = document.createElement('div');
                     var startdiv = document.createElement('div');
                     var starttitle = document.createElement('h2');
                     var startinput = document.createElement('input');
                     var secondinput = document.createElement('input');
                     create.className = 'create';
                     step1.id = 'step1';
-                    step1.classList.add('step');
+                    step2.id = 'step2';
+                    step2.style.display = 'none';
+                    step3.id = 'step3';
+                    step3.style.display = 'none';
+                    step3.className = step2.className = step1.className = 'step';
                     startdiv.classList.add('start');
                     starttitle.innerText = 'Start';
                     startinput.type = secondinput.type = 'datetime-local';
@@ -373,9 +379,40 @@ Vue.component('dashboard-scheduler', {
                     modalContent.appendChild(undertitle);
                     modalContent.appendChild(create);
                     create.appendChild(step1);
+                    create.appendChild(step2);
+                    create.appendChild(step3);
                     step1.appendChild(startdiv);
                     startdiv.appendChild(starttitle);
                     startdiv.appendChild(startinput);
+
+                    var step2question = document.createElement('p');
+                    step2question.innerText = 'Would you like GIFTron to handle this Giveaway all by itself?';
+                    var step2affirmative = document.createElement('input');
+                    var step2negative = document.createElement('input');
+                    step2negative.type = step2affirmative.type = 'radio';
+                    step2negative.name = step2affirmative.name = 'autonomous';
+                    step2affirmative.value = '1';
+                    step2affirmative.id = 'autonomychoice1';
+                    step2negative.value = '0';
+                    step2negative.id = 'autonomychoice2';
+
+
+                    //Here
+                    var step2affirmativecontainer = document.createElement('div');
+                    var step2negativecontainer = document.createElement('div');
+                    var step2affirmativelabel = document.createElement('label');
+                    var step2negativelabel = document.createElement('label');
+                    step2affirmativelabel.for = 'autonomychoice1';
+                    step2affirmativelabel.innerText = 'Yes';
+                    step2negativelabel.for = 'autonomychoice2';
+                    step2negativelabel.innerText = 'No';
+                    
+                    step2.appendChild(step2question);
+                    step2.appendChild(step2affirmative);
+                    step2.appendChild(step2affirmativelabel);
+                    step2.appendChild(step2negative);
+                    step2.appendChild(step2negativelabel);
+
                     
                     if (param) {
                         //create recurring
@@ -433,6 +470,42 @@ Vue.component('dashboard-scheduler', {
 
                     backbutton.innerText = 'Back';
                     nextbutton.innerText = 'Next';
+
+                    backbutton.addEventListener('click', () => {
+                        var steps = create.querySelectorAll('.step'),
+                            currentStep;
+                        steps.forEach((e) => {
+                            if (!e.style.display) {
+                                currentStep = parseInt(e.id.split('').pop());
+                            }
+                        });
+
+                        if (currentStep - 1) {
+                            create.querySelector('#step' + currentStep).style.display = 'none';
+    
+                            var nextStep = create.querySelector('#step' + --currentStep)
+                            nextStep.style.display = '';
+                        } else {
+                            vex.closeAll();
+                        }
+                    });
+
+                    nextbutton.addEventListener('click', () => {
+                        var steps = create.querySelectorAll('.step'),
+                            currentStep;
+                        steps.forEach((e) => {
+                            if (!e.style.display) {
+                                currentStep = parseInt(e.id.split('').pop());
+                            }
+                        });
+
+                        if (currentStep < steps.length) {
+                            create.querySelector('#step' + currentStep).style.display = 'none';
+    
+                            var nextStep = create.querySelector('#step' + ++currentStep)
+                            nextStep.style.display = '';
+                        }
+                    });
 
                     backbutton.className = nextbutton.className = 'main';
 

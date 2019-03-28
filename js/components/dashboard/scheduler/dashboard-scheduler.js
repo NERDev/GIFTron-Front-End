@@ -287,13 +287,13 @@ Vue.component('dashboard-scheduler', {
         },
         buildModalHTML: function (param, start, end) {
             var vm = this;
-            
+
             function getLocalDateTime(date) {
                 return [start.getFullYear(), (date.getMonth() + 1).AddZero(), date.getDate().AddZero()].join('-') + 'T' +
-                [date.getHours().AddZero(),
-                date.getMinutes().AddZero()].join(':');
+                    [date.getHours().AddZero(),
+                    date.getMinutes().AddZero()].join(':');
             }
-            
+
             return function () {
                 var modalContent = document.querySelector('.vex-content');
                 var title = document.createElement('h1');
@@ -386,7 +386,7 @@ Vue.component('dashboard-scheduler', {
                     startdiv.appendChild(startinput);
 
                     var step2question = document.createElement('p');
-                    step2question.innerText = 'Would you like GIFTron to handle this Giveaway all by itself?';
+                    step2question.innerText = 'Would you like GIFTron to handle ' + (param ? 'these Giveaways ' : 'this Giveaway ') + 'all by itself?';
                     var step2affirmative = document.createElement('input');
                     var step2negative = document.createElement('input');
                     step2negative.type = step2affirmative.type = 'radio';
@@ -396,24 +396,59 @@ Vue.component('dashboard-scheduler', {
                     step2negative.value = '0';
                     step2negative.id = 'autonomychoice2';
 
-
-                    //Here
                     var step2affirmativecontainer = document.createElement('div');
                     var step2negativecontainer = document.createElement('div');
                     var step2affirmativelabel = document.createElement('label');
                     var step2negativelabel = document.createElement('label');
-                    step2affirmativelabel.for = 'autonomychoice1';
+                    step2affirmativelabel.setAttribute('for', 'autonomychoice1');
                     step2affirmativelabel.innerText = 'Yes';
-                    step2negativelabel.for = 'autonomychoice2';
+                    step2negativelabel.setAttribute('for', 'autonomychoice2');
                     step2negativelabel.innerText = 'No';
-                    
-                    step2.appendChild(step2question);
-                    step2.appendChild(step2affirmative);
-                    step2.appendChild(step2affirmativelabel);
-                    step2.appendChild(step2negative);
-                    step2.appendChild(step2negativelabel);
 
-                    
+                    step2.appendChild(step2question);
+                    step2.appendChild(step2affirmativecontainer);
+                    step2.appendChild(step2negativecontainer);
+                    step2negativecontainer.className = step2affirmativecontainer.className = 'container';
+                    step2affirmativecontainer.appendChild(step2affirmative);
+                    step2affirmativecontainer.appendChild(step2affirmativelabel);
+                    step2negativecontainer.appendChild(step2negative);
+                    step2negativecontainer.appendChild(step2negativelabel);
+
+                    step2affirmative.addEventListener('click', () => {
+                        step3.innerHTML = '';
+                        var step3question = document.createElement('p');
+                        var parametersContainer = document.createElement('div');
+                        var genreLabel= document.createElement('p');
+                        var genreSelect = document.createElement('select');
+                        var platformLabel= document.createElement('p');
+                        var platformSelect = document.createElement('select');
+                        var regionLabel= document.createElement('p');
+                        var regionSelect = document.createElement('select');
+                        var priceLabel= document.createElement('p');
+                        var priceLow = document.createElement('input');
+                        var priceLowLabel= document.createElement('p');
+                        var priceHigh = document.createElement('input');
+                        var priceHighLabel= document.createElement('p');
+
+                        step3question.innerText = 'Choose what type of game you\'d like GIFTron to purchase:';
+                        parametersContainer.className = 'container';
+                        genreLabel.innerText = 'Genre:';
+                        genreSelect;
+                        platformLabel.innerText = 'Platform:';
+                        platformSelect;
+                        regionLabel.innerText = 'Activation Region';
+                        regionSelect;
+                        priceLabel.innerText = 'Price:';
+                        priceLowLabel.innerText = 'Above:';
+                        priceHighLabel.innerText = 'Below:';
+                        //need to make a function that builds select options from a key-value pair
+                        //and it is at this point, that those key-values need to be pulled from G2A. It's API time.
+                    });
+
+                    step2negative.addEventListener('click', () => {
+
+                    });
+
                     if (param) {
                         //create recurring
                         title.innerText = 'Create Recurring Giveaway';
@@ -439,7 +474,7 @@ Vue.component('dashboard-scheduler', {
                         intervaldiv.appendChild(intervalpart1);
                         intervaldiv.appendChild(intervalselect);
                         intervaldiv.appendChild(intervalpart2);
-                        
+
                         for (let index = 0; index <= 10; index++) {
                             var option = document.createElement('option');
                             if (!index) {
@@ -454,7 +489,7 @@ Vue.component('dashboard-scheduler', {
                         title.innerText = 'Create One-Off Giveaway';
                         var enddiv = document.createElement('div');
                         var endtitle = document.createElement('h2');
-                        
+
                         endtitle.innerText = 'End';
                         secondinput.value = getLocalDateTime(end);
 
@@ -482,7 +517,7 @@ Vue.component('dashboard-scheduler', {
 
                         if (currentStep - 1) {
                             create.querySelector('#step' + currentStep).style.display = 'none';
-    
+
                             var nextStep = create.querySelector('#step' + --currentStep)
                             nextStep.style.display = '';
                         } else {
@@ -499,12 +534,31 @@ Vue.component('dashboard-scheduler', {
                             }
                         });
 
-                        if (currentStep < steps.length) {
-                            create.querySelector('#step' + currentStep).style.display = 'none';
-    
-                            var nextStep = create.querySelector('#step' + ++currentStep)
-                            nextStep.style.display = '';
+                        var inputs = create.querySelector('#step' + currentStep).querySelectorAll('input, select');
+                        var valid = 0;
+                        inputs.forEach((e) => {
+                            if (e.type == 'radio') {
+                                var checked = create.querySelector('#step' + currentStep).querySelectorAll('input[name="' + e.name + '"]:checked');
+                                if (checked.length) {
+                                    valid++;
+                                }
+                            } else {
+                                if (e.value) {
+                                    valid++;
+                                }
+                            }
+                        });
+
+                        if (valid == inputs.length) {
+
+                            if (currentStep < steps.length) {
+                                create.querySelector('#step' + currentStep).style.display = 'none';
+
+                                var nextStep = create.querySelector('#step' + ++currentStep)
+                                nextStep.style.display = '';
+                            }
                         }
+
                     });
 
                     backbutton.className = nextbutton.className = 'main';
@@ -664,7 +718,7 @@ Vue.component('dashboard-scheduler', {
                                 var end = +new Date(+((Array.prototype.indexOf.call(endingElement.parentElement.querySelectorAll('td'), endingElement) * 86400000) + parseInt(endingElement.parentElement.id))).setHours(0, 0, 0, 0);
                                 var dates = [start, end].sort(function (a, b) { return a - b });
                                 var startDate = new Date(dates[0]);
-                                if (+startDate == new Date().setHours(0,0,0,0)) {
+                                if (+startDate == new Date().setHours(0, 0, 0, 0)) {
                                     var d = new Date();
                                     d.setMinutes(d.getMinutes() + 30);
                                     d.setMinutes(0);
@@ -674,7 +728,7 @@ Vue.component('dashboard-scheduler', {
                                     startDate = d;
                                 }
                                 var endDate = new Date(dates[1]);
-                                if (+endDate == new Date().setHours(0,0,0,0)) {
+                                if (+endDate == new Date().setHours(0, 0, 0, 0)) {
                                     endDate = new Date(new Date(+startDate).setHours(startDate.getHours() + 1));
                                 }
                                 console.log(endDate);

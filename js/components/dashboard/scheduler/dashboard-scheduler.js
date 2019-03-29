@@ -294,6 +294,15 @@ Vue.component('dashboard-scheduler', {
                     date.getMinutes().AddZero()].join(':');
             }
 
+            function populateSelect(selectElement, options) {
+                Object.keys(options).forEach((key) => {
+                    var option = document.createElement('option');
+                    option.innerText = options[key];
+                    selectElement.appendChild(option);
+                });
+                return selectElement;
+            }
+
             return function () {
                 var modalContent = document.querySelector('.vex-content');
                 var title = document.createElement('h1');
@@ -418,17 +427,17 @@ Vue.component('dashboard-scheduler', {
                         step3.innerHTML = '';
                         var step3question = document.createElement('p');
                         var parametersContainer = document.createElement('div');
-                        var genreLabel= document.createElement('p');
+                        var genreLabel = document.createElement('p');
                         var genreSelect = document.createElement('select');
-                        var platformLabel= document.createElement('p');
+                        var platformLabel = document.createElement('p');
                         var platformSelect = document.createElement('select');
-                        var regionLabel= document.createElement('p');
+                        var regionLabel = document.createElement('p');
                         var regionSelect = document.createElement('select');
-                        var priceLabel= document.createElement('p');
+                        var priceLabel = document.createElement('p');
                         var priceLow = document.createElement('input');
-                        var priceLowLabel= document.createElement('p');
+                        var priceLowLabel = document.createElement('p');
                         var priceHigh = document.createElement('input');
-                        var priceHighLabel= document.createElement('p');
+                        var priceHighLabel = document.createElement('p');
 
                         step3question.innerText = 'Choose what type of game you\'d like GIFTron to purchase:';
                         parametersContainer.className = 'container';
@@ -443,10 +452,27 @@ Vue.component('dashboard-scheduler', {
                         priceHighLabel.innerText = 'Below:';
                         //need to make a function that builds select options from a key-value pair
                         //and it is at this point, that those key-values need to be pulled from G2A. It's API time.
+                        /*
+                        1. Load https://www.g2a.com/category/games-c189
+                        2. Find "HASH":"2890bc81e\n"
+                        3. Load https://www.g2a.com/en/assets/index-2890bc81e.js
+                        4. Find PLATFORM_FILTER_OPTIONS, GENRE_FILTER_OPTIONS
+                        */
+
+
+                        
+                        step3.appendChild(populateSelect(genreSelect, {
+                            
+                        }));
+
                     });
 
                     step2negative.addEventListener('click', () => {
-
+                        //We need to pick a game
+                        console.log(vm.$root.user.locale);
+                        console.log(g2a.request("/products/filter/?query=rocket%20league&sort=preorder&wholesale=false&currency=USD", (response) => {
+                            console.log(response);
+                        }, (e) => {console.log('yee')}, vm.$root.user.locale));
                     });
 
                     if (param) {

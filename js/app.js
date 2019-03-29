@@ -101,3 +101,25 @@ window.onload = () => {
 
     vex.defaultOptions.contentClassName = 'modal';
 };
+
+class G2Api {
+    request(endpoint, success, error, locale) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    success(JSON.parse(this.response));
+                } else {
+                    error(this.status);
+                }
+            }
+        };
+        xhttp.open("GET", "https://cors-anywhere.herokuapp.com/https://www.g2a.com/new/api/v2" + endpoint, true);
+        xhttp.setRequestHeader('accept', 'application/json');
+        xhttp.setRequestHeader('accept-language', locale);
+        xhttp.setRequestHeader('content-type', 'application/json');
+        xhttp.send();
+    }
+}
+
+var g2a = new G2Api;
